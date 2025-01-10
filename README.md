@@ -15,17 +15,9 @@
 - Stream API를 통해 JCF의 데이터를 조회할 수 있다.
 - [심화] 모듈 간 의존 관계를 이해하고 팩토리 패턴을 활용해 의존성을 관리할 수 있다.
 
-## 프로젝트 마일스톤
-- 프로젝트 초기화 (Java, Gradle)
-- 도메인 모델 구현
-- 서비스 인터페이스 설계 및 구현체 구현
-- 각 도메인 모델별 CRUD
-- JCFx메모리 기반
-- 의존성 주입
 
 ## 요구사항💟
 ### 기본 요구사항
-#### 프로젝트 초기화(생략)
 #### 도메인 모델링
 - 디스코드 서비스를 활용해보면서 각 도메인 모델에 필요한 정보를 도출하고, Java Class로 구현하세요.
 - 패키지명: com.sprint.mission.discodeit.entity
@@ -110,5 +102,3 @@ CRUD 메소드를 선언하고, 각 메소드별 용도는 주석으로 추가�
 ### 팩토리 패턴
 - ServiceFactory에서 모든 JCF[Domain]Service를 관리합니다.
 - 각 JCF[Domain]Service 인스턴스를 가지고 있습니다.
-- 한 JCF[Domain]Service에서 다른 JCF[Domain]Service에 접근할 때 사용합니다.
-- 예: 유저가 삭제될 때 유저를 삭제하는 기능은 JCFUserService에 구현되어 있지만 채널에서 소속 유저를 제거하는 것은 JCFChannelService에 구현되어 있습니다. 이때 JCFUserService에서 ServiceFactory를 통해 JCFChannelService에 접근하여 유저 삭제 시 채널에서도 해당 유저를 없앱니다.
