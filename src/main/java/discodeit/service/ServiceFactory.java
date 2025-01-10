@@ -11,22 +11,28 @@ public class ServiceFactory {
     private final JCFChannelService jcfchannelService;
     private final JCFMessageService jcfMessageService;
 
-    private ServiceFactory() {
+//    private ServiceFactory() {
+//        jcfUserService = JCFUserService.getInstance();
+//        jcfchannelService = JCFChannelService.getInstance();
+//        jcfMessageService = JCFMessageService.getInstance();
+//    }
+
+    public ServiceFactory() {
         jcfUserService = JCFUserService.getInstance();
         jcfchannelService = JCFChannelService.getInstance();
         jcfMessageService = JCFMessageService.getInstance();
     }
 
-    public static ServiceFactory getInstance() {
-        if(instance == null) {
-            synchronized (ServiceFactory.class) {
-                if(instance == null) {
-                    instance = new ServiceFactory();
-                }
-            }
-        }
-        return instance;
-    }
+//    public static ServiceFactory getInstance() {
+//        if(instance == null) {
+//            synchronized (ServiceFactory.class) {
+//                if(instance == null) {
+//                    instance = new ServiceFactory();
+//                }
+//            }
+//        }
+//        return instance;
+//    }
 
     //Getter
     public JCFUserService getJcfUserService() {

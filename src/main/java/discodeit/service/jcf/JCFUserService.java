@@ -31,6 +31,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(String email, String name) {
+        System.out.print("사용자 생성 요청: ");
         try{
             if(data.entrySet().stream()
                     .anyMatch( entry -> entry.getValue().getEmail().equals(email))){
@@ -82,31 +83,50 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserName(User user, String name) {
-        user.updateName(name);
+        System.out.print("사용자 수정 요청: ");
+        try {
+            String prevName = user.getName();
+            user.updateName(name);
+            System.out.println(prevName + "님의 이름이 " + name + "으로 변경되었습니다.");
+        } catch (Exception e) {
+            System.out.println(user.getName() + " 이름 발생 중 오류 발생");
+        }
     }
 
     @Override
     public void updateUserEmail(User user, String email) {
-        if(data.entrySet().stream()
-                .anyMatch( entry -> entry.getValue().getEmail().equals(email))) {
-            System.out.println(email + "은 이미 존재하는 이메일입니다.");
-            return;
+        System.out.print("사용자 수정 요청: ");
+        try {
+            if(data.entrySet().stream()
+                    .anyMatch( entry -> entry.getValue().getEmail().equals(email))) {
+                System.out.println(email + "은 이미 존재하는 이메일입니다.");
+                return;
+            }
+            user.updateEmail(email);
+            System.out.println(user.getName() + "의 이메일이 " + email + "로 변경되었습니다.");
+        } catch (Exception e) {
+            System.out.println(user.getName() + " 이메일 발생 중 오류 발생");
         }
-        user.updateEmail(email);
     }
 
     @Override
     public void deleteUser(User user) {
-        if (data.containsKey(user.getId())) {
-            // 해당 유저가 속한 모든 채널에서 삭제
-            JCFChannelService jcfChannelService = ServiceFactory.getInstance().getJcfchannelService();
-            List<Channel> channelsToRemove = new ArrayList<>(user.getChannels());
-            channelsToRemove.stream()
-                    .forEach(channel -> jcfChannelService.deleteUserInChannel(channel, user));
-            data.remove(user.getId());
-            System.out.println(user.getName() + " 사용자가 삭제되었습니다.");
-        } else {
-            System.out.println("존재하지 않는 사용자입니다.");
+        System.out.print("사용자 삭제 요청: ");
+        try {
+            if (data.containsKey(user.getId())) {
+                // 해당 유저가 속한 모든 채널에서 삭제
+                user.getChannels().stream()
+                        .forEach(channel -> {
+                            channel.getUsers().remove(user);
+                        });
+                data.remove(user.getId());
+                System.out.println(user.getName() + " 사용자가 삭제되었습니다.");
+            } else {
+                System.out.println("존재하지 않는 사용자입니다.");
+            }    
+        } catch (Exception e) {
+            System.out.println(user.getName() + "(ID: " + user.getId() +") 사용자 삭제 중 오류 발생");
         }
+        
     }
 }

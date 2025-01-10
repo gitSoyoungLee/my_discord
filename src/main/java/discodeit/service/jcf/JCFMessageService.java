@@ -39,7 +39,7 @@ public class JCFMessageService implements MessageService {
         Message message=new Message(user, channel, content);
         data.add(message);
         channel.getMessages().add(message);
-        // [심화] 도메인 간 관계
+        // [심화] 도메인 간 관계 확인
         System.out.println("[심화] User: " + message.getSender().getName()
                 + " Channel: " + message.getChannel().getName()
                 + " Message: " + message.getContent());
@@ -72,26 +72,33 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void updateMessage(User user, Message message, String newContent) {
+        System.out.print("메세지 수정 요청: ");
         try {
             // 메시지 작성자인 경우에만 수정 가능
             if(message.getSender()!=user) {
                 throw new IllegalArgumentException("올바르지 않은 작성자");
             }
             message.updateContent(newContent);
-            return;
+            System.out.println("메세지가 수정되었습니다.");
         } catch (IllegalArgumentException e) {
-            System.out.println("해당 메세지를 작성한 사용자가 아닙니다.");
-            return;
+            System.out.println("해당 메세지를 작성한 사용자만 메세지를 수정할 수 있습니다.");
         } catch (Exception e) {
             e.printStackTrace();
-            return;
         }
     }
 
     @Override
     public void deleteMessage(Message message) {
-        JCFChannelService jcfChannelService = ServiceFactory.getInstance().getJcfchannelService();
-        jcfChannelService.deleteMessageInChannel(message);
-        data.remove(message);
+        System.out.print("메세지 삭제 요청: ");
+        try{
+            // 해당 채널의 메세지 리스트에서 삭제
+            int idx = message.getChannel().getMessages().indexOf(message);
+            message.getChannel().getMessages().remove(idx);
+            data.remove(message);
+            System.out.println("Message ID: " + message.getId() + "가 삭제됩니다.");
+        } catch (Exception e) {
+            System.out.println("Message ID: " + message.getId() + "가 삭제 중 오류 발생");
+        }
+
     }
 }

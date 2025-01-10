@@ -19,5 +19,4 @@ public interface ChannelService {
     void addUserIntoChannel(Channel channel, User user);    // 유저가 채널에 입장
     void deleteUserInChannel(Channel channel, User user);   // 유저를 채널에서 삭제
 
-    void deleteMessageInChannel(Message message);   // 채널에서 메세지를 삭제
 }
