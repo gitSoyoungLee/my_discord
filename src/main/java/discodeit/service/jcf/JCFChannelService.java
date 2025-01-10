@@ -6,12 +6,17 @@ import discodeit.enity.User;
 import discodeit.service.ChannelService;
 import discodeit.service.ServiceFactory;
 
+import java.time.chrono.JapaneseChronology;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JCFChannelService implements ChannelService {
 
     private static volatile JCFChannelService instance;
+
+    private JCFUserService jcfUserService;
+    private JCFMessageService jcfMessageService;
+
     private final List<Channel> data;
 
     private JCFChannelService() {
@@ -27,6 +32,14 @@ public class JCFChannelService implements ChannelService {
             }
         }
         return instance;
+    }
+
+    public void setJcfUserService(JCFUserService jcfUserService) {
+        this.jcfUserService = jcfUserService;
+    }
+
+    public void setJcfMessageService(JCFMessageService jcfMessageService) {
+        this.jcfMessageService = jcfMessageService;
     }
 
     @Override

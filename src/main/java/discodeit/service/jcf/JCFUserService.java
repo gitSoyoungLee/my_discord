@@ -12,6 +12,9 @@ public class JCFUserService implements UserService {
     //싱글톤
     private static volatile JCFUserService instance;
 
+    private JCFChannelService jcfChannelService;
+    private  JCFMessageService jcfMessageService;
+
     private final Map<UUID, User> data;   // 모든 유저 데이터, key=id
 
     private JCFUserService() {
@@ -27,6 +30,14 @@ public class JCFUserService implements UserService {
             }
         }
         return instance;
+    }
+
+    public void setJcfChannelService(JCFChannelService jcfChannelService) {
+        this.jcfChannelService = jcfChannelService;
+    }
+
+    public void setJcfMessageService(JCFMessageService jcfMessageService) {
+        this.jcfMessageService = jcfMessageService;
     }
 
     @Override

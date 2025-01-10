@@ -15,6 +15,14 @@ public class ServiceFactory {
         jcfUserService = JCFUserService.getInstance();
         jcfchannelService = JCFChannelService.getInstance();
         jcfMessageService = JCFMessageService.getInstance();
+
+        // 의존성 주입
+        jcfUserService.setJcfChannelService(jcfchannelService);
+        jcfUserService.setJcfMessageService(jcfMessageService);
+        jcfchannelService.setJcfUserService(jcfUserService);
+        jcfchannelService.setJcfMessageService(jcfMessageService);
+        jcfMessageService.setJcfUserService(jcfUserService);
+        jcfMessageService.setJcfChannelService(jcfchannelService);
     }
 
 

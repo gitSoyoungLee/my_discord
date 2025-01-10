@@ -12,6 +12,10 @@ import java.util.List;
 public class JCFMessageService implements MessageService {
 
     private static volatile JCFMessageService instance;
+
+    private JCFUserService jcfUserService;
+    private JCFChannelService jcfChannelService;
+
     private final List<Message> data;
 
     private JCFMessageService() {
@@ -27,6 +31,14 @@ public class JCFMessageService implements MessageService {
             }
         }
         return instance;
+    }
+
+    public void setJcfUserService(JCFUserService jcfUserService) {
+        this.jcfUserService = jcfUserService;
+    }
+
+    public void setJcfChannelService(JCFChannelService jcfChannelService) {
+        this.jcfChannelService = jcfChannelService;
     }
 
     @Override
