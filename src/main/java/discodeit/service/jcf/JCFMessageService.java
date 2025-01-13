@@ -100,40 +100,36 @@ public class JCFMessageService implements MessageService {
     @Override
     public void updateMessage(UUID userId, UUID messageId, String newContent) {
         System.out.print("메세지 수정 요청: ");
-        try {
-            if(!validateMessage(messageId) || !jcfUserService.validateUser(userId))
-                throw new Exception();
-            Message message = data.get(messageId);
-            User user = jcfUserService.getData().get(userId);
-            // 메시지 작성자인 경우에만 수정 가능
-            if(message.getSender()!=user) {
-                throw new IllegalArgumentException();
-            }
-            message.updateContent(newContent);
-            System.out.println("메세지가 수정되었습니다.");
-        } catch (IllegalArgumentException e) {
-            System.out.println("해당 메세지를 작성한 사용자만 메세지를 수정할 수 있습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(!validateMessage(messageId) || !jcfUserService.validateUser(userId)) {
+            System.out.println("메세지 또는 사용자 데이터가 올바르지 않습니다.");
+            return;
         }
+        Message message = data.get(messageId);
+        User user = jcfUserService.getData().get(userId);
+
+        // 메시지 작성자인 경우에만 수정 가능
+        if(message.getSender()!=user) {
+            System.out.println("메세지 작성자만 수정 가능합니다.");
+            return;
+        }
+        message.updateContent(newContent);
+        System.out.println("메세지가 수정되었습니다.");
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
         System.out.print("메세지 삭제 요청: ");
-        try{
-            if(!validateMessage(messageId)) throw new Exception();
-
-            // 해당 채널의 메세지 리스트에서 삭제
-            Message message = data.get(messageId);
-            int idx = message.getChannel().getMessages().indexOf(message);
-            message.getChannel().getMessages().remove(idx);
-            data.remove(messageId);
-            System.out.println("Message ID: " + message.getId() + "가 삭제됩니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(!validateMessage(messageId)) {
+            System.out.println("존재하지 않는 메세지입니다.");
+            return;
         }
 
+        // 해당 채널의 메세지 리스트에서 삭제
+        Message message = data.get(messageId);
+        int idx = message.getChannel().getMessages().indexOf(message);
+        message.getChannel().getMessages().remove(idx);
+        data.remove(messageId);
+        System.out.println("Message ID: " + message.getId() + "가 삭제됩니다.");
     }
 
     @Override
