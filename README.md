@@ -92,13 +92,14 @@ CRUD 메소드를 선언하고, 각 메소드별 용도는 주석으로 추가�
 - src/main/java/discodeit/service/jcf
 - 모든 사용자, 채널, 메시지를 관리하는 관리 시스템으로 전역 객체로 선언되기 때문에 **싱글톤**을 적용합니다.
 - JCFUserService
-  - Map<UUID, User> data: User 식별자 id를 key로, 해당 User를 value로 하는 맵. List<User>를 써도 되지만 Map도 사용해보고 싶어서 써봤습니다..ㅎㅎ
+  - Map<UUID, User> data: 존재하는 모든 유저를 저장한 맵. User 식별자 id를 key로, 해당 User를 value로 하는 맵. 서비스 계층에서 객체 id를 이용해 메서드를 호출하고 싶어 id를 이용했습니다.
 - JCFChannelService
-  - List<Channel> data: 존재하는 모든 채널을 저장한 리스트
+  - Map<UUID, Channel> data: 존재하는 모든 채널을 저장한 맵.
 - JCFMessageService
-  - List<Message> data: 존재하는 모든 메세지를 저장한 리스트
+  - Map<UUID, Message> data: 존재하는 모든 메세지를 저장한 맵.
 
   
 ### 팩토리 패턴
 - ServiceFactory에서 모든 JCF[Domain]Service를 관리합니다.
 - 각 JCF[Domain]Service 인스턴스를 가지고 있습니다.
+- 인스턴스 생성 후 의존성을 주입합니다.
