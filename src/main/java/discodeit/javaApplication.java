@@ -11,7 +11,7 @@ import discodeit.service.jcf.JCFUserService;
 import java.util.UUID;
 
 public class javaApplication {
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         ServiceFactory serviceFactory = new ServiceFactory();
         JCFUserService jcfUserService = serviceFactory.getJcfUserService();
@@ -20,13 +20,13 @@ public class javaApplication {
 
         //유저 등록
         System.out.println("==== Create User ====");
-        UUID user1=jcfUserService.createUser("Alice@gmail.com","Alice");
-        UUID user2=jcfUserService.createUser("Bob@gmail.com","Bob");
-        UUID user3=jcfUserService.createUser("Cindy@gmail.com","Cindy");
-        UUID user4=jcfUserService.createUser("Dan@gmail.com","Dan");
-        UUID user5=jcfUserService.createUser("Edward@gmail.com","Edward");
-        UUID user6=jcfUserService.createUser("Felix@gmail.com","felix");
-        jcfUserService.createUser("Alice@gmail.com","Alice");
+        UUID user1 = jcfUserService.createUser("Alice@gmail.com", "Alice");
+        UUID user2 = jcfUserService.createUser("Bob@gmail.com", "Bob");
+        UUID user3 = jcfUserService.createUser("Cindy@gmail.com", "Cindy");
+        UUID user4 = jcfUserService.createUser("Dan@gmail.com", "Dan");
+        UUID user5 = jcfUserService.createUser("Edward@gmail.com", "Edward");
+        UUID user6 = jcfUserService.createUser("Felix@gmail.com", "felix");
+        jcfUserService.createUser("Alice@gmail.com", "Alice");
         System.out.println("====================\n\n");
 
         System.out.println("==== Read User ====");
@@ -41,7 +41,7 @@ public class javaApplication {
         System.out.println("==== Update User ====");
         jcfUserService.updateUserName(user1, "Andy");
         jcfUserService.updateUserEmail(user1, "Andy@gmail.com");
-        jcfUserService.updateUserEmail(user1,"Bob@gmail.com");
+        jcfUserService.updateUserEmail(user1, "Bob@gmail.com");
         System.out.println();
         jcfUserService.viewAllUser();
         System.out.println("====================\n\n");
@@ -58,10 +58,10 @@ public class javaApplication {
 
         //채널 등록
         System.out.println("==== Create Channel ====");
-        UUID channel1=jcfChannelService.createChannel("채널 1");
-        UUID channel2=jcfChannelService.createChannel("채널 2");
-        UUID channel3=jcfChannelService.createChannel("채널 3");
-        UUID channel4=jcfChannelService.createChannel("채널 4");
+        UUID channel1 = jcfChannelService.createChannel("채널 1");
+        UUID channel2 = jcfChannelService.createChannel("채널 2");
+        UUID channel3 = jcfChannelService.createChannel("채널 3");
+        UUID channel4 = jcfChannelService.createChannel("채널 4");
         System.out.println("====================\n\n");
 
         //채널 다건 조회

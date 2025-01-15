@@ -13,7 +13,7 @@ public class JCFUserService implements UserService {
     private static volatile JCFUserService instance;
 
     private JCFChannelService jcfChannelService;
-    private  JCFMessageService jcfMessageService;
+    private JCFMessageService jcfMessageService;
 
     private final Map<UUID, User> data;   // 모든 유저 데이터, key=id
 
@@ -22,9 +22,9 @@ public class JCFUserService implements UserService {
     }
 
     public static JCFUserService getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             synchronized (JCFUserService.class) {
-                if(instance == null) {
+                if (instance == null) {
                     instance = new JCFUserService();
                 }
             }
@@ -40,13 +40,15 @@ public class JCFUserService implements UserService {
         this.jcfMessageService = jcfMessageService;
     }
 
-    public Map<UUID, User> getData() { return data;
+    public Map<UUID, User> getData() {
+        return data;
     }
+
     @Override
     public UUID createUser(String email, String name) {
         System.out.print("사용자 생성 요청: ");
-        if(data.entrySet().stream()
-                .anyMatch( entry -> entry.getValue().getEmail().equals(email))){
+        if (data.entrySet().stream()
+                .anyMatch(entry -> entry.getValue().getEmail().equals(email))) {
             System.out.println("이미 존재하는 계정입니다.");
             return null;
         }
@@ -59,7 +61,7 @@ public class JCFUserService implements UserService {
     @Override
     public void viewUserInfo(UUID userId) {
         System.out.println("--- 사용자 조회 ---");
-        if(validateUser(userId)){
+        if (validateUser(userId)) {
             User user = data.get(userId);
             System.out.println("Email: " + user.getEmail()
                     + " / name: " + user.getName()
@@ -78,14 +80,14 @@ public class JCFUserService implements UserService {
     @Override
     public void viewAllUser() {
         System.out.println("--- 전체 사용자 목록---");
-        if(data.isEmpty()) {
+        if (data.isEmpty()) {
             System.out.println("사용자가 없습니다.");
             return;
         }
         data.entrySet().stream()
                 .sorted(Comparator.comparingLong(entry -> entry.getValue().getCreatedAt())
                 )
-                .forEach( entry -> {
+                .forEach(entry -> {
                     System.out.println("Email: " + entry.getValue().getEmail()
                             + " / name: " + entry.getValue().getName()
                             + " / created at: " + entry.getValue().getCreatedAt());
@@ -95,7 +97,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserName(UUID userId, String name) {
-        if(validateUser(userId)) {
+        if (validateUser(userId)) {
             User user = data.get(userId);
             String prevName = user.getName();
             user.updateName(name);
@@ -108,9 +110,9 @@ public class JCFUserService implements UserService {
     @Override
     public void updateUserEmail(UUID userId, String email) {
         System.out.print("사용자 수정 요청: ");
-        if(validateUser(userId)){
-            if(data.entrySet().stream()
-                    .anyMatch( entry -> entry.getValue().getEmail().equals(email))) {
+        if (validateUser(userId)) {
+            if (data.entrySet().stream()
+                    .anyMatch(entry -> entry.getValue().getEmail().equals(email))) {
                 System.out.println(email + "은 이미 존재하는 이메일입니다.");
                 return;
             }
@@ -142,7 +144,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean validateUser(UUID userId) {
-        if(data.containsKey(userId) && data.get(userId)!=null) return true;
+        if (data.containsKey(userId) && data.get(userId) != null) return true;
         return false;
     }
 }

@@ -18,13 +18,13 @@ public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
 
     private JCFMessageService() {
-        this.data=new HashMap<>();
+        this.data = new HashMap<>();
     }
 
     public static JCFMessageService getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             synchronized (JCFUserService.class) {
-                if(instance == null) {
+                if (instance == null) {
                     instance = new JCFMessageService();
                 }
             }
@@ -40,24 +40,26 @@ public class JCFMessageService implements MessageService {
         this.jcfChannelService = jcfChannelService;
     }
 
-    public Map<UUID, Message> getData() { return data; }
+    public Map<UUID, Message> getData() {
+        return data;
+    }
 
     @Override
     public UUID createMessage(UUID userId, UUID channelId, String content) {
         try {
-            if(!jcfChannelService.validateChannel(channelId) || !jcfUserService.validateUser(userId))
+            if (!jcfChannelService.validateChannel(channelId) || !jcfUserService.validateUser(userId))
                 throw new Exception();
 
             Channel channel = jcfChannelService.getData().get(channelId);
             User user = jcfUserService.getData().get(userId);
 
-            if(!channel.getUsers().contains(user)){
+            if (!channel.getUsers().contains(user)) {
                 System.out.println("메세지를 보낼 수 없습니다: " +
-                    user.getName() + "은 아직 '" + channel.getName() + "' 채널에 입장하지 않았습니다.");
+                        user.getName() + "은 아직 '" + channel.getName() + "' 채널에 입장하지 않았습니다.");
                 return null;
             }
 
-            Message message=new Message(user, channel, content);
+            Message message = new Message(user, channel, content);
             data.put(message.getId(), message);
             channel.getMessages().add(message);
             System.out.println("메세지 생성 완료");
@@ -70,9 +72,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void viewMessage(UUID messageId) {
-        if(validateMessage(messageId)){
+        if (validateMessage(messageId)) {
             Message message = data.get(messageId);
-            System.out.println( message.getChannel().getName() + " > " +
+            System.out.println(message.getChannel().getName() + " > " +
                     message.getSender().getName() + ": " +
                     message.getContent()
                     + " (시간: " + message.getUpdatedAt() + ")");
@@ -85,7 +87,7 @@ public class JCFMessageService implements MessageService {
     public void viewAllMessages() {
         System.out.println("--- 디스코드잇에서 생성된 모든 메세지 ---");
         data.entrySet().stream()
-                .forEach( entry -> {
+                .forEach(entry -> {
                     String time = entry.getValue().getCreatedAt().equals(entry.getValue().getUpdatedAt())
                             ? String.valueOf(entry.getValue().getCreatedAt())
                             : entry.getValue().getUpdatedAt() + " 수정";
@@ -100,7 +102,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void updateMessage(UUID userId, UUID messageId, String newContent) {
         System.out.print("메세지 수정 요청: ");
-        if(!validateMessage(messageId) || !jcfUserService.validateUser(userId)) {
+        if (!validateMessage(messageId) || !jcfUserService.validateUser(userId)) {
             System.out.println("메세지 또는 사용자 데이터가 올바르지 않습니다.");
             return;
         }
@@ -108,7 +110,7 @@ public class JCFMessageService implements MessageService {
         User user = jcfUserService.getData().get(userId);
 
         // 메시지 작성자인 경우에만 수정 가능
-        if(message.getSender()!=user) {
+        if (message.getSender() != user) {
             System.out.println("메세지 작성자만 수정 가능합니다.");
             return;
         }
@@ -119,7 +121,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void deleteMessage(UUID messageId) {
         System.out.print("메세지 삭제 요청: ");
-        if(!validateMessage(messageId)) {
+        if (!validateMessage(messageId)) {
             System.out.println("존재하지 않는 메세지입니다.");
             return;
         }
@@ -134,7 +136,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean validateMessage(UUID messageId) {
-        if(data.containsKey(messageId) && data.get(messageId)!=null) return true;
+        if (data.containsKey(messageId) && data.get(messageId) != null) return true;
         return false;
     }
 }

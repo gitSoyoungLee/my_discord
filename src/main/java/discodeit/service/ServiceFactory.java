@@ -30,9 +30,11 @@ public class ServiceFactory {
     public JCFUserService getJcfUserService() {
         return jcfUserService.getInstance();
     }
+
     public JCFChannelService getJcfchannelService() {
         return jcfchannelService.getInstance();
     }
+
     public JCFMessageService getJcfMessageService() {
         return jcfMessageService.getInstance();
     }

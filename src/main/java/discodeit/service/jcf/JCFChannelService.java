@@ -24,9 +24,9 @@ public class JCFChannelService implements ChannelService {
     }
 
     public static JCFChannelService getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             synchronized (JCFUserService.class) {
-                if(instance == null) {
+                if (instance == null) {
                     instance = new JCFChannelService();
                 }
             }
@@ -42,7 +42,9 @@ public class JCFChannelService implements ChannelService {
         this.jcfMessageService = jcfMessageService;
     }
 
-    public Map<UUID, Channel> getData() { return data; }
+    public Map<UUID, Channel> getData() {
+        return data;
+    }
 
     @Override
     public UUID createChannel(String name) {
@@ -62,7 +64,7 @@ public class JCFChannelService implements ChannelService {
                 )
                 .forEach(entry -> {
                     System.out.println("채널: " + entry.getValue().getName());
-                    System.out.print("참여 중인 사용자: " );
+                    System.out.print("참여 중인 사용자: ");
                     entry.getValue().getUsers().stream()
                             .forEach(user -> {
                                 System.out.print(user.getName() + " ");
@@ -73,13 +75,13 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void viewChannelInfo(UUID channelId) {
-        if(validateChannel(channelId)){
+        if (validateChannel(channelId)) {
             //채널 정보 출력
             System.out.println("--- 채널 조회 ---");
 
             Channel channel = data.get(channelId);
             System.out.println("채널: " + channel.getName());
-            System.out.print("참여 중인 사용자: " );
+            System.out.print("참여 중인 사용자: ");
             channel.getUsers().stream()
                     .forEach(user -> {
                         System.out.print(user.getName() + " ");
@@ -87,19 +89,19 @@ public class JCFChannelService implements ChannelService {
             System.out.println();
 
             //채널 내 메세지 출력
-            if(channel.getMessages().isEmpty()){
+            if (channel.getMessages().isEmpty()) {
                 System.out.println("현재 채널에 작성된 메세지가 없습니다. 채팅을 시작하세요.");
             } else {
                 channel.getMessages().stream()
                         .forEach(message -> {
-                            if(jcfUserService.validateUser(message.getSender().getId())) {
-                                if(channel.getUsers().contains(message.getSender())) {
+                            if (jcfUserService.validateUser(message.getSender().getId())) {
+                                if (channel.getUsers().contains(message.getSender())) {
                                     System.out.println(message.getSender().getName() + ": " + message.getContent());
-                                } else{
-                                    System.out.println("(이 채널에 더 이상 없는 유저입니다.) " + message.getSender().getName() + ": "+message.getContent());
+                                } else {
+                                    System.out.println("(이 채널에 더 이상 없는 유저입니다.) " + message.getSender().getName() + ": " + message.getContent());
                                 }
                             } else {
-                                System.out.println("(탈퇴한 유저입니다.) " + message.getSender().getName() + ": "+message.getContent());
+                                System.out.println("(탈퇴한 유저입니다.) " + message.getSender().getName() + ": " + message.getContent());
                             }
                         });
             }
@@ -111,11 +113,11 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void updateChannelName(UUID channelId, String name) {
         System.out.print("채널 수정 요청: ");
-        if(validateChannel(channelId)) {
+        if (validateChannel(channelId)) {
             Channel channel = data.get(channelId);
-            String prevName=channel.getName();
+            String prevName = channel.getName();
             channel.updateName(name);
-            System.out.println("채널 '" + prevName+"'이 '" + name + "'으로 변경되었습니다.");
+            System.out.println("채널 '" + prevName + "'이 '" + name + "'으로 변경되었습니다.");
         } else {
             System.out.println("존재하지 않는 채널입니다.");
         }
@@ -124,7 +126,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID channelId) {
         System.out.print("채널 삭제 요청: ");
-        if(validateChannel(channelId)){
+        if (validateChannel(channelId)) {
             Channel channel = data.get(channelId);
             //채널-유저, 채널-메세지 관계 삭제
             channel.getUsers().stream()
@@ -132,7 +134,7 @@ public class JCFChannelService implements ChannelService {
             channel.getUsers().clear();
             channel.getMessages().clear();
             data.remove(channelId);
-            System.out.println("'" + channel.getName()+"' 채널이 삭제되었습니다.");
+            System.out.println("'" + channel.getName() + "' 채널이 삭제되었습니다.");
         } else {
             System.out.println("존재하지 않는 채널입니다.");
         }
@@ -149,7 +151,7 @@ public class JCFChannelService implements ChannelService {
         Channel channel = data.get(channelId);
         User user = jcfUserService.getData().get(userId);
 
-        if(channel.getUsers().contains(user)){
+        if (channel.getUsers().contains(user)) {
             System.out.println(channel.getName() + "은 채널에 이미 입장한 사용자입니다.");
         } else {
             channel.getUsers().add(user);
@@ -170,7 +172,7 @@ public class JCFChannelService implements ChannelService {
         Channel channel = data.get(channelId);
         User user = jcfUserService.getData().get(userId);
 
-        if(!channel.getUsers().contains(user) || !user.getChannels().contains(channel)){
+        if (!channel.getUsers().contains(user) || !user.getChannels().contains(channel)) {
             System.out.println(channel.getName() + "은 채널에 없는 사용자입니다.");
         } else {
             channel.getUsers().remove(user);
@@ -182,10 +184,9 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public boolean validateChannel(UUID channelId) {
-        if(data.containsKey(channelId) && data.get(channelId)!=null) return true;
+        if (data.containsKey(channelId) && data.get(channelId) != null) return true;
         return false;
     }
-
 
 
 }

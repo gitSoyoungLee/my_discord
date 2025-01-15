@@ -7,26 +7,28 @@ public abstract class Common {
     private final Long createdAt;
     private Long updatedAt;
 
-    public Common(){
-        this.id=UUID.randomUUID();
-        this.createdAt=System.currentTimeMillis();
-        this.updatedAt=createdAt;
+    public Common() {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = createdAt;
     }
 
 
     //Getter
-    public UUID getId(){
+    public UUID getId() {
         return id;
     }
-    public Long getCreatedAt(){
+
+    public Long getCreatedAt() {
         return createdAt;
     }
-    public Long getUpdatedAt(){
+
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
     //Update
-    public void updateClass(){
-        this.updatedAt=System.currentTimeMillis();
+    public void updateClass() {
+        this.updatedAt = System.currentTimeMillis();
     }
 }

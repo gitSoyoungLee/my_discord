@@ -8,14 +8,15 @@ public class Channel extends Common {
     List<User> users;
     List<Message> messages;
 
-    public Channel(){
+    public Channel() {
         super();
     }
+
     public Channel(String name) {
         super();
-        this.name=name;
-        users=new ArrayList<>();
-        messages=new ArrayList<>();
+        this.name = name;
+        users = new ArrayList<>();
+        messages = new ArrayList<>();
     }
 
 
@@ -23,14 +24,18 @@ public class Channel extends Common {
     public String getName() {
         return name;
     }
-    public List<User> getUsers(){
+
+    public List<User> getUsers() {
         return users;
     }
-    public List<Message> getMessages() {return messages;}
+
+    public List<Message> getMessages() {
+        return messages;
+    }
 
     //Update
-    public void updateName(String name){
-        this.name=name;
+    public void updateName(String name) {
+        this.name = name;
         updateClass();
     }
 }
