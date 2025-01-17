@@ -1,23 +1,20 @@
 package discodeit.service.jcf;
 
 import discodeit.enity.Channel;
-import discodeit.enity.Message;
 import discodeit.enity.User;
 import discodeit.service.ChannelService;
-import discodeit.service.ServiceFactory;
 
-import java.time.chrono.JapaneseChronology;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
 
     private static volatile JCFChannelService instance;
-
+    private final Map<UUID, Channel> data;
     private JCFUserService jcfUserService;
     private JCFMessageService jcfMessageService;
-
-    private final Map<UUID, Channel> data;
 
     private JCFChannelService() {
         this.data = new HashMap<>();
@@ -34,16 +31,13 @@ public class JCFChannelService implements ChannelService {
         return instance;
     }
 
-    public void setJcfUserService(JCFUserService jcfUserService) {
-        this.jcfUserService = jcfUserService;
-    }
-
-    public void setJcfMessageService(JCFMessageService jcfMessageService) {
-        this.jcfMessageService = jcfMessageService;
+    public void setService() {
+        this.jcfUserService = jcfUserService.getInstance();
+        this.jcfMessageService = jcfMessageService.getInstance();
     }
 
     public Map<UUID, Channel> getData() {
-        return data;
+        return new HashMap<>(data);
     }
 
     @Override
