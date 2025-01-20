@@ -1,13 +1,11 @@
 package discodeit.service.jcf;
 
 import discodeit.enity.Channel;
+import discodeit.enity.ChannelType;
 import discodeit.enity.User;
 import discodeit.service.ChannelService;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
@@ -41,12 +39,12 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public UUID createChannel(String name) {
+    public UUID createChannel(String name, String description, ChannelType type) {
         System.out.print("채널 생성 요청: ");
 
-        Channel channel = new Channel(name);
+        Channel channel = new Channel(name, description, type);
         data.put(channel.getId(), channel);
-        System.out.println("채널: " + name + ", 생성 시간: " + channel.getCreatedAt());
+        System.out.println("채널: " + name + "(" + type + ")" + ", 생성 시간: " + channel.getCreatedAt());
         return channel.getId();
     }
 
@@ -69,11 +67,10 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void viewChannelInfo(UUID channelId) {
-        if (validateChannel(channelId)) {
-            //채널 정보 출력
-            System.out.println("--- 채널 조회 ---");
-
-            Channel channel = data.get(channelId);
+        //채널 정보 출력
+        System.out.println("--- 채널 조회 ---");
+        try {
+            Channel channel = findChannel(channelId);
             System.out.println("채널: " + channel.getName());
             System.out.print("참여 중인 사용자: ");
             channel.getUsers().stream()
@@ -88,40 +85,41 @@ public class JCFChannelService implements ChannelService {
             } else {
                 channel.getMessages().stream()
                         .forEach(message -> {
-                            if (jcfUserService.validateUser(message.getSender().getId())) {
-                                if (channel.getUsers().contains(message.getSender())) {
-                                    System.out.println(message.getSender().getName() + ": " + message.getContent());
+                            try {
+                                User user = jcfUserService.findUser(message.getSenderId());
+                                if (channel.getUsers().contains(user)) {
+                                    System.out.println(user.getName() + ": " + message.getContent());
                                 } else {
-                                    System.out.println("(이 채널에 더 이상 없는 유저입니다.) " + message.getSender().getName() + ": " + message.getContent());
+                                    System.out.println("(이 채널에 더 이상 없는 유저입니다.) " + user.getName() + ": " + message.getContent());
                                 }
-                            } else {
-                                System.out.println("(탈퇴한 유저입니다.) " + message.getSender().getName() + ": " + message.getContent());
+                            } catch (NoSuchElementException e) {
+                                System.out.println("(알 수 없는 유저): " + message.getContent()); //탈퇴한 유저
                             }
                         });
             }
-        } else {
-            System.out.println("존재하지 않는 채널입니다.");
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
         }
     }
 
     @Override
     public void updateChannelName(UUID channelId, String name) {
         System.out.print("채널 수정 요청: ");
-        if (validateChannel(channelId)) {
-            Channel channel = data.get(channelId);
+        try {
+            Channel channel = findChannel(channelId);
             String prevName = channel.getName();
             channel.updateName(name);
             System.out.println("채널 '" + prevName + "'이 '" + name + "'으로 변경되었습니다.");
-        } else {
-            System.out.println("존재하지 않는 채널입니다.");
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
         }
     }
 
     @Override
     public void deleteChannel(UUID channelId) {
         System.out.print("채널 삭제 요청: ");
-        if (validateChannel(channelId)) {
-            Channel channel = data.get(channelId);
+        try {
+            Channel channel = findChannel(channelId);
             //채널-유저, 채널-메세지 관계 삭제
             channel.getUsers().stream()
                     .forEach(user -> user.getChannels().remove(channel));
@@ -129,57 +127,54 @@ public class JCFChannelService implements ChannelService {
             channel.getMessages().clear();
             data.remove(channelId);
             System.out.println("'" + channel.getName() + "' 채널이 삭제되었습니다.");
-        } else {
-            System.out.println("존재하지 않는 채널입니다.");
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
         }
-
     }
 
     @Override
     public void addUserIntoChannel(UUID channelId, UUID userId) {
-        if (!validateChannel(channelId) || !jcfUserService.validateUser(userId)) {
-            System.out.println("채널 또는 사용자 데이터가 올바르지 못합니다.");
-            return;
+        try {
+            Channel channel = findChannel(channelId);
+            User user = jcfUserService.findUser(userId);
+
+            if (channel.getUsers().contains(user)) {
+                System.out.println(channel.getName() + "은 채널에 이미 입장한 사용자입니다.");
+            } else {
+                channel.getUsers().add(user);
+                user.getChannels().add(channel);
+                System.out.println(user.getName() + "님이 채널 '"
+                        + channel.getName() + "'에 입장합니다.");
+            }
+        } catch (NoSuchElementException e) {
+            System.out.println("채널 또는 사용자 데이터가 올바르지 못합니다. "+e.getMessage());
         }
-
-        Channel channel = data.get(channelId);
-        User user = jcfUserService.getData().get(userId);
-
-        if (channel.getUsers().contains(user)) {
-            System.out.println(channel.getName() + "은 채널에 이미 입장한 사용자입니다.");
-        } else {
-            channel.getUsers().add(user);
-            user.getChannels().add(channel);
-            System.out.println(user.getName() + "님이 채널 '"
-                    + channel.getName() + "'에 입장합니다.");
-        }
-
     }
 
     @Override
     public void deleteUserInChannel(UUID channelId, UUID userId) {
-        if (!validateChannel(channelId) || !jcfUserService.validateUser(userId)) {
-            System.out.println("채널 또는 사용자 데이터가 올바르지 못합니다.");
-            return;
-        }
+        try {
+            Channel channel = findChannel(channelId);
+            User user = jcfUserService.findUser(userId);
 
-        Channel channel = data.get(channelId);
-        User user = jcfUserService.getData().get(userId);
-
-        if (!channel.getUsers().contains(user) || !user.getChannels().contains(channel)) {
-            System.out.println(channel.getName() + "은 채널에 없는 사용자입니다.");
-        } else {
-            channel.getUsers().remove(user);
-            user.getChannels().remove(channel);
-            System.out.println(user.getName() + "님이 채널 '"
-                    + channel.getName() + "'에서 퇴장합니다.");
+            if (!channel.getUsers().contains(user) || !user.getChannels().contains(channel)) {
+                System.out.println(channel.getName() + "은 채널에 없는 사용자입니다.");
+            } else {
+                channel.getUsers().remove(user);
+                user.getChannels().remove(channel);
+                System.out.println(user.getName() + "님이 채널 '"
+                        + channel.getName() + "'에서 퇴장합니다.");
+            }
+        } catch (NoSuchElementException e) {
+            System.out.println("채널 또는 사용자 데이터가 올바르지 못합니다. "+ e.getMessage());
         }
     }
 
     @Override
-    public boolean validateChannel(UUID channelId) {
-        if (data.containsKey(channelId) && data.get(channelId) != null) return true;
-        return false;
+    public Channel findChannel(UUID channelId) {
+        Channel channel = this.data.get(channelId);
+        return Optional.ofNullable(channel)
+                .orElseThrow(() -> new NoSuchElementException("Channel ID: "+channelId+" not found"));
     }
 
 

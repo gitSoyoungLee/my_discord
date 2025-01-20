@@ -1,6 +1,7 @@
 package discodeit;
 
 import discodeit.enity.Channel;
+import discodeit.enity.ChannelType;
 import discodeit.enity.Message;
 import discodeit.enity.User;
 import discodeit.service.ServiceFactory;
@@ -20,13 +21,14 @@ public class javaApplication {
 
         //유저 등록
         System.out.println("==== Create User ====");
-        UUID user1 = jcfUserService.createUser("Alice@gmail.com", "Alice");
-        UUID user2 = jcfUserService.createUser("Bob@gmail.com", "Bob");
-        UUID user3 = jcfUserService.createUser("Cindy@gmail.com", "Cindy");
-        UUID user4 = jcfUserService.createUser("Dan@gmail.com", "Dan");
-        UUID user5 = jcfUserService.createUser("Edward@gmail.com", "Edward");
-        UUID user6 = jcfUserService.createUser("Felix@gmail.com", "felix");
-        jcfUserService.createUser("Alice@gmail.com", "Alice");
+        UUID user1 = jcfUserService.createUser("Alice@gmail.com", "Alice", "12345");
+        UUID user2 = jcfUserService.createUser("Bob@gmail.com", "Bob", "12345");
+        UUID user3 = jcfUserService.createUser("Cindy@gmail.com", "Cindy", "12345");
+        UUID user4 = jcfUserService.createUser("Dan@gmail.com", "Dan", "12345");
+        UUID user5 = jcfUserService.createUser("Edward@gmail.com", "Edward", "12345");
+        UUID user6 = jcfUserService.createUser("Felix@gmail.com", "felix", "12345");
+        jcfUserService.createUser("Alice@gmail.com", "Alice","12345");
+        jcfUserService.createUser("Gary@gmail.com", "Gary","1234");
         System.out.println("====================\n\n");
 
         System.out.println("==== Read User ====");
@@ -58,10 +60,10 @@ public class javaApplication {
 
         //채널 등록
         System.out.println("==== Create Channel ====");
-        UUID channel1 = jcfChannelService.createChannel("채널 1");
-        UUID channel2 = jcfChannelService.createChannel("채널 2");
-        UUID channel3 = jcfChannelService.createChannel("채널 3");
-        UUID channel4 = jcfChannelService.createChannel("채널 4");
+        UUID channel1 = jcfChannelService.createChannel("채널 1", "첫 번째 채널", ChannelType.PUBLIC);
+        UUID channel2 = jcfChannelService.createChannel("채널 2", "두 번째 채널", ChannelType.PUBLIC);
+        UUID channel3 = jcfChannelService.createChannel("채널 3", "세 번째 채널", ChannelType.PUBLIC);
+        UUID channel4 = jcfChannelService.createChannel("채널 4", "네 번째 채널", ChannelType.PUBLIC);
         System.out.println("====================\n\n");
 
         //채널 다건 조회

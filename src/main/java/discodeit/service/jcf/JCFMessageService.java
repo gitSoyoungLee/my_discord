@@ -1,13 +1,12 @@
 package discodeit.service.jcf;
 
 import discodeit.enity.Channel;
+import discodeit.enity.ChannelType;
 import discodeit.enity.Message;
 import discodeit.enity.User;
 import discodeit.service.MessageService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
@@ -43,11 +42,8 @@ public class JCFMessageService implements MessageService {
     @Override
     public UUID createMessage(UUID userId, UUID channelId, String content) {
         try {
-            if (!jcfChannelService.validateChannel(channelId) || !jcfUserService.validateUser(userId))
-                throw new Exception();
-
-            Channel channel = jcfChannelService.getData().get(channelId);
-            User user = jcfUserService.getData().get(userId);
+            Channel channel = jcfChannelService.findChannel(channelId);
+            User user = jcfUserService.findUser(userId);
 
             if (!channel.getUsers().contains(user)) {
                 System.out.println("메세지를 보낼 수 없습니다: " +
@@ -55,27 +51,29 @@ public class JCFMessageService implements MessageService {
                 return null;
             }
 
-            Message message = new Message(user, channel, content);
+            Message message = new Message(userId, channelId, content);
             data.put(message.getId(), message);
             channel.getMessages().add(message);
             System.out.println("메세지 생성 완료");
             return message.getId();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (NoSuchElementException e) {
+            System.out.println("채널 또는 사용자 데이터가 올바르지 않습니다. " + e.getMessage());
             return null;
         }
     }
 
     @Override
     public void viewMessage(UUID messageId) {
-        if (validateMessage(messageId)) {
-            Message message = data.get(messageId);
-            System.out.println(message.getChannel().getName() + " > " +
-                    message.getSender().getName() + ": " +
+        try {
+            Message message = findMessage(messageId);
+            Channel channel = jcfChannelService.getData().get(message.getChannelId());
+            User user = jcfUserService.getData().get(message.getSenderId());
+            System.out.println(channel.getName() + " > " +
+                    user.getName() + ": " +
                     message.getContent()
                     + " (시간: " + message.getUpdatedAt() + ")");
-        } else {
-            System.out.println("Error: 존재하지 않는 메시지");
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 메세지입니다. " +e.getMessage());
         }
     }
 
@@ -84,13 +82,17 @@ public class JCFMessageService implements MessageService {
         System.out.println("--- 디스코드잇에서 생성된 모든 메세지 ---");
         data.entrySet().stream()
                 .forEach(entry -> {
-                    String time = entry.getValue().getCreatedAt().equals(entry.getValue().getUpdatedAt())
-                            ? String.valueOf(entry.getValue().getCreatedAt())
-                            : entry.getValue().getUpdatedAt() + " 수정";
+                    Message message = entry.getValue();
+                    Channel channel = jcfChannelService.getData().get(entry.getValue().getChannelId());
+                    User user = jcfUserService.getData().get(entry.getValue().getSenderId());
 
-                    System.out.println("채널 '" + entry.getValue().getChannel().getName() + "' > "
-                            + entry.getValue().getSender().getName() + ": "
-                            + entry.getValue().getContent()
+                    String time = message.getCreatedAt().equals(message.getUpdatedAt())
+                            ? String.valueOf(message.getCreatedAt())
+                            : message.getUpdatedAt() + " 수정";
+
+                    System.out.println("채널 '" + channel.getName() + "' > "
+                            + user.getName() + ": "
+                            + message.getContent()
                             + " (time: " + time + ")");
                 });
     }
@@ -98,41 +100,41 @@ public class JCFMessageService implements MessageService {
     @Override
     public void updateMessage(UUID userId, UUID messageId, String newContent) {
         System.out.print("메세지 수정 요청: ");
-        if (!validateMessage(messageId) || !jcfUserService.validateUser(userId)) {
-            System.out.println("메세지 또는 사용자 데이터가 올바르지 않습니다.");
-            return;
-        }
-        Message message = data.get(messageId);
-        User user = jcfUserService.getData().get(userId);
+        try {
+            Message message = findMessage(messageId);
 
-        // 메시지 작성자인 경우에만 수정 가능
-        if (message.getSender() != user) {
-            System.out.println("메세지 작성자만 수정 가능합니다.");
-            return;
+            // 메시지 작성자인 경우에만 수정 가능
+            if (message.getSenderId() != userId) {
+                System.out.println("메세지 작성자만 수정 가능합니다.");
+                return;
+            }
+            message.updateContent(newContent);
+            System.out.println("메세지가 수정되었습니다.");
+        } catch (NoSuchElementException e) {
+            System.out.println("메세지 또는 사용자 데이터가 올바르지 않습니다. " +e.getMessage());
         }
-        message.updateContent(newContent);
-        System.out.println("메세지가 수정되었습니다.");
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
         System.out.print("메세지 삭제 요청: ");
-        if (!validateMessage(messageId)) {
-            System.out.println("존재하지 않는 메세지입니다.");
-            return;
+        try {
+            // 해당 채널의 메세지 리스트에서 삭제
+            Message message = findMessage(messageId);
+            Channel channel = jcfChannelService.findChannel(message.getChannelId());
+            int idx = channel.getMessages().indexOf(message);
+            channel.getMessages().remove(idx);
+            data.remove(messageId);
+            System.out.println("Message ID: " + message.getId() + "가 삭제됩니다.");
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 메세지입니다. " + e.getMessage());
         }
-
-        // 해당 채널의 메세지 리스트에서 삭제
-        Message message = data.get(messageId);
-        int idx = message.getChannel().getMessages().indexOf(message);
-        message.getChannel().getMessages().remove(idx);
-        data.remove(messageId);
-        System.out.println("Message ID: " + message.getId() + "가 삭제됩니다.");
     }
 
     @Override
-    public boolean validateMessage(UUID messageId) {
-        if (data.containsKey(messageId) && data.get(messageId) != null) return true;
-        return false;
+    public Message findMessage(UUID messageId) {
+        Message message = this.data.get(messageId);
+        return Optional.ofNullable(message)
+                .orElseThrow(() -> new NoSuchElementException("Message ID: "+messageId+" not found"));
     }
 }

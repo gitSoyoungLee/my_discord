@@ -21,5 +21,5 @@ public interface MessageService {
     // Delete
     void deleteMessage(UUID messageId);    // 메세지 삭제
 
-    boolean validateMessage(UUID messageId);   // 실제 존재하는 메세지인지 검증
+    Message findMessage(UUID messageId);   // 실제 존재하는 메세지인지 검증
 }

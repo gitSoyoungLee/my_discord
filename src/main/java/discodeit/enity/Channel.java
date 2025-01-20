@@ -5,6 +5,9 @@ import java.util.List;
 
 public class Channel extends Common {
     String name;
+    String description;
+
+    ChannelType type;
     List<User> users;
     List<Message> messages;
 
@@ -12,9 +15,11 @@ public class Channel extends Common {
         super();
     }
 
-    public Channel(String name) {
+    public Channel(String name, String description, ChannelType type) {
         super();
         this.name = name;
+        this.description = description;
+        this.type = type;
         users = new ArrayList<>();
         messages = new ArrayList<>();
     }
@@ -35,7 +40,15 @@ public class Channel extends Common {
 
     //Update
     public void updateName(String name) {
+        if(name == null) return;
         this.name = name;
         updateClass();
     }
+
+    public void updateDescription(String description) {
+        if(description.equals(this.description)) return;
+        this.description = description;
+        updateClass();
+    }
+
 }

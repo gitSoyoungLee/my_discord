@@ -4,18 +4,18 @@ import java.util.UUID;
 
 public class Message extends Common {
     private String content;
-    private User sender;
-    private Channel channel;
+    private UUID senderId;
+    private UUID channelId;
 
     public Message() {
         super();
     }
 
-    public Message(User sender, Channel channel, String content) {
+    public Message(UUID senderId, UUID channelId, String content) {
         super();
         this.content = content;
-        this.sender = sender;
-        this.channel = channel;
+        this.senderId = senderId;
+        this.channelId = channelId;
     }
 
     //Getter
@@ -23,16 +23,17 @@ public class Message extends Common {
         return content;
     }
 
-    public User getSender() {
-        return sender;
+    public UUID getSenderId() {
+        return senderId;
     }
 
-    public Channel getChannel() {
-        return channel;
+    public UUID getChannelId() {
+        return channelId;
     }
 
     // Update
     public void updateContent(String content) {
+        if(content == null || content.equals(this.content)) return;
         this.content = content;
         updateClass();
     }
