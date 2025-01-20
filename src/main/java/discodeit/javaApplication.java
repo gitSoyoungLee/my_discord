@@ -1,10 +1,9 @@
 package discodeit;
 
-import discodeit.enity.Channel;
 import discodeit.enity.ChannelType;
-import discodeit.enity.Message;
-import discodeit.enity.User;
 import discodeit.service.ServiceFactory;
+//import discodeit.service.jcf.JCFChannelService;
+//import discodeit.service.jcf.JCFMessageService;
 import discodeit.service.jcf.JCFChannelService;
 import discodeit.service.jcf.JCFMessageService;
 import discodeit.service.jcf.JCFUserService;
@@ -12,8 +11,7 @@ import discodeit.service.jcf.JCFUserService;
 import java.util.UUID;
 
 public class javaApplication {
-    public static void main(String[] args) {
-
+    static void testSprint1() {
         ServiceFactory serviceFactory = new ServiceFactory();
         JCFUserService jcfUserService = serviceFactory.getJcfUserService();
         JCFChannelService jcfChannelService = serviceFactory.getJcfchannelService();
@@ -27,8 +25,8 @@ public class javaApplication {
         UUID user4 = jcfUserService.createUser("Dan@gmail.com", "Dan", "12345");
         UUID user5 = jcfUserService.createUser("Edward@gmail.com", "Edward", "12345");
         UUID user6 = jcfUserService.createUser("Felix@gmail.com", "felix", "12345");
-        jcfUserService.createUser("Alice@gmail.com", "Alice","12345");
-        jcfUserService.createUser("Gary@gmail.com", "Gary","1234");
+        jcfUserService.createUser("Alice@gmail.com", "Alice", "12345");
+        jcfUserService.createUser("Gary@gmail.com", "Gary", "1234");
         System.out.println("====================\n\n");
 
         System.out.println("==== Read User ====");
@@ -168,5 +166,9 @@ public class javaApplication {
         jcfChannelService.deleteUserInChannel(channel2, user3);
         jcfChannelService.viewChannelInfo(channel2);
         System.out.println();
+    }
+
+    public static void main(String[] args) {
+        testSprint1();
     }
 }
