@@ -43,7 +43,7 @@ public class JCFUserRepository implements UserRepository {
                 .anyMatch(user -> user.getEmail().equals(email));
     }
 
-    public Map<UUID, User> getData() {
+    public Map<UUID, User> findAll() {
         return new HashMap<>(data);
     }
 }

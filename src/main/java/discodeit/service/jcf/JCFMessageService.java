@@ -79,7 +79,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void viewAllMessages() {
         System.out.println("--- 디스코드잇에서 생성된 모든 메세지 ---");
-        Map<UUID, Message> data = jcfMessageRepository.getData();
+        Map<UUID, Message> data = jcfMessageRepository.findAll();
         data.entrySet().stream()
                 .forEach(entry -> {
                     Message message = entry.getValue();

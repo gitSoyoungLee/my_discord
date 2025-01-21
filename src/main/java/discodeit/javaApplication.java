@@ -4,9 +4,15 @@ import discodeit.enity.ChannelType;
 import discodeit.repository.file.FileChannelRepository;
 import discodeit.repository.file.FileMessageRepository;
 import discodeit.repository.file.FileUserRepository;
+import discodeit.repository.jcf.JCFChannelRepository;
+import discodeit.repository.jcf.JCFMessageRepository;
+import discodeit.repository.jcf.JCFUserRepository;
 import discodeit.service.ServiceFactory;
 //import discodeit.service.jcf.JCFChannelService;
 //import discodeit.service.jcf.JCFMessageService;
+import discodeit.service.basic.BasicChannelService;
+import discodeit.service.basic.BasicMessageService;
+import discodeit.service.basic.BasicUserService;
 import discodeit.service.file.FileChannelService;
 import discodeit.service.file.FileMessageService;
 import discodeit.service.file.FileUserService;
@@ -176,14 +182,6 @@ public class javaApplication {
     }
 
     static void testSprint2() {
-        String[] filesToDelete = {"user.ser", "channel.ser", "message.ser"};
-        for (String fileName : filesToDelete) {
-            File file = new File(fileName);
-            if (file.exists()) {
-                file.delete();
-            }
-        }
-
         // 서비스 생성
         FileUserService fileUserService = new FileUserService();
         FileChannelService fileChannelService = new FileChannelService();
@@ -253,11 +251,54 @@ public class javaApplication {
         fileMessageService.viewAllMessages();
 
     }
+
+    static void testSprint2Advanced() {
+//        BasicUserService userService = new BasicUserService(new JCFUserRepository());
+        BasicUserService userService = new BasicUserService(new FileUserRepository());
+        UUID user1 = userService.createUser("Alice@gmail.com", "Alice", "12345");
+        UUID user2 = userService.createUser("Bob@gmail.com", "Bob", "12345");
+        userService.viewAllUser();
+        userService.viewUserInfo(user1);
+        userService.updateUserEmail(user1,"Andy@gmail.com");
+        userService.updateUserName(user1,"Andy");
+        userService.viewUserInfo(user1);
+        userService.deleteUser(user2);
+        userService.viewAllUser();
+//        BasicChannelService channelService = new BasicChannelService(new JCFChannelRepository());
+        BasicChannelService channelService = new BasicChannelService(new FileChannelRepository());
+        UUID channel1 = channelService.createChannel("Ch 1", "This is Ch 1", ChannelType.PUBLIC);
+        UUID channel2=channelService.createChannel("Ch 2", "This is Ch 2", ChannelType.PUBLIC);
+        channelService.viewAllChannels();
+        channelService.viewChannelInfo(channel1);
+        channelService.updateChannelName(channel1, "New Ch 1");
+        channelService.viewChannelInfo(channel1);
+        channelService.deleteChannel(channel1);
+        channelService.viewAllChannels();
+//        BasicMessageService messageService = new BasicMessageService(new JCFMessageRepository());
+        BasicMessageService messageService = new BasicMessageService(new FileMessageRepository());
+        UUID message1 = messageService.createMessage(user1, channel2, "Hello,");
+        UUID message2 = messageService.createMessage(user1, channel2, "World!");
+        messageService.viewAllMessages();
+        messageService.viewMessage(message1);
+        messageService.updateMessage(user1, message1, "hello");
+        messageService.deleteMessage(message2);
+        messageService.viewAllMessages();
+    }
     public static void main(String[] args) {
 
         //testSprint1();
 
-        testSprint2();
+        String[] filesToDelete = {"user.ser", "channel.ser", "message.ser"};
+        for (String fileName : filesToDelete) {
+            File file = new File(fileName);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+
+        //testSprint2();
+
+        testSprint2Advanced();
 
     }
 }

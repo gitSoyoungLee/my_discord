@@ -20,7 +20,13 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void delete(UUID messageId) {
-        data.remove(messageId);
+        try{
+            if(!data.containsKey(messageId))
+                throw new NoSuchElementException("Message ID: " + messageId + " not found");
+            data.remove(messageId);
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
     }
 
     @Override
@@ -30,7 +36,7 @@ public class JCFMessageRepository implements MessageRepository {
                 .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " not found"));
     }
 
-    public Map<UUID, Message> getData() {
+    public Map<UUID, Message> findAll() {
         return new HashMap<>(data);
     }
 }

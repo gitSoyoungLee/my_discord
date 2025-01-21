@@ -37,7 +37,7 @@ public class JCFChannelRepository implements ChannelRepository {
                 .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " not found"));
     }
 
-    public Map<UUID, Channel> getData() {
+    public Map<UUID, Channel> findAll() {
         return new HashMap<>(data);
     }
 }

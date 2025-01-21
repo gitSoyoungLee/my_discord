@@ -1,47 +1,26 @@
-package discodeit.service.jcf;
+package discodeit.service.basic;
 
 import discodeit.enity.User;
-import discodeit.repository.jcf.JCFChannelRepository;
-import discodeit.repository.jcf.JCFMessageRepository;
-import discodeit.repository.jcf.JCFUserRepository;
+import discodeit.repository.UserRepository;
 import discodeit.service.UserService;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-public class JCFUserService implements UserService {
-    //싱글톤
-    private static volatile JCFUserService instance;
-    private final JCFUserRepository jcfUserRepository;
+public class BasicUserService implements UserService {
+    private UserRepository userRepository;
 
-    private JCFChannelService jcfChannelService;
-    private JCFMessageService jcfMessageService;
-
-    private JCFUserService() {
-        this.jcfUserRepository = new JCFUserRepository();
-
-    }
-
-    public static JCFUserService getInstance() {
-        if (instance == null) {
-            synchronized (JCFUserService.class) {
-                if (instance == null) {
-                    instance = new JCFUserService();
-                }
-            }
-        }
-        return instance;
-    }
-
-    public void setService() {
-        this.jcfMessageService = jcfMessageService.getInstance();
-        this.jcfChannelService = jcfChannelService.getInstance();
+    public BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UUID createUser(String email, String name, String password) {
         System.out.print("사용자 생성 요청: ");
-        if (jcfUserRepository.checkEmailDuplicate(email)) {
-            System.out.println("이미 존재하는 계정입니다.");
+        if (userRepository.checkEmailDuplicate(email)) {
+            System.out.println(email + "은 이미 존재하는 이메일입니다.");
             return null;
         }
         if (password.length() < 5) {
@@ -49,7 +28,7 @@ public class JCFUserService implements UserService {
             return null;
         }
         User user = new User(name, email, password);
-        jcfUserRepository.save(user);
+        userRepository.save(user);
         System.out.println(name + "(" + email + ") 사용자가 등록되었습니다.");
         return user.getId();
     }
@@ -76,7 +55,7 @@ public class JCFUserService implements UserService {
     @Override
     public void viewAllUser() {
         System.out.println("--- 전체 사용자 목록---");
-        Map<UUID, User> data = jcfUserRepository.findAll();
+        Map<UUID, User> data = userRepository.findAll();
         if (data.isEmpty()) {
             System.out.println("사용자가 없습니다.");
             return;
@@ -99,6 +78,7 @@ public class JCFUserService implements UserService {
             User user = findById(userId);
             String prevName = user.getName();
             user.updateName(name);
+            userRepository.save(user);
             System.out.println(prevName + "님의 이름이 " + name + "으로 변경되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
@@ -109,12 +89,13 @@ public class JCFUserService implements UserService {
     public void updateUserEmail(UUID userId, String email) {
         System.out.print("사용자 수정 요청: ");
         try {
-            if (jcfUserRepository.checkEmailDuplicate(email)) {
+            if (userRepository.checkEmailDuplicate(email)) {
                 System.out.println(email + "은 이미 존재하는 이메일입니다.");
                 return;
             }
             User user = findById(userId);
             user.updateEmail(email);
+            userRepository.save(user);
             System.out.println(user.getName() + "의 이메일이 " + email + "로 변경되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
@@ -125,12 +106,14 @@ public class JCFUserService implements UserService {
     public void updateUserPassword(UUID userId, String password) {
         System.out.print("사용자 수정 요청: ");
         try {
-            User user = findById(userId);
             if (password.length() < 5) {
                 System.out.println("비밀번호는 최소 5자 이상이어야 합니다.");
+                return;
             }
+            User user = findById(userId);
+            String prevName = user.getName();
             user.updatePassword(password);
-            System.out.println(user.getEmail() + " 계정의 비밀번호가 변경되었습니다.");
+            System.out.println(prevName + "님의 비밀번호가 변경되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
         }
@@ -146,7 +129,7 @@ public class JCFUserService implements UserService {
                     .forEach(channel -> {
                         channel.getUsers().remove(user);
                     });
-            jcfUserRepository.delete(userId);
+            userRepository.delete(userId);
             System.out.println(user.getName() + " 사용자가 삭제되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
@@ -155,6 +138,6 @@ public class JCFUserService implements UserService {
 
     @Override
     public User findById(UUID userId) {
-        return jcfUserRepository.findById(userId);
+        return userRepository.findById(userId);
     }
 }

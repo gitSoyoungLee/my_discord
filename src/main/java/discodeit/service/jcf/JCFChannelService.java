@@ -53,7 +53,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void viewAllChannels() {
         System.out.println("--- 전체 채널 조회 ---");
-        Map<UUID, Channel> data = jcfChannelRepository.getData();
+        Map<UUID, Channel> data = jcfChannelRepository.findAll();
         data.entrySet().stream()
                 .sorted(Comparator.comparingLong(entry -> entry.getValue().getCreatedAt())
                 )

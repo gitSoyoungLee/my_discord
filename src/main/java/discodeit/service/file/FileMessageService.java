@@ -106,7 +106,6 @@ public class FileMessageService implements MessageService {
     public void deleteMessage(UUID messageId) {
         System.out.print("메세지 삭제 요청: ");
         try {
-            Message message = findById(messageId);
             fileMessageRepository.delete(messageId);
             System.out.println("메세지가 삭제되었습니다.");
         } catch (NoSuchElementException e) {

@@ -2,6 +2,7 @@ package discodeit.repository;
 
 import discodeit.enity.User;
 
+import java.util.Map;
 import java.util.UUID;
 
 public interface UserRepository {
@@ -10,5 +11,6 @@ public interface UserRepository {
 
     User findById(UUID userId);
 
+    Map<UUID, User> findAll();
     boolean checkEmailDuplicate(String email);
 }
