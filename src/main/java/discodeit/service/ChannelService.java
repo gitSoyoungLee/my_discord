@@ -2,8 +2,6 @@ package discodeit.service;
 
 import discodeit.enity.Channel;
 import discodeit.enity.ChannelType;
-import discodeit.enity.Message;
-import discodeit.enity.User;
 
 import java.util.UUID;
 
@@ -19,6 +17,8 @@ public interface ChannelService {
     // Update
     void updateChannelName(UUID channelId, String name);   // 채널명 변경
 
+    void updateChannelDescription(UUID channelId, String description);     //채널 설명 변경
+
     // Delete
     void deleteChannel(UUID channelId);    // 채널 삭제
 
@@ -27,6 +27,6 @@ public interface ChannelService {
 
     void deleteUserInChannel(UUID channelId, UUID userId);   // 유저를 채널에서 삭제
 
-    Channel findChannel(UUID channelId);   // 실제 존재하는 채널인지 검증
+    Channel findById(UUID channelId);   // 실제 존재하는 채널인지 검증
 
 }

@@ -9,4 +9,6 @@ public interface UserRepository {
     void delete(UUID userId);
 
     User findById(UUID userId);
+
+    boolean checkEmailDuplicate(String email);
 }

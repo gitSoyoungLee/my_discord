@@ -36,6 +36,7 @@ public class JCFUserRepository implements UserRepository {
                 .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " not found"));
     }
 
+    @Override
     public boolean checkEmailDuplicate(String email) {
         Collection <User> users = data.values();
         return users.stream()

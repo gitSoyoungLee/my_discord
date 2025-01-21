@@ -16,25 +16,25 @@ public class JCFUserService implements UserService {
     private JCFChannelService jcfChannelService;
     private JCFMessageService jcfMessageService;
 
-    private JCFUserService(JCFUserRepository jcfUserRepository) {
-        this.jcfUserRepository = jcfUserRepository;
+    private JCFUserService() {
+        this.jcfUserRepository = new JCFUserRepository();
 
     }
 
-    public static JCFUserService getInstance(JCFUserRepository jcfUserRepository) {
+    public static JCFUserService getInstance() {
         if (instance == null) {
             synchronized (JCFUserService.class) {
                 if (instance == null) {
-                    instance = new JCFUserService(jcfUserRepository);
+                    instance = new JCFUserService();
                 }
             }
         }
         return instance;
     }
 
-    public void setService(JCFChannelService jcfChannelService, JCFMessageService jcfMessageService) {
-        this.jcfMessageService = jcfMessageService;
-        this.jcfChannelService = jcfChannelService;
+    public void setService() {
+        this.jcfMessageService = jcfMessageService.getInstance();
+        this.jcfChannelService = jcfChannelService.getInstance();
     }
 
     @Override

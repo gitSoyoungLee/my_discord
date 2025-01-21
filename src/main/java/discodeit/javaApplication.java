@@ -1,13 +1,20 @@
 package discodeit;
 
 import discodeit.enity.ChannelType;
+import discodeit.repository.file.FileChannelRepository;
+import discodeit.repository.file.FileMessageRepository;
+import discodeit.repository.file.FileUserRepository;
 import discodeit.service.ServiceFactory;
 //import discodeit.service.jcf.JCFChannelService;
 //import discodeit.service.jcf.JCFMessageService;
+import discodeit.service.file.FileChannelService;
+import discodeit.service.file.FileMessageService;
+import discodeit.service.file.FileUserService;
 import discodeit.service.jcf.JCFChannelService;
 import discodeit.service.jcf.JCFMessageService;
 import discodeit.service.jcf.JCFUserService;
 
+import java.io.File;
 import java.util.UUID;
 
 public class javaApplication {
@@ -168,7 +175,89 @@ public class javaApplication {
         System.out.println();
     }
 
+    static void testSprint2() {
+        String[] filesToDelete = {"user.ser", "channel.ser", "message.ser"};
+        for (String fileName : filesToDelete) {
+            File file = new File(fileName);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+
+        // 서비스 생성
+        FileUserService fileUserService = new FileUserService();
+        FileChannelService fileChannelService = new FileChannelService();
+        FileMessageService fileMessageService = new FileMessageService();
+        // 서비스 간 의존성 주입
+        fileUserService.setService(fileChannelService, fileMessageService);
+        fileChannelService.setService(fileUserService, fileMessageService);
+        fileMessageService.setService(fileUserService, fileChannelService);
+
+
+        // Create User
+        UUID user1 = fileUserService.createUser("Alice@gmail.com", "Alice", "12345");
+        fileUserService.createUser("Alice@gmail.com", "Alice", "12345");
+        UUID user2 = fileUserService.createUser("Bob@gmail.com", "Bob", "12345");
+        UUID user3 = fileUserService.createUser("Cindy@gmail.com", "Cindy", "12345");
+        // Read User
+        fileUserService.viewAllUser();
+        fileUserService.viewUserInfo(user1);
+        fileUserService.viewUserInfo(user2);
+        // Update User
+        fileUserService.updateUserName(user1, "Andy");
+        fileUserService.updateUserEmail(user1, "Andy@gmail.com");
+        fileUserService.updateUserPassword(user1, "123456");
+        fileUserService.viewUserInfo(user1);
+        // Delete User
+        fileUserService.deleteUser(user3);
+        fileUserService.viewAllUser();
+        fileUserService.viewUserInfo(user3);
+
+        // Create Channel
+        UUID channel1 = fileChannelService.createChannel("Ch 1", "채널 1입니다.", ChannelType.PUBLIC);
+        UUID channel2 = fileChannelService.createChannel("Ch 2", "채널 2입니다.", ChannelType.PUBLIC);
+        UUID channel3 = fileChannelService.createChannel("Ch 3", "채널 3입니다.", ChannelType.PUBLIC);
+        // Read Channel
+        fileChannelService.viewAllChannels();
+        fileChannelService.viewChannelInfo(channel1);
+        // Update Channel
+        fileChannelService.updateChannelName(channel2, "New Ch 2");
+        fileChannelService.updateChannelDescription(channel2, "새로워진 채널 2입니다.");
+        fileChannelService.viewChannelInfo(channel2);
+        // Delete Channel
+        fileChannelService.deleteChannel(channel3);
+        fileChannelService.viewAllChannels();
+        fileChannelService.viewChannelInfo(channel3);
+        // Add user into channel
+        fileChannelService.addUserIntoChannel(channel1, user1);
+        fileChannelService.viewChannelInfo(channel1);
+        fileUserService.viewUserInfo(user1);
+        // Delete User from channel
+        fileChannelService.deleteUserInChannel(channel1, user1);
+        fileChannelService.viewChannelInfo(channel1);
+        fileUserService.viewUserInfo(user1);
+
+        // Create Message
+        fileChannelService.addUserIntoChannel(channel1, user1);
+        UUID message1=fileMessageService.createMessage(user1, channel1, "안녕하세요");
+        // Read Message
+        fileMessageService.viewMessage(message1);
+        UUID message2=fileMessageService.createMessage(user1, channel1, "만나서 반갑습니다");
+        UUID message3=fileMessageService.createMessage(user1, channel1, "잘 부탁해요");
+        fileMessageService.viewAllMessages();
+        // Update Message
+        fileMessageService.updateMessage(user1, message1, "수정) 안녕하세요 여러분");
+        fileMessageService.viewMessage(message1);
+        // Delete Message
+        fileMessageService.deleteMessage(message3);
+        fileMessageService.viewAllMessages();
+
+    }
     public static void main(String[] args) {
-        testSprint1();
+
+        //testSprint1();
+
+        testSprint2();
+
     }
 }

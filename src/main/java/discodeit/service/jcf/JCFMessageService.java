@@ -14,27 +14,28 @@ public class JCFMessageService implements MessageService {
 
     private static volatile JCFMessageService instance;
     private final JCFMessageRepository jcfMessageRepository;
+
     private JCFUserService jcfUserService;
     private JCFChannelService jcfChannelService;
 
-    private JCFMessageService(JCFMessageRepository jcfMessageRepository) {
-        this.jcfMessageRepository = jcfMessageRepository;
+    private JCFMessageService() {
+        this.jcfMessageRepository = new JCFMessageRepository();
     }
 
-    public static JCFMessageService getInstance(JCFMessageRepository jcfMessageRepository) {
+    public static JCFMessageService getInstance() {
         if (instance == null) {
             synchronized (JCFUserService.class) {
                 if (instance == null) {
-                    instance = new JCFMessageService(jcfMessageRepository);
+                    instance = new JCFMessageService();
                 }
             }
         }
         return instance;
     }
 
-    public void setService(JCFUserService jcfUserService, JCFChannelService jcfChannelService) {
-        this.jcfUserService = jcfUserService;
-        this.jcfChannelService = jcfChannelService;
+    public void setService() {
+        this.jcfUserService = jcfUserService.getInstance();
+        this.jcfChannelService = jcfChannelService.getInstance();
     }
 
     @Override

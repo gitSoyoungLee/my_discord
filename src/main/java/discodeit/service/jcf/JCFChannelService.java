@@ -14,28 +14,29 @@ public class JCFChannelService implements ChannelService {
 
     private static volatile JCFChannelService instance;
     private final JCFChannelRepository jcfChannelRepository;
+
     private JCFUserService jcfUserService;
     private JCFMessageService jcfMessageService;
 
-    private JCFChannelService(JCFChannelRepository jcfChannelRepository) {
-        this.jcfChannelRepository = jcfChannelRepository;
+    private JCFChannelService() {
+        this.jcfChannelRepository = new JCFChannelRepository();
 
     }
 
-    public static JCFChannelService getInstance(JCFChannelRepository jcfChannelRepository) {
+    public static JCFChannelService getInstance() {
         if (instance == null) {
             synchronized (JCFUserService.class) {
                 if (instance == null) {
-                    instance = new JCFChannelService(jcfChannelRepository);
+                    instance = new JCFChannelService();
                 }
             }
         }
         return instance;
     }
 
-    public void setService(JCFUserService jcfUserService, JCFMessageService jcfMessageService) {
-        this.jcfUserService = jcfUserService;
-        this.jcfMessageService = jcfMessageService;
+    public void setService() {
+        this.jcfUserService = jcfUserService.getInstance();
+        this.jcfMessageService = jcfMessageService.getInstance();
     }
 
 
@@ -57,7 +58,8 @@ public class JCFChannelService implements ChannelService {
                 .sorted(Comparator.comparingLong(entry -> entry.getValue().getCreatedAt())
                 )
                 .forEach(entry -> {
-                    System.out.println("채널: " + entry.getValue().getName());
+                    System.out.println("채널: " + entry.getValue().getName() +
+                            " / 설명" + entry.getValue().getDescription());
                     System.out.print("참여 중인 사용자: ");
                     entry.getValue().getUsers().stream()
                             .forEach(user -> {
@@ -72,8 +74,8 @@ public class JCFChannelService implements ChannelService {
         //채널 정보 출력
         System.out.println("--- 채널 조회 ---");
         try {
-            Channel channel = jcfChannelRepository.findById(channelId);
-            System.out.println("채널: " + channel.getName());
+            Channel channel = findById(channelId);
+            System.out.println("채널: " + channel.getName() +" / 설명: " +channel.getDescription());
             System.out.print("참여 중인 사용자: ");
             channel.getUsers().stream()
                     .forEach(user -> {
@@ -108,10 +110,22 @@ public class JCFChannelService implements ChannelService {
     public void updateChannelName(UUID channelId, String name) {
         System.out.print("채널 수정 요청: ");
         try {
-            Channel channel = jcfChannelRepository.findById(channelId);
+            Channel channel = findById(channelId);
             String prevName = channel.getName();
             channel.updateName(name);
             System.out.println("채널 '" + prevName + "'이 '" + name + "'으로 변경되었습니다.");
+        } catch (NoSuchElementException e) {
+            System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateChannelDescription(UUID channelId, String description) {
+        System.out.print("채널 수정 요청: ");
+        try {
+            Channel channel = findById(channelId);
+            channel.updateDescription(description);
+            System.out.println("채널 설명이 변경되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
         }
@@ -154,7 +168,7 @@ public class JCFChannelService implements ChannelService {
             User user = jcfUserService.findById(userId);
 
             if (!channel.getUsers().contains(user) || !user.getChannels().contains(channel)) {
-                System.out.println(channel.getName() + "은 채널에 없는 사용자입니다.");
+                System.out.println(user.getName() + "은 채널에 없는 사용자입니다.");
             } else {
                 channel.getUsers().remove(user);
                 user.getChannels().remove(channel);

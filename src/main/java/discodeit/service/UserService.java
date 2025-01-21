@@ -1,6 +1,5 @@
 package discodeit.service;
 
-import discodeit.enity.Message;
 import discodeit.enity.User;
 
 import java.util.UUID;
@@ -21,9 +20,9 @@ public interface UserService {
     void updateUserEmail(UUID userId, String email);  // 유저 이메일 수정
 
     void updateUserPassword(UUID userId, String password);  // 유저 비밀번호 수정
+
     // Delete
     void deleteUser(UUID userId);
 
-
-    User findUser(UUID userId);    // 실제 존재하는 유저인지 검증
+    User findById(UUID userId);
 }
