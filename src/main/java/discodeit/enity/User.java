@@ -1,8 +1,6 @@
 package discodeit.enity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class User extends Common implements Serializable {
@@ -11,18 +9,13 @@ public class User extends Common implements Serializable {
     private String email;
 
     private transient String password;
-    private List<Channel> channels;
 
-    public User() {
-        super();
-    }
 
     public User(String name, String email, String password) {
         super();
         this.name = name;
         this.email = email;
         this.password = password;
-        channels = new ArrayList<>();
     }
 
     //Getter
@@ -38,35 +31,32 @@ public class User extends Common implements Serializable {
         return password;
     }
 
-    public List<Channel> getChannels() {
-        return channels;
-    }
-
     // Update
     public void updateName(String name) {
         if (name == null || name.equals(this.name)) return;
         this.name = name;
-        updateClass();
+        updateClass(System.currentTimeMillis());
     }
 
     public void updateEmail(String email) {
         if (email == null || email.equals(this.email)) return;
         this.email = email;
-        updateClass();
+        updateClass(System.currentTimeMillis());
     }
 
     public void updatePassword(String password) {
         if (password == null || password.equals(this.password)) return;
         this.password = password;
-        updateClass();
+        updateClass(System.currentTimeMillis());
     }
 
+    // 객체 직렬화 부분에서 ser 파일에 저장할 형식으로 추가
     @Override
     public String toString() {
         return "User{" +
                 "id='" + this.getId() + '\'' +
                 ", name='" + this.name + '\'' +
-                ", email='" + this.email +'\'' +
+                ", email='" + this.email + '\'' +
                 '}';
     }
 
@@ -83,4 +73,5 @@ public class User extends Common implements Serializable {
     public int hashCode() {
         return Objects.hash(this.getId());
     }
+
 }

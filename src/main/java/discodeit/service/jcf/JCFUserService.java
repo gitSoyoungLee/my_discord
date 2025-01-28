@@ -1,12 +1,13 @@
 package discodeit.service.jcf;
 
+import discodeit.dto.UserInfoDto;
+import discodeit.enity.Channel;
 import discodeit.enity.User;
-import discodeit.repository.jcf.JCFChannelRepository;
-import discodeit.repository.jcf.JCFMessageRepository;
 import discodeit.repository.jcf.JCFUserRepository;
 import discodeit.service.UserService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
     //싱글톤
@@ -32,15 +33,14 @@ public class JCFUserService implements UserService {
         return instance;
     }
 
-    public void setService() {
+    protected void setService() {
         this.jcfMessageService = jcfMessageService.getInstance();
         this.jcfChannelService = jcfChannelService.getInstance();
     }
 
     @Override
     public UUID createUser(String email, String name, String password) {
-        System.out.print("사용자 생성 요청: ");
-        if (jcfUserRepository.checkEmailDuplicate(email)) {
+        if (checkEmailDuplicate(email)) {
             System.out.println("이미 존재하는 계정입니다.");
             return null;
         }
@@ -55,46 +55,45 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void viewUserInfo(UUID userId) {
-        System.out.println("--- 사용자 조회 ---");
+    public UserInfoDto getUserInfoById(UUID userId) {
         try {
+            // UUID로 User 객체 찾기
             User user = findById(userId);
-            System.out.println("Email: " + user.getEmail()
-                    + " / name: " + user.getName()
-                    + " / created at: " + user.getCreatedAt());
-            System.out.print("소속 채널: ");
-            user.getChannels().stream()
-                    .forEach(channel -> {
-                        System.out.print(channel.getName() + " ");
-                    });
-            System.out.println();
+            // 해당 유저가 소속된 채널 목록 찾기
+            List<Channel> channelsContainUser = jcfChannelService.getChannelsByUserId(userId);
+            // 채널명만 가져옴
+            List<String> channelNames = channelsContainUser.stream()
+                    .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
+                    .map(channel -> channel.getName())
+                    .collect(Collectors.toList());
+
+            return new UserInfoDto(user.getName(), user.getEmail(),
+                    user.getCreatedAt(), channelNames);
         } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다." + e.getMessage());
+            System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
+            return null;
         }
     }
 
     @Override
-    public void viewAllUser() {
-        System.out.println("--- 전체 사용자 목록---");
+    public List<UserInfoDto> getAllUsersInfo() {
         Map<UUID, User> data = jcfUserRepository.findAll();
-        if (data.isEmpty()) {
+        if (data == null || data.isEmpty()) {
             System.out.println("사용자가 없습니다.");
-            return;
+            return null;
         }
-        data.entrySet().stream()
-                .sorted(Comparator.comparingLong(entry -> entry.getValue().getCreatedAt())
-                )
-                .forEach(entry -> {
-                    System.out.println("Email: " + entry.getValue().getEmail()
-                            + " / name: " + entry.getValue().getName()
-                            + " / created at: " + entry.getValue().getCreatedAt());
-                    System.out.println("소속 채널: " + entry.getValue().getChannels());
+        List<UserInfoDto> list = new ArrayList<>();
+        data.values().stream()
+                .sorted(Comparator.comparing(user -> user.getCreatedAt()))
+                .forEach(user -> {
+                    list.add(new UserInfoDto(user.getName(), user.getEmail(),
+                            user.getCreatedAt(), null));    // 전체 사용자 목록 조회 시에는 소속 채널 출력 x
                 });
+        return list;
     }
 
     @Override
     public void updateUserName(UUID userId, String name) {
-        System.out.print("사용자 수정 요청: ");
         try {
             User user = findById(userId);
             String prevName = user.getName();
@@ -107,9 +106,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserEmail(UUID userId, String email) {
-        System.out.print("사용자 수정 요청: ");
         try {
-            if (jcfUserRepository.checkEmailDuplicate(email)) {
+            if (checkEmailDuplicate(email)) {
                 System.out.println(email + "은 이미 존재하는 이메일입니다.");
                 return;
             }
@@ -123,7 +121,6 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserPassword(UUID userId, String password) {
-        System.out.print("사용자 수정 요청: ");
         try {
             User user = findById(userId);
             if (password.length() < 5) {
@@ -138,14 +135,10 @@ public class JCFUserService implements UserService {
 
     @Override
     public void deleteUser(UUID userId) {
-        System.out.print("사용자 삭제 요청: ");
         try {
-            // 해당 유저가 속한 모든 채널에서 삭제
             User user = findById(userId);
-            user.getChannels().stream()
-                    .forEach(channel -> {
-                        channel.getUsers().remove(user);
-                    });
+            // 해당 유저가 속한 모든 채널에서 삭제하기 위해 채널 서비스 호출
+            jcfChannelService.deleteUserInAllChannels(userId);
             jcfUserRepository.delete(userId);
             System.out.println(user.getName() + " 사용자가 삭제되었습니다.");
         } catch (NoSuchElementException e) {
@@ -157,4 +150,13 @@ public class JCFUserService implements UserService {
     public User findById(UUID userId) {
         return jcfUserRepository.findById(userId);
     }
+
+    @Override
+    public boolean checkEmailDuplicate(String email) {
+        Collection<User> users = jcfUserRepository.findAll().values();
+        if (users == null) return false;
+        return users.stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
 }

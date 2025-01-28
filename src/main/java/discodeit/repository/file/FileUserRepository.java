@@ -5,13 +5,11 @@ import discodeit.repository.UserRepository;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.io.FileDescriptor.in;
 
 public class FileUserRepository implements UserRepository {
     @Override
     public void save(User user) {
+        // ser 파일에 Map으로 저장
         Map<UUID, User> users = this.findAll();
         if (users == null) {
             users = new HashMap<>();
@@ -19,6 +17,7 @@ public class FileUserRepository implements UserRepository {
         try (FileOutputStream fos = new FileOutputStream("user.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
+            // 기존 Map을 읽어와 새로운 객체를 추가한 후 덮어씌움
             users.put(user.getId(), user);
             oos.writeObject(users);
         } catch (IOException e) {
@@ -32,6 +31,7 @@ public class FileUserRepository implements UserRepository {
         if (users == null || !users.containsKey(userId)) {
             throw new NoSuchElementException("User ID: " + userId + " not found");
         }
+        // 기존 Map을 읽어와 데이터를 삭제한 후 덮어씌움
         users.remove(userId);
         try (FileOutputStream fos = new FileOutputStream("user.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -46,22 +46,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findById(UUID userId) {
-        Map<UUID, User> users= findAll();
-        Optional<User> finding_user =  users.values().stream()
+        Map<UUID, User> users = findAll();
+        Optional<User> finding_user = users.values().stream()
                 .filter(user -> user.getId().equals(userId))
                 .findAny();
         return finding_user
                 .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " not found"));
-    }
-
-    @Override
-    public boolean checkEmailDuplicate(String email) {
-        Map<UUID, User> users = findAll();
-        if(users == null) {
-            users = new HashMap<>();
-        }
-        return users.values().stream()
-                .anyMatch(user -> user.getEmail().equals(email));
     }
 
     public Map<UUID, User> findAll() {
@@ -70,7 +60,7 @@ public class FileUserRepository implements UserRepository {
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             users = (Map<UUID, User>) ois.readObject();
         } catch (EOFException e) {
-          return users;
+            return users;
         } catch (IOException | ClassNotFoundException e) {
             return null;
         }

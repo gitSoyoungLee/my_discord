@@ -1,8 +1,6 @@
 package discodeit.repository.file;
 
-import discodeit.enity.Channel;
 import discodeit.enity.Message;
-import discodeit.enity.User;
 import discodeit.repository.MessageRepository;
 
 import java.io.*;
@@ -11,6 +9,7 @@ import java.util.*;
 public class FileMessageRepository implements MessageRepository {
     @Override
     public void save(Message message) {
+        // ser 파일에 Map으로 저장
         Map<UUID, Message> messages = this.findAll();
         if (messages == null) {
             messages = new HashMap<>();
@@ -18,6 +17,7 @@ public class FileMessageRepository implements MessageRepository {
         try (FileOutputStream fos = new FileOutputStream("message.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
+            // 기존 Map을 읽어와 새로운 객체를 추가한 후 덮어씌움
             messages.put(message.getId(), message);
             oos.writeObject(messages);
         } catch (IOException e) {
@@ -31,6 +31,7 @@ public class FileMessageRepository implements MessageRepository {
         if (messages == null || !messages.containsKey(messageId)) {
             throw new NoSuchElementException("Message ID: " + messageId + " not found");
         }
+        // 기존 Map을 읽어와 데이터를 삭제한 후 덮어씌움
         messages.remove(messageId);
         try (FileOutputStream fos = new FileOutputStream("message.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -45,8 +46,8 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID messageId) {
-        Map<UUID, Message> messages= findAll();
-        Optional<Message> finding_message =  messages.values().stream()
+        Map<UUID, Message> messages = findAll();
+        Optional<Message> finding_message = messages.values().stream()
                 .filter(message -> message.getId().equals(messageId))
                 .findAny();
         return finding_message

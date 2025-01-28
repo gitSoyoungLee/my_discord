@@ -1,7 +1,6 @@
 package discodeit.repository;
 
 import discodeit.enity.Message;
-import discodeit.enity.User;
 
 import java.util.Map;
 import java.util.UUID;

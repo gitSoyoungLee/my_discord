@@ -4,7 +4,6 @@ import discodeit.enity.User;
 import discodeit.repository.UserRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;   // 모든 유저 데이터, key=id
@@ -20,13 +19,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void delete(UUID userId) {
-        // 해당 유저가 속한 모든 채널에서 삭제
-        User user = findById(userId);
-        user.getChannels().stream()
-                .forEach(channel -> {
-                    channel.getUsers().remove(user);
-                });
-        data.remove(user.getId());
+        data.remove(userId);
     }
 
     @Override
@@ -36,12 +29,6 @@ public class JCFUserRepository implements UserRepository {
                 .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " not found"));
     }
 
-    @Override
-    public boolean checkEmailDuplicate(String email) {
-        Collection <User> users = data.values();
-        return users.stream()
-                .anyMatch(user -> user.getEmail().equals(email));
-    }
 
     public Map<UUID, User> findAll() {
         return new HashMap<>(data);

@@ -30,7 +30,7 @@ public abstract class Common implements Serializable {
     }
 
     //Update
-    public void updateClass() {
-        this.updatedAt = System.currentTimeMillis();
+    public void updateClass(Long updateTime) {
+        this.updatedAt = updateTime;
     }
 }

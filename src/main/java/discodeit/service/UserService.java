@@ -1,7 +1,9 @@
 package discodeit.service;
 
+import discodeit.dto.UserInfoDto;
 import discodeit.enity.User;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -10,9 +12,9 @@ public interface UserService {
     UUID createUser(String email, String name, String password);  // 유저 생성
 
     // Read
-    void viewUserInfo(UUID userId);    // 유저 정보 단건 조회
+    UserInfoDto getUserInfoById(UUID userId);    // 유저 정보 단건 조회
 
-    void viewAllUser(); // 모든 유저 조회
+    List<UserInfoDto> getAllUsersInfo(); // 모든 유저 조회
 
     // Update
     void updateUserName(UUID userId, String name);  // 유저 이름 수정
@@ -25,4 +27,6 @@ public interface UserService {
     void deleteUser(UUID userId);
 
     User findById(UUID userId);
+
+    boolean checkEmailDuplicate(String email);  //이메일 중복 검사
 }

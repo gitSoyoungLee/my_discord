@@ -1,7 +1,6 @@
 package discodeit.repository.jcf;
 
 import discodeit.enity.Channel;
-import discodeit.enity.User;
 import discodeit.repository.ChannelRepository;
 
 import java.util.*;
@@ -21,12 +20,6 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(UUID channelId) {
-        Channel channel = findById(channelId);
-        //채널-유저, 채널-메세지 관계 삭제
-        channel.getUsers().stream()
-                .forEach(user -> user.getChannels().remove(channel));
-        channel.getUsers().clear();
-        channel.getMessages().clear();
         data.remove(channelId);
     }
 

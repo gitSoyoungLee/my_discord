@@ -10,9 +10,6 @@ public class Message extends Common implements Serializable {
     private UUID senderId;
     private UUID channelId;
 
-    public Message() {
-        super();
-    }
 
     public Message(UUID senderId, UUID channelId, String content) {
         super();
@@ -38,7 +35,16 @@ public class Message extends Common implements Serializable {
     public void updateContent(String content) {
         if (content == null || content.equals(this.content)) return;
         this.content = content;
-        updateClass();
+        updateClass(System.currentTimeMillis());
+    }
+
+    // 객체 직렬화 부분에서 ser 파일에 저장할 형식으로 추가
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id='" + this.getId() + '\'' +
+                ", content='" + this.content + '\'' +
+                '}';
     }
 
     // 객체를 UUID로 비교하기 위해
@@ -53,5 +59,13 @@ public class Message extends Common implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(this.getId());
+    }
+
+    // Read 시 출력용
+    public String messageInfoToString() {
+        return content +
+                (this.getCreatedAt() == this.getUpdatedAt()
+                        ? " (time: " + this.getCreatedAt() + ")"
+                        : " (time: " + this.getUpdatedAt() + " (수정됨))");
     }
 }
