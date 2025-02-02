@@ -67,8 +67,7 @@ public class JCFUserService implements UserService {
                     .map(channel -> channel.getName())
                     .collect(Collectors.toList());
 
-            return new UserInfoDto(user.getName(), user.getEmail(),
-                    user.getCreatedAt(), channelNames);
+            return new UserInfoDto(user);
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
             return null;
@@ -86,8 +85,7 @@ public class JCFUserService implements UserService {
         data.values().stream()
                 .sorted(Comparator.comparing(user -> user.getCreatedAt()))
                 .forEach(user -> {
-                    list.add(new UserInfoDto(user.getName(), user.getEmail(),
-                            user.getCreatedAt(), null));    // 전체 사용자 목록 조회 시에는 소속 채널 출력 x
+                    list.add(new UserInfoDto(user));    // 전체 사용자 목록 조회 시에는 소속 채널 출력 x
                 });
         return list;
     }

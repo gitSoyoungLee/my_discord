@@ -3,6 +3,7 @@ package discodeit.service;
 import discodeit.enity.Message;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
@@ -12,7 +13,7 @@ public interface MessageService {
     // Read
     String getMessageById(UUID messageId);  // 메세지 단건 조회
 
-    List<String> getAllMessages(); // 모든 메세지 조회
+    Optional<List<String>> getAllMessages(); // 모든 메세지 조회
 
     // Update
     void updateMessage(UUID userId, UUID messageId, String newContent);    // 메시지 수정

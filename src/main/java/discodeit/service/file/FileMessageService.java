@@ -67,7 +67,7 @@ public class FileMessageService implements MessageService {
             String formattedMessage = channel.getName() + " > ";
             try {
                 User user = fileUserService.findById(message.getSenderId());
-                if (fileChannelService.checkUserInChannel(user.getId(), channel.getId())) {
+                if (channel.containsUser(user.getId())) {
                     formattedMessage += user.getName() + ": ";
                 } else {
                     formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -84,7 +84,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<String> getAllMessages() {
+    public Optional<List<String>> getAllMessages() {
         Map<UUID, Message> data = fileMessageRepository.findAll();
         if (data == null || data.size() == 0) return null;
         List<String> formattedMessages = new ArrayList<>();
@@ -102,7 +102,7 @@ public class FileMessageService implements MessageService {
                     */
                     try {
                         User user = fileUserService.findById(message.getSenderId());
-                        if (fileChannelService.checkUserInChannel(user.getId(), channel.getId())) {
+                        if (channel.containsUser(user.getId())) {
                             formattedMessage += user.getName() + ": ";
                         } else {
                             formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -113,7 +113,7 @@ public class FileMessageService implements MessageService {
                     formattedMessage += message.messageInfoToString();
                     formattedMessages.add(formattedMessage);
                 });
-        return formattedMessages;
+        return Optional.of(formattedMessages);
     }
 
 
@@ -166,7 +166,8 @@ public class FileMessageService implements MessageService {
             String formattedMessage = "";
             try {
                 User user = fileUserService.findById(message.getSenderId());
-                if (fileChannelService.checkUserInChannel(user.getId(), channelId)) {
+                Channel channel = fileChannelService.findById(channelId);
+                if (channel.containsUser(user.getId())) {
                     formattedMessage += user.getName() + ": ";
                 } else {
                     formattedMessage += user.getName() + "(퇴장한 사용자): ";

@@ -58,8 +58,7 @@ public class FileChannelService implements ChannelService {
             // 채널 내 메세지
             List<String> formattedMessages = fileMessageService.getMessagesByChannelId(channelId);
 
-            return new ChannelInfoDto(channel.getName(), channel.getDescription(),
-                    userNames, formattedMessages);
+            return new ChannelInfoDto(channel);
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
             return null;
@@ -82,8 +81,7 @@ public class FileChannelService implements ChannelService {
                     for (UUID userId : channel.getUsers()) {
                         userNames.add((fileUserService.findById(userId).getName()));
                     }
-                    list.add(new ChannelInfoDto(channel.getName(), channel.getDescription(),
-                            userNames, null));  // 메세지는 출력 x
+                    list.add(new ChannelInfoDto(channel));  // 메세지는 출력 x
                 });
         return list;
     }
@@ -134,7 +132,7 @@ public class FileChannelService implements ChannelService {
             Channel channel = findById(channelId);
             User user = fileUserService.findById(userId);
 
-            if (checkUserInChannel(userId, channelId)) {
+            if (channel.containsUser(userId)) {
                 System.out.println(channel.getName() + "은 채널에 이미 입장한 사용자입니다.");
             } else {
                 channel.getUsers().add(userId);
@@ -154,7 +152,7 @@ public class FileChannelService implements ChannelService {
             Channel channel = findById(channelId);
             User user = fileUserService.findById(userId);
 
-            if (!checkUserInChannel(userId, channelId)) {
+            if (!channel.containsUser(userId)) {
                 System.out.println(user.getName() + "은 채널에 없는 사용자입니다.");
             } else {
                 channel.getUsers().remove(userId);
@@ -195,14 +193,4 @@ public class FileChannelService implements ChannelService {
         return channels;
     }
 
-    @Override
-    public boolean checkUserInChannel(UUID userId, UUID channelId) {
-        try {
-            Channel channel = findById(channelId);
-            // 채널이 유저를 포함하는지 반환
-            return channel.getUsers().contains(userId);
-        } catch (NoSuchElementException e) {
-            throw e;
-        }
-    }
 }

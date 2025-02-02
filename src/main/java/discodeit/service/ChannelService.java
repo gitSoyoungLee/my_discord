@@ -35,7 +35,5 @@ public interface ChannelService {
 
     List<Channel> getChannelsByUserId(UUID userId); //유저 아이디를 받아 그 유저가 소속된 채널을 반환
 
-    boolean checkUserInChannel(UUID userId, UUID channelId);    // 유저가 채널에 소속되어 있는지 확인
-
 
 }

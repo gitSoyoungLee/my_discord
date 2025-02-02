@@ -17,6 +17,7 @@ import discodeit.service.file.FileServiceFactory;
 import discodeit.service.jcf.JCFServiceFactory;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +43,7 @@ public class javaApplication {
     static void printChannelInfo(UUID channelId, ChannelService channelService) {
         System.out.println("--- UUID로 특정 채널 조회 ---");
         ChannelInfoDto channelInfoDto = channelService.getChannelInfoById(channelId);
-        if (channelInfoDto != null) System.out.println(channelInfoDto.fullInfoToString());
+        if (channelInfoDto != null) System.out.println(channelInfoDto);
         else System.out.println("정보 조회가 불가능합니다.");
     }
 
@@ -63,7 +64,9 @@ public class javaApplication {
 
     static void printAllMessageInfo(MessageService messageService) {
         System.out.println("--- 디스코드잇에서 작성된 모든 메세지 조회 ---");
-        List<String> messageList = messageService.getAllMessages();
+        List<String> messageList = messageService.getAllMessages()
+                .orElse(Collections.emptyList());
+        if(messageList.size()==0) System.out.println("현재 작성된 메세지가 없습니다.");
         messageList.stream()
                 .forEach(System.out::println);
     }

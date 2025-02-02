@@ -55,7 +55,7 @@ public class BasicMessageService implements MessageService {
             String formattedMessage = channel.getName() + " > ";
             try {
                 User user = userService.findById(message.getSenderId());
-                if (channelService.checkUserInChannel(user.getId(), channel.getId())) {
+                if (channel.containsUser(user.getId())) {
                     formattedMessage += user.getName() + ": ";
                 } else {
                     formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -72,7 +72,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<String> getAllMessages() {
+    public Optional<List<String>> getAllMessages() {
         Map<UUID, Message> data = messageRepository.findAll();
         if (data == null || data.size() == 0) return null;
         List<String> formattedMessages = new ArrayList<>();
@@ -90,7 +90,7 @@ public class BasicMessageService implements MessageService {
                     */
                     try {
                         User user = userService.findById(message.getSenderId());
-                        if (channelService.checkUserInChannel(user.getId(), channel.getId())) {
+                        if (channel.containsUser(user.getId())) {
                             formattedMessage += user.getName() + ": ";
                         } else {
                             formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -101,7 +101,7 @@ public class BasicMessageService implements MessageService {
                     formattedMessage += message.messageInfoToString();
                     formattedMessages.add(formattedMessage);
                 });
-        return formattedMessages;
+        return Optional.of(formattedMessages);
     }
 
 
@@ -153,7 +153,8 @@ public class BasicMessageService implements MessageService {
             String formattedMessage = "";
             try {
                 User user = userService.findById(message.getSenderId());
-                if (channelService.checkUserInChannel(user.getId(), channelId)) {
+                Channel channel = channelService.findById(channelId);
+                if (channel.containsUser(user.getId())) {
                     formattedMessage += user.getName() + ": ";
                 } else {
                     formattedMessage += user.getName() + "(퇴장한 사용자): ";

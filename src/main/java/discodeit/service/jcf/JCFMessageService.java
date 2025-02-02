@@ -68,7 +68,7 @@ public class JCFMessageService implements MessageService {
             String formattedMessage = channel.getName() + " > ";
             try {
                 User user = jcfUserService.findById(message.getSenderId());
-                if (jcfChannelService.checkUserInChannel(user.getId(), channel.getId())) {
+                if (channel.containsUser(user.getId())) {
                     formattedMessage += user.getName() + ": ";
                 } else {
                     formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -85,7 +85,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<String> getAllMessages() {
+    public Optional<List<String>> getAllMessages() {
         Map<UUID, Message> data = jcfMessageRepository.findAll();
         List<String> formattedMessages = new ArrayList<>();
         data.values().stream()
@@ -102,7 +102,7 @@ public class JCFMessageService implements MessageService {
                     */
                     try {
                         User user = jcfUserService.findById(message.getSenderId());
-                        if (jcfChannelService.checkUserInChannel(user.getId(), channel.getId())) {
+                        if (channel.containsUser(user.getId())) {
                             formattedMessage += user.getName() + ": ";
                         } else {
                             formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -113,7 +113,7 @@ public class JCFMessageService implements MessageService {
                     formattedMessage += message.messageInfoToString();
                     formattedMessages.add(formattedMessage);
                 });
-        return formattedMessages;
+        return Optional.of(formattedMessages);
     }
 
     @Override
@@ -162,7 +162,8 @@ public class JCFMessageService implements MessageService {
             String formattedMessage = "";
             try {
                 User user = jcfUserService.findById(message.getSenderId());
-                if (jcfChannelService.checkUserInChannel(user.getId(), channelId)) {
+                Channel channel = jcfChannelService.findById(channelId);
+                if (channel.containsUser(user.getId())) {
                     formattedMessage += user.getName() + ": ";
                 } else {
                     formattedMessage += user.getName() + "(퇴장한 사용자): ";
