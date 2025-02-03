@@ -76,6 +76,4 @@ public class Channel extends Common implements Serializable {
     public int hashCode() {
         return Objects.hash(this.getId());
     }
-
-
 }

@@ -1,6 +1,6 @@
 package discodeit.service.basic;
 
-import discodeit.dto.ChannelInfoDto;
+import discodeit.dto.ChannelDto;
 import discodeit.enity.Channel;
 import discodeit.enity.ChannelType;
 import discodeit.enity.User;
@@ -36,13 +36,13 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelInfoDto> getAllChannelsInfo() {
+    public List<ChannelDto> getAllChannelsInfo() {
         Map<UUID, Channel> data = channelRepository.findAll();
         if (data == null || data.isEmpty()) {
             System.out.println("채널이 없습니다.");
             return null;
         }
-        List<ChannelInfoDto> list = new ArrayList<>();
+        List<ChannelDto> list = new ArrayList<>();
         data.values().stream()
                 .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
                 .forEach(channel -> {
@@ -50,13 +50,13 @@ public class BasicChannelService implements ChannelService {
                     for (UUID userId : channel.getUsers()) {
                         userNames.add((userService.findById(userId).getName()));
                     }
-                    list.add(new ChannelInfoDto(channel));  // 메세지는 출력 x
+                    list.add(new ChannelDto(channel));  // 메세지는 출력 x
                 });
         return list;
     }
 
     @Override
-    public ChannelInfoDto getChannelInfoById(UUID channelId) {
+    public ChannelDto getChannelInfoById(UUID channelId) {
         try {
             Channel channel = findById(channelId);
             // 채널에 참여한 사용자 이름
@@ -67,7 +67,7 @@ public class BasicChannelService implements ChannelService {
             // 채널 내 메세지
             List<String> formattedMessages = messageService.getMessagesByChannelId(channelId);
 
-            return new ChannelInfoDto(channel);
+            return new ChannelDto(channel);
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
             return null;

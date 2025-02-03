@@ -1,6 +1,6 @@
 package discodeit.service.jcf;
 
-import discodeit.dto.ChannelInfoDto;
+import discodeit.dto.ChannelDto;
 import discodeit.enity.Channel;
 import discodeit.enity.ChannelType;
 import discodeit.enity.User;
@@ -50,7 +50,7 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 이름, 설명, 채널 내 사용자, 채널 내 메세지 조회
     @Override
-    public ChannelInfoDto getChannelInfoById(UUID channelId) {
+    public ChannelDto getChannelInfoById(UUID channelId) {
         try {
             Channel channel = findById(channelId);
             // 채널에 참여한 사용자 이름
@@ -61,7 +61,7 @@ public class JCFChannelService implements ChannelService {
             // 채널 내 메세지
             List<String> formattedMessages = jcfMessageService.getMessagesByChannelId(channelId);
 
-            return new ChannelInfoDto(channel);
+            return new ChannelDto(channel);
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
             return null;
@@ -70,13 +70,13 @@ public class JCFChannelService implements ChannelService {
 
     // 채널별 이름, 설명, 채널 내 사용자 조회
     @Override
-    public List<ChannelInfoDto> getAllChannelsInfo() {
+    public List<ChannelDto> getAllChannelsInfo() {
         Map<UUID, Channel> data = jcfChannelRepository.findAll();
         if (data.isEmpty()) {
             System.out.println("채널이 없습니다.");
             return null;
         }
-        List<ChannelInfoDto> list = new ArrayList<>();
+        List<ChannelDto> list = new ArrayList<>();
         data.values().stream()
                 .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
                 .forEach(channel -> {
@@ -85,7 +85,7 @@ public class JCFChannelService implements ChannelService {
                     for (UUID userId : channel.getUsers()) {
                         userNames.add((jcfUserService.findById(userId).getName()));
                     }
-                    list.add(new ChannelInfoDto(channel));  // 메세지는 출력 x
+                    list.add(new ChannelDto(channel));  // 메세지는 출력 x
                 });
         return list;
     }

@@ -2,13 +2,11 @@ package discodeit.dto;
 
 import discodeit.enity.User;
 
-import java.util.List;
-
 // 유저 정보를 읽기 위한 DTO
-public class UserInfoDto {
+public class UserDto {
     private User user;
 
-    public UserInfoDto(User user) {
+    public UserDto(User user) {
         this.user = user;
     }
 

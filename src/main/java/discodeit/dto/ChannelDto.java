@@ -2,13 +2,10 @@ package discodeit.dto;
 
 import discodeit.enity.Channel;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-public class ChannelInfoDto {
+public class ChannelDto {
     private Channel channel;
 
-    public ChannelInfoDto(Channel channel) {
+    public ChannelDto(Channel channel) {
         this.channel = channel;
     }
 

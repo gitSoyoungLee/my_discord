@@ -1,6 +1,6 @@
 package discodeit.service.basic;
 
-import discodeit.dto.UserInfoDto;
+import discodeit.dto.UserDto;
 import discodeit.enity.Channel;
 import discodeit.enity.User;
 import discodeit.repository.UserRepository;
@@ -42,7 +42,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserInfoDto getUserInfoById(UUID userId) {
+    public UserDto getUserInfoById(UUID userId) {
         try {
             // UUID로 User 객체 찾기
             User user = findById(userId);
@@ -57,7 +57,7 @@ public class BasicUserService implements UserService {
                         .collect(Collectors.toList());
             }
 
-            return new UserInfoDto(user);
+            return new UserDto(user);
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 사용자입니다." + e.getMessage());
             return null;
@@ -65,17 +65,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserInfoDto> getAllUsersInfo() {
+    public List<UserDto> getAllUsersInfo() {
         Map<UUID, User> data = userRepository.findAll();
         if (data.isEmpty()) {
             System.out.println("사용자가 없습니다.");
             return null;
         }
-        List<UserInfoDto> list = new ArrayList<>();
+        List<UserDto> list = new ArrayList<>();
         data.values().stream()
                 .sorted(Comparator.comparing(user -> user.getCreatedAt()))
                 .forEach(user -> {
-                    list.add(new UserInfoDto(user));    // 전체 사용자 목록 조회 시에는 소속 채널 출력 x
+                    list.add(new UserDto(user));    // 전체 사용자 목록 조회 시에는 소속 채널 출력 x
                 });
         return list;
     }

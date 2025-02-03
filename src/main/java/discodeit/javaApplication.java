@@ -1,7 +1,7 @@
 package discodeit;
 
-import discodeit.dto.ChannelInfoDto;
-import discodeit.dto.UserInfoDto;
+import discodeit.dto.ChannelDto;
+import discodeit.dto.UserDto;
 import discodeit.enity.ChannelType;
 import discodeit.repository.file.FileChannelRepository;
 import discodeit.repository.file.FileMessageRepository;
@@ -25,7 +25,7 @@ public class javaApplication {
 
     static void printUserInfo(UUID userId, UserService userService) {
         System.out.println("--- UUID로 사용자 조회 ---");
-        UserInfoDto userInfoDto = userService.getUserInfoById(userId);
+        UserDto userInfoDto = userService.getUserInfoById(userId);
         if (userInfoDto != null) {
             System.out.println(userInfoDto);
         } else {
@@ -35,21 +35,21 @@ public class javaApplication {
 
     static void printAllUserInfo(UserService userService) {
         System.out.println("--- 전체 사용자 조회 ---");
-        List<UserInfoDto> allUserDtoList = userService.getAllUsersInfo();
+        List<UserDto> allUserDtoList = userService.getAllUsersInfo();
         allUserDtoList.stream()
                 .forEach(System.out::println);
     }
 
     static void printChannelInfo(UUID channelId, ChannelService channelService) {
         System.out.println("--- UUID로 특정 채널 조회 ---");
-        ChannelInfoDto channelInfoDto = channelService.getChannelInfoById(channelId);
-        if (channelInfoDto != null) System.out.println(channelInfoDto);
+        ChannelDto channelDto = channelService.getChannelInfoById(channelId);
+        if (channelDto != null) System.out.println(channelDto);
         else System.out.println("정보 조회가 불가능합니다.");
     }
 
     static void printAllChannelInfo(ChannelService channelService) {
         System.out.println("--- 전체 채널 조회 ---");
-        List<ChannelInfoDto> allChannelDtoList = channelService.getAllChannelsInfo();
+        List<ChannelDto> allChannelDtoList = channelService.getAllChannelsInfo();
         allChannelDtoList.stream()
                 .forEach(System.out::println);
     }

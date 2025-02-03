@@ -1,6 +1,6 @@
 package discodeit.service;
 
-import discodeit.dto.ChannelInfoDto;
+import discodeit.dto.ChannelDto;
 import discodeit.enity.Channel;
 import discodeit.enity.ChannelType;
 
@@ -12,9 +12,9 @@ public interface ChannelService {
     UUID createChannel(String name, String description, ChannelType type);    // 채널 생성
 
     // Read
-    List<ChannelInfoDto> getAllChannelsInfo(); // 전체 채널 다건 조회
+    List<ChannelDto> getAllChannelsInfo(); // 전체 채널 다건 조회
 
-    ChannelInfoDto getChannelInfoById(UUID channelId);  // 채널 정보 단건 조회
+    ChannelDto getChannelInfoById(UUID channelId);  // 채널 정보 단건 조회
 
     // Update
     void updateChannelName(UUID channelId, String name);   // 채널명 변경

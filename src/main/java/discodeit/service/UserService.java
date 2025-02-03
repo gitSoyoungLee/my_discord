@@ -1,6 +1,6 @@
 package discodeit.service;
 
-import discodeit.dto.UserInfoDto;
+import discodeit.dto.UserDto;
 import discodeit.enity.User;
 
 import java.util.List;
@@ -12,9 +12,9 @@ public interface UserService {
     UUID createUser(String email, String name, String password);  // 유저 생성
 
     // Read
-    UserInfoDto getUserInfoById(UUID userId);    // 유저 정보 단건 조회
+    UserDto getUserInfoById(UUID userId);    // 유저 정보 단건 조회
 
-    List<UserInfoDto> getAllUsersInfo(); // 모든 유저 조회
+    List<UserDto> getAllUsersInfo(); // 모든 유저 조회
 
     // Update
     void updateUserName(UUID userId, String name);  // 유저 이름 수정
