@@ -26,11 +26,6 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void setChannelRepository(ChannelRepository channelRepository) {
-        this.jcfChannelRepository = (JCFChannelRepository) channelRepository;
-    }
-
-    @Override
     public void setService(UserService userService, MessageService messageService) {
         this.jcfUserService = (JCFUserService) userService;
         this.jcfMessageService = (JCFMessageService) messageService;
@@ -122,7 +117,7 @@ public class JCFChannelService implements ChannelService {
         if (channel.containsUser(userId)) {
             return;
         }
-        channel.getUsers().add(userId);
+        channel.getUsersId().add(userId);
         return;
     }
 
@@ -137,7 +132,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println(user.getName() + "은 채널에 없는 사용자입니다.");
             return;
         }
-        channel.getUsers().remove(userId);
+        channel.getUsersId().remove(userId);
     }
 
     @Override
@@ -145,7 +140,7 @@ public class JCFChannelService implements ChannelService {
         Map<UUID, Channel> data = jcfChannelRepository.findAll();
         data.values().stream()
                 .forEach(channel -> {
-                    channel.getUsers().remove(userId);
+                    channel.getUsersId().remove(userId);
                 });
     }
 

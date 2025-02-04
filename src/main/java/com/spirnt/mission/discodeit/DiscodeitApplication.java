@@ -312,10 +312,6 @@ public class DiscodeitApplication {
 		UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
-		//레포지토리 할당
-		userService.setUserRepository(context.getBean(UserRepository.class));
-		channelService.setChannelRepository(context.getBean(ChannelRepository.class));
-		messageService.setMessageRepository(context.getBean(MessageRepository.class));
 		//서비스 의존성
 		userService.setService(channelService, messageService);
 		channelService.setService(userService, messageService);

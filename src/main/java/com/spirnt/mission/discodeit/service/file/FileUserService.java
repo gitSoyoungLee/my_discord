@@ -24,11 +24,6 @@ public class FileUserService implements UserService {
         this.fileUserRepository = new FileUserRepository();
     }
 
-    @Override
-    public void setUserRepository(UserRepository userRepository) {
-        this.fileUserRepository = (FileUserRepository) userRepository;
-    }
-
     public static FileUserService getInstance() {
         if (instance == null) {
             synchronized (FileUserService.class) {

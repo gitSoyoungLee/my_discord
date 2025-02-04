@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
-    void setChannelRepository(ChannelRepository channelRepository);
     void setService(UserService userService, MessageService messageService);
     // Create
     UUID createChannel(String name, String description, ChannelType type);    // 채널 생성

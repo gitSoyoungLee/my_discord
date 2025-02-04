@@ -1,11 +1,14 @@
 package com.spirnt.mission.discodeit.enity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class Channel extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
     String name;
@@ -24,18 +27,6 @@ public class Channel extends Common implements Serializable {
     }
 
 
-    //Getter
-    public String getName() {
-        return name;
-    }
-
-    public List<UUID> getUsers() {
-        return usersId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     //Update
     public void updateName(String name) {

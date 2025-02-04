@@ -8,23 +8,16 @@ import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
     private UserService userService;
     private ChannelService channelService;
 
-    public BasicMessageService() {}
-    public BasicMessageService(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
-    }
-    @Override
-    public void setMessageRepository(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
-    }
     @Override
     public void setService(UserService userService, ChannelService channelService) {
         this.userService = userService;
@@ -39,7 +32,7 @@ public class BasicMessageService implements MessageService {
         User user = userService.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
 
-        if (!channel.getUsers().contains(userId)) {
+        if (!channel.getUsersId().contains(userId)) {
             System.out.println("메세지를 보낼 수 없습니다: " +
                     user.getName() + "은 아직 '" + channel.getName() + "' 채널에 입장하지 않았습니다.");
             return null;

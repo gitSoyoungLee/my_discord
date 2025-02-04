@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void setMessageRepository(MessageRepository messageRepository);
     void setService(UserService userService, ChannelService channelService);
     // Create
     UUID createMessage(UUID userId, UUID channelId, String content); // 메세지 전송

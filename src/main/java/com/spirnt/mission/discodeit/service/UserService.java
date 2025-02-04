@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    void setUserRepository(UserRepository userRepository);
     void setService(ChannelService channelService, MessageService messageService);
 
     // Create

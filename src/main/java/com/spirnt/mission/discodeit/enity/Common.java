@@ -1,8 +1,11 @@
 package com.spirnt.mission.discodeit.enity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 public abstract class Common implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
@@ -16,18 +19,6 @@ public abstract class Common implements Serializable {
     }
 
 
-    //Getter
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
 
     //Update
     public void updateClass(Long updateTime) {

@@ -27,11 +27,6 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void setMessageRepository(MessageRepository messageRepository) {
-        this.fileMessageRepository = (FileMessageRepository) messageRepository;
-    }
-
-    @Override
     public void setService(UserService userService, ChannelService channelService) {
         this.fileUserService = (FileUserService) userService;
         this.fileChannelService = (FileChannelService) channelService;
@@ -61,7 +56,7 @@ public class FileMessageService implements MessageService {
         User user = fileUserService.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
 
-        if (!channel.getUsers().contains(userId)) {
+        if (!channel.getUsersId().contains(userId)) {
             System.out.println("메세지를 보낼 수 없습니다: " +
                     user.getName() + "은 아직 '" + channel.getName() + "' 채널에 입장하지 않았습니다.");
             return null;

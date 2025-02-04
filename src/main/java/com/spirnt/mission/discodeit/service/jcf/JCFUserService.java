@@ -23,11 +23,6 @@ public class JCFUserService implements UserService {
 
     }
 
-    @Override
-    public void setUserRepository(UserRepository userRepository) {
-        this.jcfUserRepository = (JCFUserRepository) userRepository;
-    }
-
     public static JCFUserService getInstance() {
         if (instance == null) {
             synchronized (JCFUserService.class) {

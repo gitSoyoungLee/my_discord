@@ -13,6 +13,6 @@ public class ChannelDto {
     public String toString() {
         return "채널: " + channel.getName() +
                 " / 설명: " + channel.getDescription() +
-                " / 참여 중인 사용자 수: " + channel.getUsers().size();
+                " / 참여 중인 사용자 수: " + channel.getUsersId().size();
     }
 }

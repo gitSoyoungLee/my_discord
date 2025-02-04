@@ -1,8 +1,11 @@
 package com.spirnt.mission.discodeit.enity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
 public class User extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
@@ -18,18 +21,6 @@ public class User extends Common implements Serializable {
         this.password = password;
     }
 
-    //Getter
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 
     // Update
     public void updateName(String name) {

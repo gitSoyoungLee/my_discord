@@ -8,24 +8,17 @@ import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
-    private ChannelRepository channelRepository;
+    private final ChannelRepository channelRepository;
     private UserService userService;
     private MessageService messageService;
 
-    public BasicChannelService() {}
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
-
-    @Override
-    public void setChannelRepository(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
     public void setService(UserService userService, MessageService messageService) {
         this.userService = userService;
         this.messageService = messageService;
@@ -98,7 +91,7 @@ public class BasicChannelService implements ChannelService {
         if (channel.containsUser(userId)) {
             return;
         }
-        channel.getUsers().add(userId);
+        channel.getUsersId().add(userId);
         channelRepository.save(channel);
     }
 
@@ -113,7 +106,7 @@ public class BasicChannelService implements ChannelService {
         if (!channel.containsUser(userId)) {
             return;
         }
-        channel.getUsers().remove(userId);
+        channel.getUsersId().remove(userId);
         channelRepository.save(channel);
     }
 
@@ -123,7 +116,7 @@ public class BasicChannelService implements ChannelService {
         if (data.isEmpty()) return;
         data.values().stream()
                 .forEach(channel -> {
-                    channel.getUsers().remove(userId);
+                    channel.getUsersId().remove(userId);
                     // 채널 객체 수정 후 ser 파일에 반영
                     channelRepository.save(channel);
                 });

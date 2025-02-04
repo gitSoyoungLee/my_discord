@@ -27,10 +27,6 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void setChannelRepository(ChannelRepository channelRepository) {
-        this.fileChannelRepository = (FileChannelRepository) channelRepository;
-    }
-    @Override
     public void setService(UserService userService, MessageService messageService) {
         this.fileUserService = (FileUserService) userService;
         this.fileMessageService = (FileMessageService) messageService;
@@ -122,7 +118,7 @@ public class FileChannelService implements ChannelService {
         if (channel.containsUser(userId)) {
             return;
         }
-        channel.getUsers().add(userId);
+        channel.getUsersId().add(userId);
         fileChannelRepository.save(channel);
     }
 
@@ -137,7 +133,7 @@ public class FileChannelService implements ChannelService {
         if (!channel.containsUser(userId)) {
             return;
         }
-        channel.getUsers().remove(userId);
+        channel.getUsersId().remove(userId);
         fileChannelRepository.save(channel);
     }
 
@@ -147,7 +143,7 @@ public class FileChannelService implements ChannelService {
         if (data.isEmpty()) return;
         data.values().stream()
                 .forEach(channel -> {
-                    channel.getUsers().remove(userId);
+                    channel.getUsersId().remove(userId);
                     // 채널 객체 수정 후 ser 파일에 반영
                     fileChannelRepository.save(channel);
                 });

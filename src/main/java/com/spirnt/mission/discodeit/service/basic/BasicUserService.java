@@ -6,25 +6,18 @@ import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     private ChannelService channelService;
     private MessageService messageService;
-    public BasicUserService() {
-    }
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
-    @Override
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
     @Override
     public void setService(ChannelService channelService, MessageService messageService) {
         this.channelService = channelService;
