@@ -1,44 +1,54 @@
 package discodeit.repository.file;
 
 import discodeit.enity.Channel;
+import discodeit.enity.Message;
+import discodeit.enity.User;
 import discodeit.repository.ChannelRepository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class FileChannelRepository extends FileRepository implements ChannelRepository {
 
     public FileChannelRepository() {
-        this.setFileName("channel.ser");
+        super(Paths.get(System.getProperty("user.dir"), "file-data-map", Channel.class.getSimpleName()));
     }
 
     @Override
     public void save(Channel channel) {
-        // ser 파일에 Map으로 저장
-        Map<UUID, Channel> channels = loadFromFile();
-        channels.put(channel.getId(), channel);
-        saveToFile(channels);
+        Path path = resolvePath(channel.getId());
+        saveToFile(path, channel);
     }
 
     @Override
     public void delete(UUID channelId) {
-        Map<UUID, Channel> channels = loadFromFile();
-        if (!channels.containsKey(channelId)) {
-            throw new NoSuchElementException("Channel ID: " + channelId + " not found");
-        }
-        // 기존 Map을 읽어와 데이터를 삭제한 후 덮어씌움
-        channels.remove(channelId);
-        saveToFile(channels);
+        Path path = resolvePath(channelId);
+        deleteFile(path);
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        Map<UUID, Channel> channels = loadFromFile();
-        return Optional.ofNullable(channels.get(channelId))
-                .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " not found"));
+    public Optional<Channel> findById(UUID channelId) {
+        Path path = resolvePath(channelId);
+        return loadFromFile(path);
     }
 
     public Map<UUID, Channel> findAll() {
-        return loadFromFile();
+        Map<UUID, Channel> channels = new HashMap<>();
+        // 폴더 내 모든 .ser 파일을 찾음
+        try (Stream<Path> paths = Files.walk(this.getDIRECTORY())) {
+            paths.filter(path -> path.toString().endsWith(".ser"))  // .ser 파일만 필터링
+                    .forEach(path -> {
+                        Optional<Channel> channelOptional = loadFromFile(path);
+                        channelOptional.ifPresent(channel -> channels.put(channel.getId(), channel));
+                    });
+        } catch (IOException e) {
+            System.out.println("파일을 읽는 중 오류가 발생했습니다: " + e.getMessage());
+        }
+
+        return channels;
     }
 }

@@ -3,20 +3,30 @@ package discodeit.repository.file;
 import discodeit.enity.User;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 // Serializable한 객체만 T로 들어올 수 있음
 public abstract class FileRepository<T extends Serializable> {
-    private String fileName;
+    private Path DIRECTORY;   // ser 파일 저장할 경로
+    private final String EXTENSION = ".ser";
 
-    protected void setFileName(String fileName) {
-        this.fileName = fileName;
+    protected FileRepository(Path directory) {
+        this.DIRECTORY = directory;
     }
 
-    protected void saveToFile(Map<UUID, T> data) {
-        try (FileOutputStream fos = new FileOutputStream(fileName);
+    protected Path getDIRECTORY() { return DIRECTORY; }
+    protected Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id+EXTENSION);
+    }
+
+    protected void saveToFile(Path path, T data) {
+        try (FileOutputStream fos = new FileOutputStream(path.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
             oos.writeObject(data);
@@ -25,14 +35,23 @@ public abstract class FileRepository<T extends Serializable> {
         }
     }
 
-    protected Map<UUID, T> loadFromFile() {
-        try (FileInputStream fis = new FileInputStream(fileName);
+    protected Optional<T> loadFromFile(Path path) {
+        try (FileInputStream fis = new FileInputStream(path.toFile());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
-            return (Map<UUID, T>) ois.readObject();
-        } catch (EOFException e) {
-            return new HashMap<>(); // 파일이 비어있을 경우 새로운 맵 반환
-        } catch (IOException | ClassNotFoundException e) {  // 파일이 없을 경우 새로운 맵 반환
-            return new HashMap<>();
+
+            return Optional.ofNullable((T) ois.readObject());
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    protected void deleteFile(Path path) {
+        try {
+            // 파일이 존재하면 삭제
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            System.out.println("파일 삭제 중 오류 발생: " + e.getMessage());
         }
     }
 }

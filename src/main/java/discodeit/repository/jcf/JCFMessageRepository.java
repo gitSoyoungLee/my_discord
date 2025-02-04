@@ -29,10 +29,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        Message message = this.data.get(messageId);
-        return Optional.ofNullable(message)
-                .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " not found"));
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.of(this.data.get(messageId));
     }
 
     public Map<UUID, Message> findAll() {

@@ -3,6 +3,7 @@ package discodeit.repository;
 import discodeit.enity.User;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository {
@@ -13,7 +14,7 @@ public interface UserRepository {
     void delete(UUID userId);
 
     // 객체 찾기
-    User findById(UUID userId);
+    Optional<User> findById(UUID userId);
 
     // 저장된 모든 데이터 가져오기
     Map<UUID, User> findAll();

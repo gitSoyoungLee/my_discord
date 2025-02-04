@@ -23,12 +23,9 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
-        User user = this.data.get(userId);
-        return Optional.ofNullable(user)
-                .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " not found"));
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(this.data.get(userId));
     }
-
 
     public Map<UUID, User> findAll() {
         return new HashMap<>(data);

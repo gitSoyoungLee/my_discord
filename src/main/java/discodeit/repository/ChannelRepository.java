@@ -3,6 +3,7 @@ package discodeit.repository;
 import discodeit.enity.Channel;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelRepository {
@@ -11,7 +12,7 @@ public interface ChannelRepository {
 
     void delete(UUID channelId);
 
-    Channel findById(UUID channelId);
+    Optional<Channel> findById(UUID channelId);
 
     Map<UUID, Channel> findAll();
 }

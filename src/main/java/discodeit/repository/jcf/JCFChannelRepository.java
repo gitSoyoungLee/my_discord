@@ -24,10 +24,8 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        Channel channel = this.data.get(channelId);
-        return Optional.ofNullable(channel)
-                .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " not found"));
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(this.data.get(channelId));
     }
 
     public Map<UUID, Channel> findAll() {
