@@ -4,21 +4,35 @@ import com.spirnt.mission.discodeit.dto.MessageDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
+import com.spirnt.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
     private static volatile JCFMessageService instance;
-    private final JCFMessageRepository jcfMessageRepository;
+    private JCFMessageRepository jcfMessageRepository;
 
     private JCFUserService jcfUserService;
     private JCFChannelService jcfChannelService;
 
     private JCFMessageService() {
         this.jcfMessageRepository = new JCFMessageRepository();
+    }
+
+    @Override
+    public void setMessageRepository(MessageRepository messageRepository) {
+        this.jcfMessageRepository = (JCFMessageRepository) messageRepository;
+    }
+
+    @Override
+    public void setService(UserService userService, ChannelService channelService) {
+        this.jcfUserService = (JCFUserService) userService;
+        this.jcfChannelService = (JCFChannelService) channelService;
     }
 
     public static JCFMessageService getInstance() {

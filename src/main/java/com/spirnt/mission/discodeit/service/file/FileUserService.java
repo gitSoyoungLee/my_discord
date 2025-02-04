@@ -2,20 +2,31 @@ package com.spirnt.mission.discodeit.service.file;
 
 import com.spirnt.mission.discodeit.dto.UserDto;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.repository.file.FileUserRepository;
+import com.spirnt.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.spirnt.mission.discodeit.service.ChannelService;
+import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
+import com.spirnt.mission.discodeit.service.jcf.JCFChannelService;
+import com.spirnt.mission.discodeit.service.jcf.JCFMessageService;
 
 import java.util.*;
 
 public class FileUserService implements UserService {
     //싱글톤
     private static volatile FileUserService instance;
-    private final FileUserRepository fileUserRepository;
+    private FileUserRepository fileUserRepository;
     private FileChannelService fileChannelService;
     private FileMessageService fileMessageService;
 
     public FileUserService() {
         this.fileUserRepository = new FileUserRepository();
+    }
+
+    @Override
+    public void setUserRepository(UserRepository userRepository) {
+        this.fileUserRepository = (FileUserRepository) userRepository;
     }
 
     public static FileUserService getInstance() {
@@ -34,6 +45,11 @@ public class FileUserService implements UserService {
         this.fileChannelService = fileChannelService.getInstance();
     }
 
+    @Override
+    public void setService(ChannelService channelService, MessageService messageService) {
+        this.fileChannelService = (FileChannelService) channelService;
+        this.fileMessageService= (FileMessageService) messageService;
+    }
 
     @Override
     public UUID createUser(String email, String name, String password) {

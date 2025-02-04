@@ -3,12 +3,16 @@ package com.spirnt.mission.discodeit.service;
 import com.spirnt.mission.discodeit.dto.ChannelDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
+import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.ChannelRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
+    void setChannelRepository(ChannelRepository channelRepository);
+    void setService(UserService userService, MessageService messageService);
     // Create
     UUID createChannel(String name, String description, ChannelType type);    // 채널 생성
 

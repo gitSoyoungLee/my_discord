@@ -4,20 +4,37 @@ import com.spirnt.mission.discodeit.dto.MessageDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.file.FileMessageRepository;
+import com.spirnt.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
+import com.spirnt.mission.discodeit.service.UserService;
+import com.spirnt.mission.discodeit.service.jcf.JCFChannelService;
+import com.spirnt.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.*;
 
 public class FileMessageService implements MessageService {
     //싱글톤
     private static volatile FileMessageService instance;
-    private final FileMessageRepository fileMessageRepository;
+    private FileMessageRepository fileMessageRepository;
     private FileUserService fileUserService;
     private FileChannelService fileChannelService;
 
     public FileMessageService() {
         this.fileMessageRepository = new FileMessageRepository();
+    }
+
+    @Override
+    public void setMessageRepository(MessageRepository messageRepository) {
+        this.fileMessageRepository = (FileMessageRepository) messageRepository;
+    }
+
+    @Override
+    public void setService(UserService userService, ChannelService channelService) {
+        this.fileUserService = (FileUserService) userService;
+        this.fileChannelService = (FileChannelService) channelService;
     }
 
     public static FileMessageService getInstance() {

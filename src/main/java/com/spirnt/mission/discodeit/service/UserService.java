@@ -2,12 +2,15 @@ package com.spirnt.mission.discodeit.service;
 
 import com.spirnt.mission.discodeit.dto.UserDto;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
+    void setUserRepository(UserRepository userRepository);
+    void setService(ChannelService channelService, MessageService messageService);
 
     // Create
     UUID createUser(String email, String name, String password);  // 유저 생성

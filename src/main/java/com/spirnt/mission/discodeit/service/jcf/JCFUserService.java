@@ -2,7 +2,10 @@ package com.spirnt.mission.discodeit.service.jcf;
 
 import com.spirnt.mission.discodeit.dto.UserDto;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.spirnt.mission.discodeit.service.ChannelService;
+import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
 
 import java.util.*;
@@ -10,7 +13,7 @@ import java.util.*;
 public class JCFUserService implements UserService {
     //싱글톤
     private static volatile JCFUserService instance;
-    private final JCFUserRepository jcfUserRepository;
+    private JCFUserRepository jcfUserRepository;
 
     private JCFChannelService jcfChannelService;
     private JCFMessageService jcfMessageService;
@@ -18,6 +21,11 @@ public class JCFUserService implements UserService {
     private JCFUserService() {
         this.jcfUserRepository = new JCFUserRepository();
 
+    }
+
+    @Override
+    public void setUserRepository(UserRepository userRepository) {
+        this.jcfUserRepository = (JCFUserRepository) userRepository;
     }
 
     public static JCFUserService getInstance() {
@@ -34,6 +42,12 @@ public class JCFUserService implements UserService {
     protected void setService() {
         this.jcfMessageService = jcfMessageService.getInstance();
         this.jcfChannelService = jcfChannelService.getInstance();
+    }
+
+    @Override
+    public void setService(ChannelService channelService, MessageService messageService) {
+        this.jcfChannelService = (JCFChannelService) channelService;
+        this.jcfMessageService= (JCFMessageService) messageService;
     }
 
     @Override

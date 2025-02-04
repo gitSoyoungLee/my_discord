@@ -4,15 +4,18 @@ import com.spirnt.mission.discodeit.dto.ChannelDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
+import com.spirnt.mission.discodeit.service.MessageService;
+import com.spirnt.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
     private static volatile JCFChannelService instance;
-    private final JCFChannelRepository jcfChannelRepository;
+    private JCFChannelRepository jcfChannelRepository;
 
     private JCFUserService jcfUserService;
     private JCFMessageService jcfMessageService;
@@ -20,6 +23,17 @@ public class JCFChannelService implements ChannelService {
     private JCFChannelService() {
         this.jcfChannelRepository = new JCFChannelRepository();
 
+    }
+
+    @Override
+    public void setChannelRepository(ChannelRepository channelRepository) {
+        this.jcfChannelRepository = (JCFChannelRepository) channelRepository;
+    }
+
+    @Override
+    public void setService(UserService userService, MessageService messageService) {
+        this.jcfUserService = (JCFUserService) userService;
+        this.jcfMessageService = (JCFMessageService) messageService;
     }
 
     public static JCFChannelService getInstance() {

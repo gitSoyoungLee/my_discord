@@ -2,12 +2,16 @@ package com.spirnt.mission.discodeit.service;
 
 import com.spirnt.mission.discodeit.dto.MessageDto;
 import com.spirnt.mission.discodeit.enity.Message;
+import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.MessageRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
+    void setMessageRepository(MessageRepository messageRepository);
+    void setService(UserService userService, ChannelService channelService);
     // Create
     UUID createMessage(UUID userId, UUID channelId, String content); // 메세지 전송
 

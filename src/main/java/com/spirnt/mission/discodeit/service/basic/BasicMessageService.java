@@ -8,6 +8,7 @@ import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -16,10 +17,15 @@ public class BasicMessageService implements MessageService {
     private UserService userService;
     private ChannelService channelService;
 
+    public BasicMessageService() {}
     public BasicMessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
-
+    @Override
+    public void setMessageRepository(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
+    @Override
     public void setService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;

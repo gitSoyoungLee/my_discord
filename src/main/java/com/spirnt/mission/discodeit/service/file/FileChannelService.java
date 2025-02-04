@@ -4,21 +4,38 @@ import com.spirnt.mission.discodeit.dto.ChannelDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.file.FileChannelRepository;
+import com.spirnt.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
+import com.spirnt.mission.discodeit.service.MessageService;
+import com.spirnt.mission.discodeit.service.UserService;
+import com.spirnt.mission.discodeit.service.jcf.JCFMessageService;
+import com.spirnt.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.*;
 
 public class FileChannelService implements ChannelService {
     //싱글톤
     private static volatile FileChannelService instance;
-    private final FileChannelRepository fileChannelRepository;
+    private FileChannelRepository fileChannelRepository;
     private FileUserService fileUserService;
     private FileMessageService fileMessageService;
 
     public FileChannelService() {
         this.fileChannelRepository = new FileChannelRepository();
     }
+
+    @Override
+    public void setChannelRepository(ChannelRepository channelRepository) {
+        this.fileChannelRepository = (FileChannelRepository) channelRepository;
+    }
+    @Override
+    public void setService(UserService userService, MessageService messageService) {
+        this.fileUserService = (FileUserService) userService;
+        this.fileMessageService = (FileMessageService) messageService;
+    }
+
 
     public static FileChannelService getInstance() {
         if (instance == null) {
