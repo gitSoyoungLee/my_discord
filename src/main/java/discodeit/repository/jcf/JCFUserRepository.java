@@ -3,7 +3,10 @@ package discodeit.repository.jcf;
 import discodeit.enity.User;
 import discodeit.repository.UserRepository;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;   // 모든 유저 데이터, key=id

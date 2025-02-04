@@ -1,28 +1,26 @@
 package discodeit.repository.file;
 
-import discodeit.enity.User;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 // Serializable한 객체만 T로 들어올 수 있음
 public abstract class FileRepository<T extends Serializable> {
-    private Path DIRECTORY;   // ser 파일 저장할 경로
     private final String EXTENSION = ".ser";
+    private Path DIRECTORY;   // ser 파일 저장할 경로
 
     protected FileRepository(Path directory) {
         this.DIRECTORY = directory;
     }
 
-    protected Path getDIRECTORY() { return DIRECTORY; }
+    protected Path getDIRECTORY() {
+        return DIRECTORY;
+    }
+
     protected Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id+EXTENSION);
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     protected void saveToFile(Path path, T data) {

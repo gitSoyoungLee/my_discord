@@ -8,7 +8,6 @@ import discodeit.repository.file.FileMessageRepository;
 import discodeit.service.MessageService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
     //싱글톤
@@ -59,7 +58,7 @@ public class FileMessageService implements MessageService {
     @Override
     public MessageDto getMessageById(UUID messageId) {
         Message message = findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message ID: "+messageId+" Not Found"));
+                .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
         return new MessageDto(message);
     }
 
@@ -72,7 +71,7 @@ public class FileMessageService implements MessageService {
         }
         List<MessageDto> list = new ArrayList<>();
         data.values().stream()
-                .sorted(Comparator.comparing(message-> message.getCreatedAt()))
+                .sorted(Comparator.comparing(message -> message.getCreatedAt()))
                 .forEach(message -> {
                     list.add(new MessageDto(message));
                 });
@@ -83,7 +82,7 @@ public class FileMessageService implements MessageService {
     @Override
     public void updateMessage(UUID userId, UUID messageId, String newContent) {
         Message message = findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message ID: "+messageId+" Not Found"));
+                .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
         // 메시지 작성자인 경우에만 수정 가능
         if (!message.getSenderId().equals(userId)) {
             System.out.println("메세지 작성자만 수정 가능합니다.");
@@ -97,7 +96,7 @@ public class FileMessageService implements MessageService {
     @Override
     public void deleteMessage(UUID messageId) {
         Message message = findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message ID: "+messageId+" Not Found"));
+                .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
         fileMessageRepository.delete(messageId);
     }
 

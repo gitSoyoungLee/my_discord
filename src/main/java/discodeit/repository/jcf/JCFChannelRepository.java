@@ -3,7 +3,10 @@ package discodeit.repository.jcf;
 import discodeit.enity.Channel;
 import discodeit.repository.ChannelRepository;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
 

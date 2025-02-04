@@ -1,13 +1,11 @@
 package discodeit.service.file;
 
 import discodeit.dto.UserDto;
-import discodeit.enity.Channel;
 import discodeit.enity.User;
 import discodeit.repository.file.FileUserRepository;
 import discodeit.service.UserService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FileUserService implements UserService {
     //싱글톤
@@ -65,7 +63,7 @@ public class FileUserService implements UserService {
     public List<UserDto> getAllUsersInfo() {
         Map<UUID, User> data = fileUserRepository.findAll();
         List<UserDto> list = new ArrayList<>();
-        if(data.isEmpty()) return list;
+        if (data.isEmpty()) return list;
         data.values().stream()
                 .sorted(Comparator.comparing(user -> user.getCreatedAt()))
                 .forEach(user -> {

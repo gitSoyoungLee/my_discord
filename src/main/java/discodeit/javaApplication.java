@@ -16,14 +16,14 @@ import discodeit.service.basic.BasicMessageService;
 import discodeit.service.basic.BasicUserService;
 import discodeit.service.file.FileServiceFactory;
 import discodeit.service.jcf.JCFServiceFactory;
-import org.w3c.dom.ls.LSOutput;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class javaApplication {
@@ -69,7 +69,7 @@ public class javaApplication {
     static void printAllUserInfo(UserService userService) {
         System.out.println("--- 전체 사용자 조회 ---");
         List<UserDto> userDtoList = userService.getAllUsersInfo();
-        if(userDtoList.isEmpty()) {
+        if (userDtoList.isEmpty()) {
             System.out.println("사용자가 없습니다.");
             return;
         }
@@ -90,11 +90,11 @@ public class javaApplication {
     static void printAllChannelInfo(ChannelService channelService) {
         System.out.println("--- 전체 채널 조회 ---");
         List<ChannelDto> channelDtoList = channelService.getAllChannelsInfo();
-        if(channelDtoList.isEmpty()) {
+        if (channelDtoList.isEmpty()) {
             System.out.println("채널이 없습니다.");
             return;
         }
-            channelDtoList.stream()
+        channelDtoList.stream()
                 .forEach(System.out::println);
     }
 
@@ -111,7 +111,7 @@ public class javaApplication {
     static void printAllMessageInfo(MessageService messageService) {
         System.out.println("--- 디스코드잇에서 작성된 모든 메세지 조회 ---");
         List<MessageDto> messageList = messageService.getAllMessages();
-        if(messageList.isEmpty()) {
+        if (messageList.isEmpty()) {
             System.out.println("메세지가 없습니다.");
             return;
         }

@@ -3,7 +3,6 @@ package discodeit.service;
 import discodeit.dto.MessageDto;
 import discodeit.enity.Message;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

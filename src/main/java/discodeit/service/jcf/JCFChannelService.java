@@ -8,7 +8,6 @@ import discodeit.repository.jcf.JCFChannelRepository;
 import discodeit.service.ChannelService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
 
@@ -91,8 +90,8 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID channelId) {
         // 존재하는지 검증
-        Channel channel= findById(channelId)
-                .orElseThrow(()->new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
+        Channel channel = findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
         // 채널에 속해있던 메세지도 삭제
         jcfMessageService.deleteMessagesInChannel(channelId);
         jcfChannelRepository.delete(channelId);

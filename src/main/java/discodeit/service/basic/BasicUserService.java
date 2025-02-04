@@ -1,7 +1,6 @@
 package discodeit.service.basic;
 
 import discodeit.dto.UserDto;
-import discodeit.enity.Channel;
 import discodeit.enity.User;
 import discodeit.repository.UserRepository;
 import discodeit.service.ChannelService;
@@ -9,7 +8,6 @@ import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class BasicUserService implements UserService {
     private UserRepository userRepository;
@@ -53,7 +51,7 @@ public class BasicUserService implements UserService {
     public List<UserDto> getAllUsersInfo() {
         Map<UUID, User> data = userRepository.findAll();
         List<UserDto> list = new ArrayList<>();
-        if(data.isEmpty()) return list;
+        if (data.isEmpty()) return list;
         data.values().stream()
                 .sorted(Comparator.comparing(user -> user.getCreatedAt()))
                 .forEach(user -> {

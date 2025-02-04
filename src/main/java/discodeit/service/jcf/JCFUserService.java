@@ -1,13 +1,11 @@
 package discodeit.service.jcf;
 
 import discodeit.dto.UserDto;
-import discodeit.enity.Channel;
 import discodeit.enity.User;
 import discodeit.repository.jcf.JCFUserRepository;
 import discodeit.service.UserService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
     //싱글톤

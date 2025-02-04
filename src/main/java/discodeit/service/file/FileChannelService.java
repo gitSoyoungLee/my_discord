@@ -8,7 +8,6 @@ import discodeit.repository.file.FileChannelRepository;
 import discodeit.service.ChannelService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FileChannelService implements ChannelService {
     //싱글톤
@@ -58,7 +57,7 @@ public class FileChannelService implements ChannelService {
     public List<ChannelDto> getAllChannelsInfo() {
         Map<UUID, Channel> data = fileChannelRepository.findAll();
         List<ChannelDto> list = new ArrayList<>();
-        if(data.isEmpty()) return list;
+        if (data.isEmpty()) return list;
         data.values().stream()
                 .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
                 .forEach(channel -> {
@@ -88,8 +87,8 @@ public class FileChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID channelId) {
         // 존재하는지 검증
-        Channel channel= findById(channelId)
-                .orElseThrow(()->new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
+        Channel channel = findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
         // 채널에 속해있던 메세지도 삭제
         fileMessageService.deleteMessagesInChannel(channelId);
         fileChannelRepository.delete(channelId);
