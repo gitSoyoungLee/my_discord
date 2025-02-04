@@ -50,7 +50,6 @@ public class User extends Common implements Serializable {
         updateClass(System.currentTimeMillis());
     }
 
-    // 객체 직렬화 부분에서 ser 파일에 저장할 형식으로 추가
     @Override
     public String toString() {
         return "User{" +

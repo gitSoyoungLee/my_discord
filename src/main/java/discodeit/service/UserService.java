@@ -4,6 +4,7 @@ import discodeit.dto.UserDto;
 import discodeit.enity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
@@ -26,7 +27,7 @@ public interface UserService {
     // Delete
     void deleteUser(UUID userId);
 
-    User findById(UUID userId);
+    Optional<User> findById(UUID userId);
 
     boolean checkEmailDuplicate(String email);  //이메일 중복 검사
 }

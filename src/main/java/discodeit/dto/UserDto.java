@@ -2,6 +2,8 @@ package discodeit.dto;
 
 import discodeit.enity.User;
 
+import java.util.Optional;
+
 // 유저 정보를 읽기 위한 DTO
 public class UserDto {
     private User user;

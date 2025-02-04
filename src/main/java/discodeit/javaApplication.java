@@ -1,6 +1,7 @@
 package discodeit;
 
 import discodeit.dto.ChannelDto;
+import discodeit.dto.MessageDto;
 import discodeit.dto.UserDto;
 import discodeit.enity.ChannelType;
 import discodeit.repository.file.FileChannelRepository;
@@ -15,58 +16,105 @@ import discodeit.service.basic.BasicMessageService;
 import discodeit.service.basic.BasicUserService;
 import discodeit.service.file.FileServiceFactory;
 import discodeit.service.jcf.JCFServiceFactory;
+import org.w3c.dom.ls.LSOutput;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class javaApplication {
 
+    static public void clearDataFiles() {
+        // 현재 작업 디렉토리에 있는 file-data-map 경로
+        Path basePath = Paths.get(System.getProperty("user.dir"), "file-data-map");
+
+        // 삭제할 폴더 목록
+        List<String> folders = List.of("User", "Channel", "Message");
+
+        for (String folder : folders) {
+            Path folderPath = basePath.resolve(folder);
+            if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
+                try (Stream<Path> files = Files.list(folderPath)) {
+                    files
+                            .filter(path -> path.toString().endsWith(".ser")) // .ser 파일만 선택
+                            .forEach(path -> {
+                                try {
+                                    Files.delete(path);
+                                    System.out.println("삭제됨: " + path);
+                                } catch (IOException e) {
+                                    System.out.println("파일 삭제 실패: " + path + " - " + e.getMessage());
+                                }
+                            });
+                } catch (IOException e) {
+                    System.out.println("폴더 접근 실패: " + folderPath + " - " + e.getMessage());
+                }
+            }
+        }
+    }
+
     static void printUserInfo(UUID userId, UserService userService) {
         System.out.println("--- UUID로 사용자 조회 ---");
-        UserDto userInfoDto = userService.getUserInfoById(userId);
-        if (userInfoDto != null) {
+        try {
+            UserDto userInfoDto = userService.getUserInfoById(userId);
             System.out.println(userInfoDto);
-        } else {
-            System.out.println("정보 조회가 불가능합니다.");
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
         }
     }
 
     static void printAllUserInfo(UserService userService) {
         System.out.println("--- 전체 사용자 조회 ---");
-        List<UserDto> allUserDtoList = userService.getAllUsersInfo();
-        allUserDtoList.stream()
+        List<UserDto> userDtoList = userService.getAllUsersInfo();
+        if(userDtoList.isEmpty()) {
+            System.out.println("사용자가 없습니다.");
+            return;
+        }
+        userDtoList.stream()
                 .forEach(System.out::println);
     }
 
     static void printChannelInfo(UUID channelId, ChannelService channelService) {
         System.out.println("--- UUID로 특정 채널 조회 ---");
-        ChannelDto channelDto = channelService.getChannelInfoById(channelId);
-        if (channelDto != null) System.out.println(channelDto);
-        else System.out.println("정보 조회가 불가능합니다.");
+        try {
+            ChannelDto channelDto = channelService.getChannelInfoById(channelId);
+            System.out.println(channelDto);
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     static void printAllChannelInfo(ChannelService channelService) {
         System.out.println("--- 전체 채널 조회 ---");
-        List<ChannelDto> allChannelDtoList = channelService.getAllChannelsInfo();
-        allChannelDtoList.stream()
+        List<ChannelDto> channelDtoList = channelService.getAllChannelsInfo();
+        if(channelDtoList.isEmpty()) {
+            System.out.println("채널이 없습니다.");
+            return;
+        }
+            channelDtoList.stream()
                 .forEach(System.out::println);
     }
 
     static void printMessageInfo(UUID messageId, MessageService messageService) {
         System.out.println("--- UUID로 특정 메세지 조회 ---");
-        // 메시지 단건 조회
-        String msg = messageService.getMessageById(messageId);
-        if (msg != null) System.out.println(msg);
-        else System.out.println("정보 조회가 불가능합니다.");
+        try {
+            MessageDto messageDto = messageService.getMessageById(messageId);
+            System.out.println(messageDto);
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     static void printAllMessageInfo(MessageService messageService) {
         System.out.println("--- 디스코드잇에서 작성된 모든 메세지 조회 ---");
-        List<String> messageList = messageService.getAllMessages()
-                .orElse(Collections.emptyList());
-        if(messageList.size()==0) System.out.println("현재 작성된 메세지가 없습니다.");
+        List<MessageDto> messageList = messageService.getAllMessages();
+        if(messageList.isEmpty()) {
+            System.out.println("메세지가 없습니다.");
+            return;
+        }
         messageList.stream()
                 .forEach(System.out::println);
     }
@@ -585,16 +633,11 @@ public class javaApplication {
     }
 
     public static void main(String[] args) {
+
+        clearDataFiles();
+
         //testSprint1();
 
-        // 파일 없앤 후 시작
-        String[] filesToDelete = {"user.ser", "channel.ser", "message.ser"};
-        for (String fileName : filesToDelete) {
-            File file = new File(fileName);
-            if (file.exists()) {
-                file.delete();
-            }
-        }
 
         //testSprint2();
 

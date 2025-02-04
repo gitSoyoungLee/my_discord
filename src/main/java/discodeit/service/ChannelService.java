@@ -5,6 +5,7 @@ import discodeit.enity.Channel;
 import discodeit.enity.ChannelType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
@@ -24,16 +25,13 @@ public interface ChannelService {
     // Delete
     void deleteChannel(UUID channelId);    // 채널 삭제
 
-
     void addUserIntoChannel(UUID channelId, UUID userId);    // 유저가 채널에 입장
 
     void deleteUserInChannel(UUID channelId, UUID userId);   // 유저를 채널에서 삭제
 
     void deleteUserInAllChannels(UUID userId);  // 유저를 모든 채널에서 삭제(유저 삭제를 위한 메소드)
 
-    Channel findById(UUID channelId);
-
-    List<Channel> getChannelsByUserId(UUID userId); //유저 아이디를 받아 그 유저가 소속된 채널을 반환
+    Optional<Channel> findById(UUID channelId);
 
 
 }

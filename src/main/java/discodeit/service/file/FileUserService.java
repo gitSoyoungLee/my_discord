@@ -55,35 +55,17 @@ public class FileUserService implements UserService {
 
     @Override
     public UserDto getUserInfoById(UUID userId) {
-        try {
-            // UUID로 User 객체 찾기
-            User user = findById(userId);
-            // 해당 유저가 소속된 채널 목록 찾기
-            List<Channel> channelsContainUser = fileChannelService.getChannelsByUserId(userId);
-            // 채널명만 가져옴
-            List<String> channelNames = new ArrayList<>();
-            if (channelsContainUser != null) {
-                channelNames = channelsContainUser.stream()
-                        .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
-                        .map(channel -> channel.getName())
-                        .collect(Collectors.toList());
-            }
+        User user = findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
 
-            return new UserDto(user);
-        } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다." + e.getMessage());
-            return null;
-        }
+        return new UserDto(user);
     }
 
     @Override
     public List<UserDto> getAllUsersInfo() {
         Map<UUID, User> data = fileUserRepository.findAll();
-        if (data.isEmpty()) {
-            System.out.println("사용자가 없습니다.");
-            return null;
-        }
         List<UserDto> list = new ArrayList<>();
+        if(data.isEmpty()) return list;
         data.values().stream()
                 .sorted(Comparator.comparing(user -> user.getCreatedAt()))
                 .forEach(user -> {
@@ -95,68 +77,51 @@ public class FileUserService implements UserService {
 
     @Override
     public void updateUserName(UUID userId, String name) {
-        try {
-            User user = findById(userId);
-            String prevName = user.getName();
-            user.updateName(name);
-            // 객체 수정 후 파일에도 덮어씌워야 함
-            fileUserRepository.save(user);
-            System.out.println(prevName + "님의 이름이 " + name + "으로 변경되었습니다.");
-        } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
-        }
+        User user = findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
+        user.updateName(name);
+        fileUserRepository.save(user);
     }
 
     @Override
     public void updateUserEmail(UUID userId, String email) {
-        try {
-            if (checkEmailDuplicate(email)) {
-                System.out.println(email + "은 이미 존재하는 이메일입니다.");
-                return;
-            }
-            User user = findById(userId);
-            user.updateEmail(email);
-            // 객체 수정 후 파일에도 덮어씌워야 함
-            fileUserRepository.save(user);
-            System.out.println(user.getName() + "의 이메일이 " + email + "로 변경되었습니다.");
-        } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
+        User user = findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
+
+        // 중복 이메일인지 검증
+        if (checkEmailDuplicate(email)) {
+            System.out.println(email + "은 이미 존재하는 이메일입니다.");
+            return;
         }
+        user.updateEmail(email);
+        fileUserRepository.save(user);
     }
 
     @Override
     public void updateUserPassword(UUID userId, String password) {
-        try {
-            if (password.length() < 5) {
-                System.out.println("비밀번호는 최소 5자 이상이어야 합니다.");
-                return;
-            }
-            User user = findById(userId);
-            String prevName = user.getName();
-            user.updatePassword(password);
-            // 비밀번호는 ser 파일에 저장되지 않으므로 save 생략
-            System.out.println(prevName + "님의 비밀번호가 변경되었습니다.");
-        } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
+        User user = findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
+
+        if (password.length() < 5) {
+            System.out.println("비밀번호는 최소 5자 이상이어야 합니다.");
+            return; // 비밀번호가 너무 짧으면 변경하지 않고 종료
         }
+
+        user.updatePassword(password);
+        // 비밀번호는 직렬화에서 제외되므로 save() 안함
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        System.out.print("사용자 삭제 요청: ");
-        try {
-            User user = findById(userId);
-            // 해당 유저가 속한 모든 채널에서 삭제
-            fileChannelService.deleteUserInAllChannels(userId);
-            fileUserRepository.delete(userId);
-            System.out.println(user.getName() + " 사용자가 삭제되었습니다.");
-        } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다. " + e.getMessage());
-        }
+        User user = findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
+        // 해당 유저가 속한 모든 채널에서 삭제하기 위해 채널 서비스 호출
+        fileChannelService.deleteUserInAllChannels(userId);
+        fileUserRepository.delete(userId);
     }
 
 
-    public User findById(UUID userID) {
+    public Optional<User> findById(UUID userID) {
         return fileUserRepository.findById(userID);
     }
 

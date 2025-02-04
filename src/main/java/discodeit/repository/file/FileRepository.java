@@ -36,6 +36,9 @@ public abstract class FileRepository<T extends Serializable> {
     }
 
     protected Optional<T> loadFromFile(Path path) {
+        if (!Files.exists(path)) {
+            return Optional.empty(); // 파일이 없으면 Optional.empty() 반환
+        }
         try (FileInputStream fis = new FileInputStream(path.toFile());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
 

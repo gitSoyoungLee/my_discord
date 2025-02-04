@@ -38,7 +38,6 @@ public class Message extends Common implements Serializable {
         updateClass(System.currentTimeMillis());
     }
 
-    // 객체 직렬화 부분에서 ser 파일에 저장할 형식으로 추가
     @Override
     public String toString() {
         return "Message{" +
@@ -61,11 +60,4 @@ public class Message extends Common implements Serializable {
         return Objects.hash(this.getId());
     }
 
-    // Read 시 출력용
-    public String messageInfoToString() {
-        return content +
-                (this.getCreatedAt() == this.getUpdatedAt()
-                        ? " (time: " + this.getCreatedAt() + ")"
-                        : " (time: " + this.getUpdatedAt() + " (수정됨))");
-    }
 }
