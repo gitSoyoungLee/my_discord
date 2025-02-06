@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.service.basic;
 
-import com.spirnt.mission.discodeit.dto.MessageDto;
+import com.spirnt.mission.discodeit.dto.message.MessageResponse;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.enity.User;
@@ -9,7 +9,6 @@ import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 @RequiredArgsConstructor
@@ -44,24 +43,24 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageDto getMessageById(UUID messageId) {
+    public MessageResponse getMessageById(UUID messageId) {
         Message message = findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
-        return new MessageDto(message);
+        return new MessageResponse(message, null);
     }
 
     @Override
-    public List<MessageDto> getAllMessages() {
+    public List<MessageResponse> getAllMessages() {
         Map<UUID, Message> data = messageRepository.findAll();
         if (data == null || data.isEmpty()) {
             System.out.println("메세지가 없습니다.");
             return null;
         }
-        List<MessageDto> list = new ArrayList<>();
+        List<MessageResponse> list = new ArrayList<>();
         data.values().stream()
                 .sorted(Comparator.comparing(message -> message.getCreatedAt()))
                 .forEach(message -> {
-                    list.add(new MessageDto(message));
+                    list.add(new MessageResponse(message, null));
                 });
         return list;
     }

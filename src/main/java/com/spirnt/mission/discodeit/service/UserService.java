@@ -1,8 +1,7 @@
 package com.spirnt.mission.discodeit.service;
 
-import com.spirnt.mission.discodeit.dto.UserDto;
+import com.spirnt.mission.discodeit.dto.user.UserResponse;
 import com.spirnt.mission.discodeit.enity.User;
-import com.spirnt.mission.discodeit.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +14,9 @@ public interface UserService {
     UUID createUser(String email, String name, String password);  // 유저 생성
 
     // Read
-    UserDto getUserInfoById(UUID userId);    // 유저 정보 단건 조회
+    UserResponse getUserInfoById(UUID userId);    // 유저 정보 단건 조회
 
-    List<UserDto> getAllUsersInfo(); // 모든 유저 조회
+    List<UserResponse> getAllUsersInfo(); // 모든 유저 조회
 
     // Update
     void updateUserName(UUID userId, String name);  // 유저 이름 수정

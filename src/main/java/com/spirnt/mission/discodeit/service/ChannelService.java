@@ -1,10 +1,8 @@
 package com.spirnt.mission.discodeit.service;
 
-import com.spirnt.mission.discodeit.dto.ChannelDto;
+import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
-import com.spirnt.mission.discodeit.enity.User;
-import com.spirnt.mission.discodeit.repository.ChannelRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +14,9 @@ public interface ChannelService {
     UUID createChannel(String name, String description, ChannelType type);    // 채널 생성
 
     // Read
-    List<ChannelDto> getAllChannelsInfo(); // 전체 채널 다건 조회
+    List<ChannelResponse> getAllChannelsInfo(); // 전체 채널 다건 조회
 
-    ChannelDto getChannelInfoById(UUID channelId);  // 채널 정보 단건 조회
+    ChannelResponse getChannelInfoById(UUID channelId);  // 채널 정보 단건 조회
 
     // Update
     void updateChannelName(UUID channelId, String name);   // 채널명 변경

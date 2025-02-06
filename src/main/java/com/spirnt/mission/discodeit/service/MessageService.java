@@ -1,9 +1,7 @@
 package com.spirnt.mission.discodeit.service;
 
-import com.spirnt.mission.discodeit.dto.MessageDto;
+import com.spirnt.mission.discodeit.dto.message.MessageResponse;
 import com.spirnt.mission.discodeit.enity.Message;
-import com.spirnt.mission.discodeit.enity.User;
-import com.spirnt.mission.discodeit.repository.MessageRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +13,9 @@ public interface MessageService {
     UUID createMessage(UUID userId, UUID channelId, String content); // 메세지 전송
 
     // Read
-    MessageDto getMessageById(UUID messageId);  // 메세지 단건 조회
+    MessageResponse getMessageById(UUID messageId);  // 메세지 단건 조회
 
-    List<MessageDto> getAllMessages(); // 모든 메세지 조회
+    List<MessageResponse> getAllMessages(); // 모든 메세지 조회
 
     // Update
     void updateMessage(UUID userId, UUID messageId, String newContent);    // 메시지 수정

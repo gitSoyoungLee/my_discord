@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.service.basic;
 
-import com.spirnt.mission.discodeit.dto.ChannelDto;
+import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.enity.User;
@@ -9,7 +9,6 @@ import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -33,21 +32,21 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto getChannelInfoById(UUID channelId) {
+    public ChannelResponse getChannelInfoById(UUID channelId) {
         Channel channel = findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
-        return new ChannelDto(channel);
+        return new ChannelResponse(channel, null);
     }
 
     @Override
-    public List<ChannelDto> getAllChannelsInfo() {
+    public List<ChannelResponse> getAllChannelsInfo() {
         Map<UUID, Channel> data = channelRepository.findAll();
-        List<ChannelDto> list = new ArrayList<>();
+        List<ChannelResponse> list = new ArrayList<>();
         if (data.isEmpty()) return list;
         data.values().stream()
                 .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
                 .forEach(channel -> {
-                    list.add(new ChannelDto(channel));
+                    list.add(new ChannelResponse(channel,null));
                 });
         return list;
     }

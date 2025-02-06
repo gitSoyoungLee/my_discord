@@ -1,14 +1,12 @@
 package com.spirnt.mission.discodeit.service.basic;
 
-import com.spirnt.mission.discodeit.dto.UserDto;
+import com.spirnt.mission.discodeit.dto.user.UserResponse;
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -41,22 +39,22 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserDto getUserInfoById(UUID userId) {
+    public UserResponse getUserInfoById(UUID userId) {
         User user = findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
 
-        return new UserDto(user);
+        return new UserResponse(user, null);
     }
 
     @Override
-    public List<UserDto> getAllUsersInfo() {
+    public List<UserResponse> getAllUsersInfo() {
         Map<UUID, User> data = userRepository.findAll();
-        List<UserDto> list = new ArrayList<>();
+        List<UserResponse> list = new ArrayList<>();
         if (data.isEmpty()) return list;
         data.values().stream()
                 .sorted(Comparator.comparing(user -> user.getCreatedAt()))
                 .forEach(user -> {
-                    list.add(new UserDto(user));    // 전체 사용자 목록 조회 시에는 소속 채널 출력 x
+                    list.add(new UserResponse(user, null));    // 전체 사용자 목록 조회 시에는 소속 채널 출력 x
                 });
         return list;
     }
