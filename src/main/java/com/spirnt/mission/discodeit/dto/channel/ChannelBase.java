@@ -9,6 +9,6 @@ public abstract class ChannelBase {
 
     public ChannelBase(String name, String description) {
         this.name = name;
-        this.description= description;
+        this.description = description;
     }
 }

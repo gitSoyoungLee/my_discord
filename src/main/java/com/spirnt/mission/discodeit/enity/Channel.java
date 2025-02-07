@@ -1,8 +1,11 @@
 package com.spirnt.mission.discodeit.enity;
 
+import com.spirnt.mission.discodeit.dto.channel.ChannelCreateRequest;
+import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,32 +16,33 @@ public class Channel extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
     String name;
     String description;
-
     ChannelType type;
     List<UUID> usersId;
 
 
-    public Channel(String name, String description, ChannelType type) {
+    public Channel(ChannelCreateRequest dto, ChannelType type) {
         super();
-        this.name = name;
-        this.description = description;
+        this.name = dto.getName();
+        this.description = dto.getDescription();
         this.type = type;
-        usersId = new ArrayList<>();
+        if (dto.getUsersId() != null) this.usersId = dto.getUsersId();
+        else this.usersId = new ArrayList<>();
     }
 
 
-
-    //Update
-    public void updateName(String name) {
-        if (name == null) return;
-        this.name = name;
-        updateClass(System.currentTimeMillis());
-    }
-
-    public void updateDescription(String description) {
-        if (description.equals(this.description)) return;
-        this.description = description;
-        updateClass(System.currentTimeMillis());
+    public void update(ChannelUpdateRequest dto) {
+        boolean anyValueUpdated = false;
+        if (dto.getName() != null && !dto.getName().equals(this.name)) {
+            this.name = dto.getName();
+            anyValueUpdated = true;
+        }
+        if (dto.getDescription() != null && !dto.getDescription().equals(this.description)) {
+            this.description = dto.getDescription();
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.updateClass(Instant.now());
+        }
     }
 
     public boolean containsUser(UUID userID) {

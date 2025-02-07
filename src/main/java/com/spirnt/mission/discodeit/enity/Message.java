@@ -1,8 +1,11 @@
 package com.spirnt.mission.discodeit.enity;
 
+import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
+import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -14,18 +17,29 @@ public class Message extends Common implements Serializable {
     private UUID channelId;
 
 
-    public Message(UUID senderId, UUID channelId, String content) {
+    public Message(MessageCreateRequest dto) {
         super();
-        this.content = content;
-        this.senderId = senderId;
-        this.channelId = channelId;
+        this.content = dto.getContent();
+        this.channelId = dto.getChannelId();
+        this.senderId = dto.getUserId();
     }
 
     // Update
     public void updateContent(String content) {
         if (content == null || content.equals(this.content)) return;
         this.content = content;
-        updateClass(System.currentTimeMillis());
+        updateClass(Instant.now());
+    }
+
+    public void update(MessageUpdateRequest dto) {
+        boolean anyValueUpdated = false;
+        if (dto.getContent() != null && !dto.getContent().equals(this.content)) {
+            this.content = dto.getContent();
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.updateClass(Instant.now());
+        }
     }
 
     @Override

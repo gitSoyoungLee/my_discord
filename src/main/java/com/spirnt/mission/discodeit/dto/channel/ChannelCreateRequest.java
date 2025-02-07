@@ -7,10 +7,10 @@ import java.util.UUID;
 
 @Getter
 public class ChannelCreateRequest extends ChannelBase {
-    private List<UUID> users;
+    private List<UUID> usersId;
 
     public ChannelCreateRequest(String name, String description, List<UUID> users) {
         super(name, description);
-        this.users=users;
+        this.usersId = users;
     }
 }

@@ -1,15 +1,9 @@
 package com.spirnt.mission.discodeit.config;
 
 
-import com.spirnt.mission.discodeit.repository.ChannelRepository;
-import com.spirnt.mission.discodeit.repository.MessageRepository;
-import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.service.ChannelService;
-import com.spirnt.mission.discodeit.service.MessageService;
-import com.spirnt.mission.discodeit.service.UserService;
-import com.spirnt.mission.discodeit.service.basic.BasicChannelService;
-import com.spirnt.mission.discodeit.service.basic.BasicMessageService;
-import com.spirnt.mission.discodeit.service.basic.BasicUserService;
+import com.spirnt.mission.discodeit.repository.*;
+import com.spirnt.mission.discodeit.service.*;
+import com.spirnt.mission.discodeit.service.basic.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +15,7 @@ public class ServiceConfig {
     //Repository Bean을 불러 오기 위한 context
     AnnotationConfigApplicationContext context =
             new AnnotationConfigApplicationContext(RepositoryConfig.class);
+
     @Bean
     public UserService userService() {
         return new BasicUserService(context.getBean(UserRepository.class));
@@ -35,4 +30,27 @@ public class ServiceConfig {
     public MessageService messageService() {
         return new BasicMessageService(context.getBean(MessageRepository.class));
     }
+
+    //
+
+    @Bean
+    public AuthService authService() {
+        return new AuthServiceImpl(context.getBean(UserRepository.class));
+    }
+
+    @Bean
+    public ReadStatusService readStatusService() {
+        return new ReadStatusServiceImpl(context.getBean(ReadStatusRepository.class));
+    }
+
+    @Bean
+    public UserStatusService userStatusService() {
+        return new UserStatusServiceImpl(context.getBean(UserStatusRepository.class));
+    }
+
+    @Bean
+    public BinaryContentService binaryContentService() {
+        return new BinaryContentServiceImpl(context.getBean(BinaryContentRepository.class));
+    }
+
 }

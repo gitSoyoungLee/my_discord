@@ -2,8 +2,6 @@ package com.spirnt.mission.discodeit.service.basic;
 
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
-import com.spirnt.mission.discodeit.enity.ReadStatus;
-import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.enity.UserStatus;
 import com.spirnt.mission.discodeit.repository.UserStatusRepository;
 import com.spirnt.mission.discodeit.service.UserService;
@@ -17,30 +15,37 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class BasicUserStatusService implements UserStatusService {
+public class UserStatusServiceImpl implements UserStatusService {
     private final UserStatusRepository repository;
-    private final UserService userService;
+    private UserService userService;
 
     @Override
-    public UUID create(UserStatusCreate userStatusCreate) {
+    public void setService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Override
+    public UserStatus create(UserStatusCreate userStatusCreate) {
         // User가 존재하지 않으면 예외 발생
-        User user = userService.findById(userStatusCreate.userId())
-                .orElseThrow(()->new NoSuchElementException("User ID: "+userStatusCreate.userId()+
-                        " Not Found"));
+        try {
+            userService.find(userStatusCreate.userId());
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
         // 이미 User와 관련된 객체가 존재하면 예외 발생
-        if(repository.findAll().values().stream()
+        if (repository.findAll().values().stream()
                 .anyMatch(userStatus -> userStatus.getUserId().equals(userStatusCreate.userId()))) {
             throw new IllegalStateException("The ReadStatus with UserId and ChannelId Already Exists");
         }
         UserStatus userStatus = new UserStatus(userStatusCreate);
         repository.save(userStatus);
-        return userStatus.getId();
+        return userStatus;
     }
 
     @Override
     public UserStatus find(UUID userStatusId) {
         return repository.findById(userStatusId)
-                .orElseThrow(()->new NoSuchElementException("UserStatus ID Not Found"));
+                .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
     }
 
     @Override
@@ -52,26 +57,49 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void update(UUID userStatusId, UserStatusUpdate userStatusUpdate) {
+    public UserStatus update(UUID userStatusId, UserStatusUpdate userStatusUpdate) {
         UserStatus userStatus = repository.findById(userStatusId)
-                .orElseThrow(()->new NoSuchElementException("UserStatus ID Not Found"));
+                .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
         userStatus.update(userStatusUpdate);
         repository.save(userStatus);
+        return userStatus;
     }
 
     @Override
-    public void updateByUserId(UUID userId, UserStatusUpdate userStatusUpdate) {
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdate userStatusUpdate) {
         Map<UUID, UserStatus> map = repository.findAll();
         UserStatus userStatus = map.values().stream()
-                .filter(value->value.getUserId().equals(userId))
+                .filter(value -> value.getUserId().equals(userId))
                 .findAny()
-                .orElseThrow(()->new NoSuchElementException("UserStatus ID Not Found"));
+                .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
         userStatus.update(userStatusUpdate);
         repository.save(userStatus);
+        return userStatus;
     }
 
     @Override
     public void delete(UUID userStatusId) {
         repository.delete(userStatusId);
+    }
+
+    @Override
+    public UserStatus findByUserId(UUID userId) {
+        List<UserStatus> list = findAll();
+        UUID userStatusId = list.stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .map(userStatus -> userStatus.getId())
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
+        return find(userStatusId);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        Map<UUID, UserStatus> map = repository.findAll();
+        UserStatus userStatus = map.values().stream()
+                .filter(value -> value.getUserId().equals(userId))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
+        delete(userStatus.getId());
     }
 }

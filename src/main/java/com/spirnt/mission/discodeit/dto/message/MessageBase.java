@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public abstract class MessageBase {
     private String content;
+
     public MessageBase(String content) {
-        this.content =content;
+        this.content = content;
     }
 }

@@ -2,8 +2,6 @@ package com.spirnt.mission.discodeit.repository.file;
 
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
-import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.nio.file.Files;

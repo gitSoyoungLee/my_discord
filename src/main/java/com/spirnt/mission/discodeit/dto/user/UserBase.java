@@ -7,7 +7,7 @@ public abstract class UserBase {
     private String name;
     private String email;
 
-    public UserBase(String name, String email){
+    public UserBase(String name, String email) {
         this.name = name;
         this.email = email;
     }

@@ -8,14 +8,18 @@ import java.util.UUID;
 
 public interface ReadStatusService {
 
-    UUID create(ReadStatusDto readStatusDto);
+    void setService(UserService userService, ChannelService channelService);
+
+    ReadStatus create(ReadStatusDto readStatusDto);
 
     ReadStatus find(UUID readStatusId);
 
     List<ReadStatus> findAllByUserId(UUID userId);
 
-    void update(UUID readStatusId, ReadStatusDto readStatusDto);
+    ReadStatus update(UUID readStatusId, ReadStatusDto readStatusDto);
 
     void delete(UUID id);
+
+    void deleteByChannelId(UUID channelId);
 
 }

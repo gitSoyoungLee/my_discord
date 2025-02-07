@@ -38,3 +38,5 @@ out/
 
 
 *.ser
+testFiles/*
+uploadedFiles/*

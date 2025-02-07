@@ -1,330 +1,262 @@
 package com.spirnt.mission.discodeit;
 
-import com.spirnt.mission.discodeit.dto.ChannelDto;
-import com.spirnt.mission.discodeit.dto.MessageDto;
-import com.spirnt.mission.discodeit.dto.UserDto;
-import com.spirnt.mission.discodeit.enity.ChannelType;
-import com.spirnt.mission.discodeit.repository.ChannelRepository;
-import com.spirnt.mission.discodeit.repository.MessageRepository;
-import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.repository.file.FileChannelRepository;
-import com.spirnt.mission.discodeit.repository.file.FileMessageRepository;
-import com.spirnt.mission.discodeit.repository.file.FileUserRepository;
-import com.spirnt.mission.discodeit.service.ChannelService;
-import com.spirnt.mission.discodeit.service.MessageService;
-import com.spirnt.mission.discodeit.service.ServiceFactory;
-import com.spirnt.mission.discodeit.service.UserService;
-import com.spirnt.mission.discodeit.service.basic.BasicChannelService;
-import com.spirnt.mission.discodeit.service.basic.BasicMessageService;
-import com.spirnt.mission.discodeit.service.basic.BasicUserService;
-import com.spirnt.mission.discodeit.service.file.FileServiceFactory;
-import com.spirnt.mission.discodeit.service.file.FileUserService;
-import com.spirnt.mission.discodeit.service.jcf.JCFServiceFactory;
+import com.spirnt.mission.discodeit.dto.channel.ChannelCreateRequest;
+import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
+import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
+import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
+import com.spirnt.mission.discodeit.dto.message.MessageResponse;
+import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
+import com.spirnt.mission.discodeit.dto.user.UserResponse;
+import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
+import com.spirnt.mission.discodeit.enity.BinaryContent;
+import com.spirnt.mission.discodeit.enity.Channel;
+import com.spirnt.mission.discodeit.enity.Message;
+import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 @SpringBootApplication
 public class DiscodeitApplication {
 
-	static public void clearDataFiles() {
-		// 현재 작업 디렉토리에 있는 file-data-map 경로
-		Path basePath = Paths.get(System.getProperty("user.dir"), "file-data-map");
+    static void clearDataFiles() {
+        // 현재 작업 디렉토리에 있는 file-data-map 경로
+        Path basePath = Paths.get(System.getProperty("user.dir"), "file-data-map");
 
-		// 삭제할 폴더 목록
-		List<String> folders = List.of("User", "Channel", "Message");
+        // 삭제할 폴더 목록
+        List<String> folders = List.of("User", "Channel", "Message", "ReadStatus", "UserStatus", "BinaryContent");
 
-		for (String folder : folders) {
-			Path folderPath = basePath.resolve(folder);
-			if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
-				try (Stream<Path> files = Files.list(folderPath)) {
-					files
-							.filter(path -> path.toString().endsWith(".ser")) // .ser 파일만 선택
-							.forEach(path -> {
-								try {
-									Files.delete(path);
-								} catch (IOException e) {
-									System.out.println("파일 삭제 실패: " + path + " - " + e.getMessage());
-								}
-							});
-				} catch (IOException e) {
-					System.out.println("폴더 접근 실패: " + folderPath + " - " + e.getMessage());
-				}
-			}
-		}
-	}
+        for (String folder : folders) {
+            Path folderPath = basePath.resolve(folder);
+            if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
+                try (Stream<Path> files = Files.list(folderPath)) {
+                    files
+                            .filter(path -> path.toString().endsWith(".ser")) // .ser 파일만 선택
+                            .forEach(path -> {
+                                try {
+                                    Files.delete(path);
+                                } catch (IOException e) {
+                                    System.out.println("파일 삭제 실패: " + path + " - " + e.getMessage());
+                                }
+                            });
+                } catch (IOException e) {
+                    System.out.println("폴더 접근 실패: " + folderPath + " - " + e.getMessage());
+                }
+            }
+        }
+    }
 
-	static void printUserInfo(UUID userId, UserService userService) {
-		System.out.println("--- UUID로 사용자 조회 ---");
-		try {
-			UserDto userInfoDto = userService.getUserInfoById(userId);
-			System.out.println(userInfoDto);
-		} catch (NoSuchElementException e) {
-			System.out.println(e.getMessage());
-		}
-	}
+    static MultipartFile convertFileToMultipartFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        FileInputStream input = new FileInputStream(file);
 
-	static void printAllUserInfo(UserService userService) {
-		System.out.println("--- 전체 사용자 조회 ---");
-		List<UserDto> userDtoList = userService.getAllUsersInfo();
-		if (userDtoList.isEmpty()) {
-			System.out.println("사용자가 없습니다.");
-			return;
-		}
-		userDtoList.stream()
-				.forEach(System.out::println);
-	}
+        return new MockMultipartFile(
+                "file",              // 필드명
+                file.getName(),      // 원본 파일명
+                "image/jpeg",        // MIME 타입 (파일 확장자에 맞게 설정 가능)
+                input                // 파일 데이터
+        );
+    }
 
-	static void printChannelInfo(UUID channelId, ChannelService channelService) {
-		System.out.println("--- UUID로 특정 채널 조회 ---");
-		try {
-			ChannelDto channelDto = channelService.getChannelInfoById(channelId);
-			System.out.println(channelDto);
-		} catch (NoSuchElementException e) {
-			System.out.println(e.getMessage());
-		}
-	}
-
-	static void printAllChannelInfo(ChannelService channelService) {
-		System.out.println("--- 전체 채널 조회 ---");
-		List<ChannelDto> channelDtoList = channelService.getAllChannelsInfo();
-		if (channelDtoList.isEmpty()) {
-			System.out.println("채널이 없습니다.");
-			return;
-		}
-		channelDtoList.stream()
-				.forEach(System.out::println);
-	}
-
-	static void printMessageInfo(UUID messageId, MessageService messageService) {
-		System.out.println("--- UUID로 특정 메세지 조회 ---");
-		try {
-			MessageDto messageDto = messageService.getMessageById(messageId);
-			System.out.println(messageDto);
-		} catch (NoSuchElementException e) {
-			System.out.println(e.getMessage());
-		}
-	}
-
-	static void printAllMessageInfo(MessageService messageService) {
-		System.out.println("--- 디스코드잇에서 작성된 모든 메세지 조회 ---");
-		List<MessageDto> messageList = messageService.getAllMessages();
-		if (messageList.isEmpty()) {
-			System.out.println("메세지가 없습니다.");
-			return;
-		}
-		messageList.stream()
-				.forEach(System.out::println);
-	}
+    static void readUser(UserService userService, User user) {
+        try {
+            UserResponse userResponse = userService.find(user.getId());
+            System.out.println(userResponse);
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
 
 
-	static void testSprint2Advanced() {
-		// JCF
-//        BasicUserService userService = new BasicUserService(new JCFUserRepository());
-//        BasicChannelService channelService = new BasicChannelService(new JCFChannelRepository());
-//        BasicMessageService messageService = new BasicMessageService(new JCFMessageRepository());
-		// File
-		BasicUserService userService = new BasicUserService(new FileUserRepository());
-		BasicChannelService channelService = new BasicChannelService(new FileChannelRepository());
-		BasicMessageService messageService = new BasicMessageService(new FileMessageRepository());
-		userService.setService(channelService, messageService);
-		channelService.setService(userService, messageService);
-		messageService.setService(userService, channelService);
+    }
 
-		//유저 등록
-		System.out.println("==== Create User ====");
-		UUID user1Id = userService.createUser("Alice@gmail.com", "Alice", "12345");
-		UUID user2Id = userService.createUser("Bob@gmail.com", "Bob", "12345");
-		UUID user3Id = userService.createUser("Cindy@gmail.com", "Cindy", "12345");
-		UUID user4Id = userService.createUser("Dan@gmail.com", "Dan", "12345");
-		UUID user5Id = userService.createUser("Edward@gmail.com", "Edward", "12345");
-		UUID user6Id = userService.createUser("Felix@gmail.com", "felix", "12345");
-		System.out.println("// 이메일 중복 검사 확인");
-		userService.createUser("Alice@gmail.com", "Alice", "12345");
-		System.out.println("// 비밀번호 형식 검사 확인");
-		userService.createUser("Gary@gmail.com", "Gary", "1234");
-		System.out.println("====================\n\n");
+    static void readAllUsers(UserService userService) {
+        List<UserResponse> list = userService.findAll();
+        System.out.println("---- All Users ----");
+        for (UserResponse userResponse : list) {
+            System.out.println(userResponse);
+        }
+        System.out.println("-------------------");
+    }
 
-		System.out.println("==== Read User ====");
-		//유저 단건 조회
-		printUserInfo(user1Id, userService);
-		//유저 다건 조회
-		printAllUserInfo(userService);
-		System.out.println("====================\n\n");
+    static void readChannel(ChannelService channelService, Channel channel) {
+        try {
+            ChannelResponse channelResponse = channelService.find(channel.getId());
+            System.out.println(channelResponse);
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
+    static void readChannelByUser(ChannelService channelService, User user) {
+        List<ChannelResponse> list = channelService.findAllByUserId(user.getId());
+        System.out.println("---- All Channels that the user can view ----");
+        for (ChannelResponse channelResponse : list) {
+            System.out.println(channelResponse);
+        }
+        System.out.println("---------------------------------------------");
+    }
 
-		// 유저 수정
-		System.out.println("==== Update User ====");
-		System.out.println("// 이름과 이메일 변경");
-		userService.updateUserName(user1Id, "Andy");
-		userService.updateUserEmail(user1Id, "Andy@gmail.com");
-		System.out.println("// 이미 존재하는 이메일로 바꾸려는 경우");
-		userService.updateUserEmail(user1Id, "Bob@gmail.com");
-		System.out.println("// 수정 후 전체 사용자 조회");
-		printAllUserInfo(userService);
-		System.out.println("====================\n\n");
+    static void readMessage(MessageService messageService, Message message) {
+        try {
+            System.out.println(messageService.find(message.getId()));
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-		// 유저 삭제
-		System.out.println("==== Delete User ====");
-		userService.deleteUser(user6Id);
-		System.out.println("// 삭제 후 전체 사용자 조회");
-		printAllUserInfo(userService);
-		System.out.println("// 삭제된 유저 정보 조회 시도: ");
-		printUserInfo(user6Id, userService);
-		System.out.println("====================\n\n");
+    static void readAllMessages(MessageService messageService) {
+        List<MessageResponse> list = messageService.findAll();
+        System.out.println("---- All Messages ----");
+        for (MessageResponse messageResponse : list) {
+            System.out.println(messageResponse);
+        }
+        System.out.println("----------------------");
+    }
 
-		//채널 등록
-		System.out.println("==== Create Channel ====");
-		UUID channel1 = channelService.createChannel("채널 1", "첫 번째 채널", ChannelType.PUBLIC);
-		UUID channel2 = channelService.createChannel("채널 2", "두 번째 채널", ChannelType.PUBLIC);
-		UUID channel3 = channelService.createChannel("채널 3", "세 번째 채널", ChannelType.PUBLIC);
-		UUID channel4 = channelService.createChannel("채널 4", "네 번째 채널", ChannelType.PUBLIC);
-		System.out.println("====================\n\n");
+    public static void main(String[] args) {
 
-		System.out.println("==== Read Channel ====");
-		printChannelInfo(channel1, channelService);
-		printAllChannelInfo(channelService);
-		System.out.println("====================\n\n");
+        // SpringApplication.run(DiscodeitApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-		//채널 수정
-		System.out.println("==== Update Channel ====");
-		System.out.println("// 채널 이름 변경");
-		channelService.updateChannelName(channel1, "채널 11");
-		// 채널에 유저 등록
-		System.out.println("// 채널에 유저 입장");
-		channelService.addUserIntoChannel(channel1, user1Id);
-		channelService.addUserIntoChannel(channel1, user2Id);
-		channelService.addUserIntoChannel(channel1, user3Id);
-		channelService.addUserIntoChannel(channel1, user4Id);
-		System.out.println("// 채널에 유저 입장시킨 후 채널 정보 조회");
-		printAllChannelInfo(channelService);
-		System.out.println("--- 채널 정보 조회 ---");
-		printChannelInfo(channel1, channelService);
-		System.out.println("// 유저 정보 조회 시에도 채널 목록이 출력되는지 확인");
-		printUserInfo(user1Id, userService);
-		System.out.println("//채널에 유저 퇴장시킨 후 채널 정보 조회");
-		//채널에서 유저 삭제
-		channelService.deleteUserInChannel(channel1, user4Id);
-		printChannelInfo(channel1, channelService);
-		//유저 삭제 시 채널에서도 함께 삭제
-		System.out.println("// 사용자 삭제 시 채널에서도 정보 삭제");
-		System.out.println("// 삭제 전 채널에 입장");
-		channelService.addUserIntoChannel(channel1, user4Id);
-		printChannelInfo(channel1, channelService);
-		userService.deleteUser(user4Id);
-		System.out.println("// 삭제 후");
-		printChannelInfo(channel1, channelService);
-		System.out.println("====================\n\n");
+        // 서비스 초기화
+        // TODO context에서 Bean을 조회하여 각 서비스 구현체 할당 코드 작성하세요.
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
+        //
+        ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
+        UserStatusService userStatusService = context.getBean(UserStatusService.class);
+        BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
+        // 서비스 의존성 주입
+        userService.setService(channelService, messageService, binaryContentService, userStatusService);
+        channelService.setService(userService, messageService, readStatusService);
+        messageService.setService(userService, channelService, binaryContentService);
+        readStatusService.setService(userService, channelService);
+        userStatusService.setService(userService);
 
-		//채널 삭제
-		System.out.println("==== Delete Channel ====");
-		channelService.addUserIntoChannel(channel4, user1Id);
-		channelService.addUserIntoChannel(channel4, user2Id);
-		channelService.deleteChannel(channel4);
-		System.out.println("// 채널 삭제 후 전체 채널 목록 조회");
-		printAllChannelInfo(channelService);
-		System.out.println("// 삭제한 채널 정보 조회: 채널 정보 조회가 불가능한지 확인");
-		printChannelInfo(channel4, channelService);
-		System.out.println("// 사용자 정보 조회 시에도 채널이 안 나오는지 확인");
-		printUserInfo(user1Id, userService);
-		printUserInfo(user2Id, userService);
-		System.out.println("====================\n\n");
+        // 스프린트 미션 3 테스트
+        clearDataFiles();
+        // BinaryContent 테스트를 위한 MultipartFile 변환
+        MultipartFile testImageFile1;
+        try {
+            testImageFile1 = convertFileToMultipartFile("testFiles/userprofile.jpg");
+        } catch (IOException e) {
+            e.printStackTrace();
+            testImageFile1 = null;
+        }
+        MultipartFile testImageFile2;
+        try {
+            testImageFile2 = convertFileToMultipartFile("testFiles/sky.jpg");
+        } catch (IOException e) {
+            e.printStackTrace();
+            testImageFile2 = null;
+        }
 
+        // User Create
+        UserCreateRequest ucr1 = new UserCreateRequest("Alice", "Alice@gmail.com", "password", null);
+        User user1 = userService.create(ucr1);
+        UserCreateRequest ucr2 = new UserCreateRequest("Bob", "Bob@gmail.com", "password", testImageFile1);
+        User user2 = userService.create(ucr2);
+        // 중복 검증
+        try {
+            userService.create(new UserCreateRequest("Alice", "Alice@gmail.com", "password", null));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error occured while creating User: " + e.getMessage());
+        }
+        // User Read
+        readUser(userService, user1);
+        readUser(userService, user2);
 
-		// 메시지 등록(전송)
-		System.out.println("==== Create Message ====");
-		UUID message1 = messageService.createMessage(user1Id, channel1, "안녕하세요");
-		UUID message2 = messageService.createMessage(user1Id, channel1, "저는 Andy입니다.");
-		UUID message3 = messageService.createMessage(user2Id, channel1, "반가워요 Andy.");
-		System.out.println("// 유저가 입장하지 않은 채널에 메세지를 전송하려는 경우");
-		UUID message4 = messageService.createMessage(user5Id, channel1, "아직 입장하지 않은 채널");
-		System.out.println("====================\n\n");
+        //User Update
+        userService.update(user1.getId(), new UserUpdateRequest("Andy", "Andy@gmail.com", "password", null));
+        readUser(userService, user1);
+        // User Delete
+        userService.delete(user2.getId());
+        readAllUsers(userService);
 
-		System.out.println("==== Read Message ====");
-		System.out.println("// 채널에 메세지가 작성되었는지 확인");
-		printChannelInfo(channel1, channelService);
-		System.out.println("// UUID로 특정 메세지 단건 조회");
-		// 메시지 단건 조회
-		printMessageInfo(message1, messageService);
-		printMessageInfo(message2, messageService);
-		// 메시지 다건 조회
-		printAllMessageInfo(messageService);
-		System.out.println("// 메세지 추가 후 확인");
-		channelService.addUserIntoChannel(channel2, user1Id);
-		channelService.addUserIntoChannel(channel2, user2Id);
-		channelService.addUserIntoChannel(channel2, user3Id);
-		UUID message5 = messageService.createMessage(user1Id, channel2, "채널 2 시작");
-		UUID message6 = messageService.createMessage(user2Id, channel2, "안녕하세요.");
-		UUID message7 = messageService.createMessage(user3Id, channel2, "채널 2는 무엇을 하는 채널인가요?");
-		printAllMessageInfo(messageService);
-		System.out.println("====================\n\n");
+        // Channel Create - PUBLIC
+        ChannelCreateRequest ccr1 = new ChannelCreateRequest("Ch 1", "This is public", null);
+        Channel channel1 = channelService.createChannelPublic(ccr1);
+        // Channel Create - PRIVATE
+        user2 = userService.create(ucr2);
+        ChannelCreateRequest ccr2 = new ChannelCreateRequest("Ch 2 ", "This is private", List.of(user1.getId(), user2.getId()));
+        Channel channel2 = channelService.createChannelPrivate(ccr2);
+        ccr2 = new ChannelCreateRequest("Ch 3 ", "This is private", List.of(user2.getId()));
+        Channel channel3 = channelService.createChannelPrivate(ccr2);
 
-		System.out.println("==== Update Message ====");
-		//메시지 수정
-		System.out.println("// 메세지 작성자가 아닌 다른 유저가 수정하려는 경우");
-		messageService.updateMessage(user2Id, message1, "잘못된 작성자");
-		messageService.updateMessage(user1Id, message1, "수정) 안녕하세요 여러분");
-		System.out.println("// 메세지 수정 후 확인");
-		System.out.println(messageService.getMessageById(message1));
-		System.out.println("// 메세지 수정 후 소속 채널에 반영됐는지 확인");
-		printChannelInfo(channel1, channelService);
-		printAllMessageInfo(messageService);
-		System.out.println("====================\n\n");
+        // Channel Read
+        readChannel(channelService, channel1);
+        readChannel(channelService, channel2);
+        readChannel(channelService, channel3);
+        readChannelByUser(channelService, user1);
 
-		System.out.println("==== Delete Message ====");
-		// 메시지 삭제
-		System.out.println("// 메세지 삭제 전 채널 조회");
-		printChannelInfo(channel1, channelService);
-		messageService.deleteMessage(message1);
-		System.out.println("// 메세지 삭제 후 채널 조회");
-		printChannelInfo(channel1, channelService);
-		printAllMessageInfo(messageService);
-		//메세지 삭제 후 메세지 조회
-		printMessageInfo(message1, messageService);
-		System.out.println("====================\n\n");
+        // Channel Update
+        ChannelUpdateRequest cur = new ChannelUpdateRequest("New Ch 1", "This is public!");
+        channelService.update(channel1.getId(), cur);
+        readChannel(channelService, channel1);
 
+        // Channel Delete
+        channelService.delete(channel3.getId());
+        readChannel(channelService, channel3);
 
-		System.out.println("--- 유저 삭제/퇴장 시 메세지 표시 ---");
-		System.out.println("// Bob 유저 삭제 시");
-		userService.deleteUser(user2Id);
-		printAllMessageInfo(messageService);
-		System.out.println("// Ch 2에서 Cindy 유저 퇴장 시");
-		channelService.deleteUserInChannel(channel2, user3Id);
-		printChannelInfo(channel2, channelService);
-	}
+        // Message Create
+        MessageCreateRequest mcr1 = new MessageCreateRequest(user1.getId(), channel1.getId(), "Hi Ch 1", null);
+        Message message1 = messageService.create(mcr1);
+        // 입장하지 않은 private 채널에 메세지 생성 시도 시 예외 발생
+        User user3 = userService.create(new UserCreateRequest("Cindy", "Cindy@gmail.com", "12345", null));
+        try {
+            MessageCreateRequest mcr2 = new MessageCreateRequest(user3.getId(), channel2.getId(), "This message will not be sent", null);
+            messageService.create(mcr2);
+        } catch (IllegalStateException e) {
+            System.out.println("Error occured while creating message: " + e.getMessage());
+        }
+        mcr1 = new MessageCreateRequest(user2.getId(), channel2.getId(), "Hi Ch 2", List.of(testImageFile1));
+        Message message2 = messageService.create(mcr1);
 
-	public static void main(String[] args) {
+        // Message Read
+        readMessage(messageService, message1);
+        readAllMessages(messageService);
 
-		// SpringApplication.run(DiscodeitApplication.class, args);
-		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+        // Message Update
+        messageService.update(message1.getId(), new MessageUpdateRequest("New Message"));
+        readMessage(messageService, message1);
 
-		// 서비스 초기화
-		// TODO context에서 Bean을 조회하여 각 서비스 구현체 할당 코드 작성하세요.
-		UserService userService = context.getBean(UserService.class);
-		ChannelService channelService = context.getBean(ChannelService.class);
-		MessageService messageService = context.getBean(MessageService.class);
-		//서비스 의존성
-		userService.setService(channelService, messageService);
-		channelService.setService(userService, messageService);
-		messageService.setService(userService, channelService);
+        // Message Delete
+        messageService.delete(message2.getId());
+        readAllMessages(messageService);
 
-		// 스프린트 미션 3 기본 요구사항 테스트
-		clearDataFiles();
-		UUID user = userService.createUser("Alice@gmail.com", "Alice", "password");
-		UUID channel = channelService.createChannel("Ch 1", "This is Ch 1", ChannelType.PUBLIC);
-		channelService.addUserIntoChannel(channel, user);
-		UUID message = messageService.createMessage(user, channel, "Hello World");
-		printMessageInfo(message, messageService);
+        // UserStatus
+        System.out.println(userStatusService.findByUserId(user1.getId()));
+        System.out.println(userStatusService.findByUserId(user2.getId()));
 
-	}
+        // ReadStatus
+        System.out.println(readStatusService.findAllByUserId(user1.getId()));
+        System.out.println(readStatusService.findAllByUserId(user2.getId()));
+
+        //BinaryContent
+        //User2 프로필이미지 확인
+        System.out.println(binaryContentService.findUserProfile(user2.getId()));
+        //Message3 첨부파일 확인
+        Message message3 = messageService.create(new MessageCreateRequest(user1.getId(),
+                channel1.getId(), "Files", List.of(testImageFile1, testImageFile2)));
+        List<BinaryContent> message3files = binaryContentService.findByMessageId(message3.getId());
+        for (BinaryContent file : message3files) {
+            System.out.println(file);
+        }
+    }
 
 }

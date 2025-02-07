@@ -3,7 +3,7 @@ package com.spirnt.mission.discodeit.dto.user;
 import lombok.Getter;
 
 @Getter
-public class UserUpdateRequest extends UserBase{
+public class UserUpdateRequest extends UserBase {
 
     private String password;
     private String imagePath;    // 프로필 사진
@@ -12,6 +12,6 @@ public class UserUpdateRequest extends UserBase{
                              String password, String imagePath) {
         super(name, email);
         this.password = password;
-        this.imagePath= imagePath;
+        this.imagePath = imagePath;
     }
 }

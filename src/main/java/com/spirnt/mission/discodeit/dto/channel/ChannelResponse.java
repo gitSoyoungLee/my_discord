@@ -7,9 +7,9 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
 @Getter
-public class ChannelResponse extends ChannelBase
-{
+public class ChannelResponse extends ChannelBase {
     private UUID channelId;
     private ChannelType type;
     private List<UUID> usersId;
@@ -17,8 +17,17 @@ public class ChannelResponse extends ChannelBase
 
     public ChannelResponse(Channel channel, Instant lastMessage) {
         super(channel.getName(), channel.getDescription());
+        this.channelId = channel.getId();
         this.type = channel.getType();
-        this.usersId= channel.getUsersId();
-        this.lastMessage= lastMessage;
-}
+        this.usersId = channel.getUsersId();
+        this.lastMessage = lastMessage;
+    }
+
+    @Override
+    public String toString() {
+        return "Channel[Name: " + this.getName() +
+                " Description: " + this.getDescription() +
+                " Type: " + this.type +
+                " ID: " + this.channelId + "]";
+    }
 }
