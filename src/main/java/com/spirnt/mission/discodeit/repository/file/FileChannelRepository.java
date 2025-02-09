@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -15,8 +14,8 @@ import java.util.stream.Stream;
 
 public class FileChannelRepository extends FileRepository implements ChannelRepository {
 
-    public FileChannelRepository() {
-        super(Paths.get(System.getProperty("user.dir"), "file-data-map", Channel.class.getSimpleName()));
+    public FileChannelRepository(String fileDirectory) {
+        super(fileDirectory + "/Channel");
     }
 
     @Override

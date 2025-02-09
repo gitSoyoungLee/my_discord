@@ -60,6 +60,33 @@ public class DiscodeitApplication {
         }
     }
 
+    static void clearDataFiles2() {
+        // 현재 작업 디렉토리에 있는 file-data-map 경로
+        Path basePath = Paths.get(System.getProperty("user.dir"), "file-data-map2");
+
+        // 삭제할 폴더 목록
+        List<String> folders = List.of("User", "Channel", "Message", "ReadStatus", "UserStatus", "BinaryContent");
+
+        for (String folder : folders) {
+            Path folderPath = basePath.resolve(folder);
+            if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
+                try (Stream<Path> files = Files.list(folderPath)) {
+                    files
+                            .filter(path -> path.toString().endsWith(".ser")) // .ser 파일만 선택
+                            .forEach(path -> {
+                                try {
+                                    Files.delete(path);
+                                } catch (IOException e) {
+                                    System.out.println("파일 삭제 실패: " + path + " - " + e.getMessage());
+                                }
+                            });
+                } catch (IOException e) {
+                    System.out.println("폴더 접근 실패: " + folderPath + " - " + e.getMessage());
+                }
+            }
+        }
+    }
+
     static MultipartFile convertFileToMultipartFile(String filePath) throws IOException {
         File file = new File(filePath);
         FileInputStream input = new FileInputStream(file);
@@ -150,6 +177,7 @@ public class DiscodeitApplication {
 
         // 스프린트 미션 3 테스트
         clearDataFiles();
+        clearDataFiles2();
         // BinaryContent 테스트를 위한 MultipartFile 변환
         MultipartFile testImageFile1;
         try {
@@ -249,8 +277,10 @@ public class DiscodeitApplication {
 
         //BinaryContent
         //User2 프로필이미지 확인
+        System.out.println("User2's profile image: ");
         System.out.println(binaryContentService.findUserProfile(user2.getId()));
         //Message3 첨부파일 확인
+        System.out.println("Attached Files in Message 3:");
         Message message3 = messageService.create(new MessageCreateRequest(user1.getId(),
                 channel1.getId(), "Files", List.of(testImageFile1, testImageFile2)));
         List<BinaryContent> message3files = binaryContentService.findByMessageId(message3.getId());

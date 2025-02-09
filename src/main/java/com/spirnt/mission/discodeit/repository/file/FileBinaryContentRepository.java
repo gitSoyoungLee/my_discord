@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,8 +13,9 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileBinaryContentRepository extends FileRepository implements BinaryContentRepository {
-    public FileBinaryContentRepository() {
-        super(Paths.get(System.getProperty("user.dir"), "file-data-map", BinaryContent.class.getSimpleName()));
+
+    public FileBinaryContentRepository(String fileDirectory) {
+        super(fileDirectory + "/BinaryContent");
     }
 
     @Override

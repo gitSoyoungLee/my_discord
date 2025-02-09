@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.repository.UserStatusRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,8 +13,9 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileUserStatusRepository extends FileRepository implements UserStatusRepository {
-    public FileUserStatusRepository() {
-        super(Paths.get(System.getProperty("user.dir"), "file-data-map", UserStatus.class.getSimpleName()));
+
+    public FileUserStatusRepository(String fileDirectory) {
+        super(fileDirectory + "/UserStatus");
     }
 
     @Override

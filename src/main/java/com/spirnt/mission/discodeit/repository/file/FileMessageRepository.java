@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.repository.MessageRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,8 +13,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileMessageRepository extends FileRepository implements MessageRepository {
-    public FileMessageRepository() {
-        super(Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName()));
+    public FileMessageRepository(String fileDirectory) {
+        super(fileDirectory + "/Message");
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.repository.UserRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,9 +13,10 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileUserRepository extends FileRepository implements UserRepository {
-    public FileUserRepository() {
-        // Java 프로그램이 실행되는 현재 작업 디렉토리 내 file-data-map/User 폴더로 지정
-        super(Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName()));
+
+
+    public FileUserRepository(String fileDirectory) {
+        super(fileDirectory + "/User");
     }
 
     @Override

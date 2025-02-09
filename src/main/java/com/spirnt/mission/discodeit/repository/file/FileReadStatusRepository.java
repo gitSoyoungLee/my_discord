@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,9 +13,10 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileReadStatusRepository extends FileRepository implements ReadStatusRepository {
-    public FileReadStatusRepository() {
-        super(Paths.get(System.getProperty("user.dir"), "file-data-map", ReadStatus.class.getSimpleName()));
+    public FileReadStatusRepository(String fileDirectory) {
+        super(fileDirectory + "/ReadStatus");
     }
+
 
     @Override
     public void save(ReadStatus readStatus) {

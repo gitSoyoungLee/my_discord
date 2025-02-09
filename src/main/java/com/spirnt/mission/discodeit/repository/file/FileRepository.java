@@ -11,6 +11,10 @@ public abstract class FileRepository<T extends Serializable> {
     private final String EXTENSION = ".ser";
     private Path DIRECTORY;   // ser 파일 저장할 경로
 
+    protected FileRepository(String fileDirectory) {
+        this.DIRECTORY = Path.of(fileDirectory);
+    }
+
     protected FileRepository(Path directory) {
         this.DIRECTORY = directory;
     }
@@ -24,6 +28,8 @@ public abstract class FileRepository<T extends Serializable> {
     }
 
     protected void saveToFile(Path path, T data) {
+
+
         try (FileOutputStream fos = new FileOutputStream(path.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {

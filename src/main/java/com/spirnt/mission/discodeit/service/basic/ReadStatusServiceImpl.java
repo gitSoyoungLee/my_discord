@@ -20,6 +20,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     private UserService userService;
     private ChannelService channelService;
 
+
     @Override
     public void setService(UserService userService, ChannelService channelService) {
         this.userService = userService;

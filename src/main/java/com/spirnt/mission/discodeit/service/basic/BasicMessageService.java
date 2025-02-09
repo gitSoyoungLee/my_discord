@@ -26,6 +26,7 @@ public class BasicMessageService implements MessageService {
     private ChannelService channelService;
     private BinaryContentService binaryContentService;
 
+
     @Override
     public void setService(UserService userService, ChannelService channelService, BinaryContentService binaryContentService) {
         this.userService = userService;
