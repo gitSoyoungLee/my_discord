@@ -38,5 +38,4 @@ out/
 
 
 *.ser
-testFiles/*
 uploadedFiles/*
