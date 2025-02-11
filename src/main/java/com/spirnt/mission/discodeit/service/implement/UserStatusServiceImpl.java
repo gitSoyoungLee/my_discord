@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.service.basic;
+package com.spirnt.mission.discodeit.service.implement;
 
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserStatusServiceImpl implements UserStatusService {
+    @Autowired
     private final UserStatusRepository repository;
     @Autowired
     private UserService userService;

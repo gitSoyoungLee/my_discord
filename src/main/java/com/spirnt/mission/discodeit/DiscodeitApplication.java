@@ -156,7 +156,7 @@ public class DiscodeitApplication {
 
     public static void main(String[] args) {
 
-        // SpringApplication.run(DiscodeitApplication.class, args);
+        //SpringApplication.run(DiscodeitApplication.class, args);
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
         // 서비스 초기화
@@ -165,9 +165,9 @@ public class DiscodeitApplication {
         ChannelService channelService = context.getBean(ChannelService.class);
         MessageService messageService = context.getBean(MessageService.class);
         //
-        ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
-        UserStatusService userStatusService = context.getBean(UserStatusService.class);
-        BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
+//        ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
+//        UserStatusService userStatusService = context.getBean(UserStatusService.class);
+//        BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
 
 
         // 스프린트 미션 3 테스트
@@ -262,26 +262,26 @@ public class DiscodeitApplication {
         messageService.delete(message2.getId());
         readAllMessages(messageService);
 
-        // UserStatus
-        System.out.println(userStatusService.findByUserId(user1.getId()));
-        System.out.println(userStatusService.findByUserId(user2.getId()));
-
-        // ReadStatus
-        System.out.println(readStatusService.findAllByUserId(user1.getId()));
-        System.out.println(readStatusService.findAllByUserId(user2.getId()));
-
-        //BinaryContent
-        //User2 프로필이미지 확인
-        System.out.println("User2's profile image: ");
-        System.out.println(binaryContentService.findUserProfile(user2.getId()));
-        //Message3 첨부파일 확인
-        System.out.println("Attached Files in Message 3:");
-        Message message3 = messageService.create(new MessageCreateRequest(user1.getId(),
-                channel1.getId(), "Files", List.of(testImageFile1, testImageFile2)));
-        List<BinaryContent> message3files = binaryContentService.findByMessageId(message3.getId());
-        for (BinaryContent file : message3files) {
-            System.out.println(file);
-        }
+//        // UserStatus
+//        System.out.println(userStatusService.findByUserId(user1.getId()));
+//        System.out.println(userStatusService.findByUserId(user2.getId()));
+//
+//        // ReadStatus
+//        System.out.println(readStatusService.findAllByUserId(user1.getId()));
+//        System.out.println(readStatusService.findAllByUserId(user2.getId()));
+//
+//        //BinaryContent
+//        //User2 프로필이미지 확인
+//        System.out.println("User2's profile image: ");
+//        System.out.println(binaryContentService.findUserProfile(user2.getId()));
+//        //Message3 첨부파일 확인
+//        System.out.println("Attached Files in Message 3:");
+//        Message message3 = messageService.create(new MessageCreateRequest(user1.getId(),
+//                channel1.getId(), "Files", List.of(testImageFile1, testImageFile2)));
+//        List<BinaryContent> message3files = binaryContentService.findByMessageId(message3.getId());
+//        for (BinaryContent file : message3files) {
+//            System.out.println(file);
+//        }
     }
 
 }

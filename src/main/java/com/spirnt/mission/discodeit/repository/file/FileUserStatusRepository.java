@@ -2,6 +2,10 @@ package com.spirnt.mission.discodeit.repository.file;
 
 import com.spirnt.mission.discodeit.enity.UserStatus;
 import com.spirnt.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,12 +16,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+@Repository
+@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file")
 public class FileUserStatusRepository extends FileRepository implements UserStatusRepository {
 
-    public FileUserStatusRepository(String fileDirectory) {
-        super(fileDirectory + "/UserStatus");
+    public FileUserStatusRepository(@Value("${discodeit.repository.UserStatus}") String fileDirectory) {
+        super(fileDirectory);
     }
-
     @Override
     public void save(UserStatus userStatus) {
         Path path = resolvePath(userStatus.getId());

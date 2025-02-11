@@ -7,6 +7,8 @@ import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
+import com.spirnt.mission.discodeit.repository.MessageRepository;
+import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
@@ -21,6 +23,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
+    @Autowired
     private final ChannelRepository channelRepository;
     @Autowired
     private UserService userService;
@@ -51,7 +54,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponse find(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
-        // 해당 채널의 가장 최근 메세지 작성 시간 찾기
+//        // 해당 채널의 가장 최근 메세지 작성 시간 찾기
         Instant lastSeenAt = messageService.findLastMessageInChannel(channelId)
                 .orElse(channel.getCreatedAt());    // 채널 내 메세지가 없는 경우 채널 생성 시간을 디폴트로 함
         return new ChannelResponse(channel, lastSeenAt);

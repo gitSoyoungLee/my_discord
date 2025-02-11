@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.service.basic;
+package com.spirnt.mission.discodeit.service.implement;
 
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.spirnt.mission.discodeit.enity.ReadStatus;
@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ReadStatusServiceImpl implements ReadStatusService {
+    @Autowired
     private final ReadStatusRepository repository;
     @Autowired
     private UserService userService;

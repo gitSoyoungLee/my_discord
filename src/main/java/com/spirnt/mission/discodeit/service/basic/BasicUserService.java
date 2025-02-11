@@ -7,7 +7,10 @@ import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.enity.UserStatusType;
+import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
+import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.repository.UserStatusRepository;
 import com.spirnt.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
+    @Autowired
     private final UserRepository userRepository;
     @Autowired
     private ChannelService channelService;

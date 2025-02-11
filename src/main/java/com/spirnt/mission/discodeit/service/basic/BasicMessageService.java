@@ -6,9 +6,13 @@ import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageResponse;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserResponse;
+import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.enity.Message;
+import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
+import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
@@ -24,6 +28,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
+    @Autowired
     private final MessageRepository messageRepository;
     @Autowired
     private UserService userService;

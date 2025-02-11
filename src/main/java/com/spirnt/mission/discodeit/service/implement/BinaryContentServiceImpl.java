@@ -1,10 +1,11 @@
-package com.spirnt.mission.discodeit.service.basic;
+package com.spirnt.mission.discodeit.service.implement;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreate;
 import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -17,6 +18,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class BinaryContentServiceImpl implements BinaryContentService {
+    @Autowired
     private final BinaryContentRepository repository;
 
 
@@ -24,21 +26,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     public BinaryContent create(BinaryContentCreate dto) {
         try {
             BinaryContent binaryContent = new BinaryContent(dto);
-            // 파일 업로드
-            // uploadedFiles 디렉토리에 {UUID.확장자} 형태로 저장
-            String uploadDir = "uploadedFiles/";
-            String originalFilename = dto.file().getOriginalFilename();
-            String fileExtension;   //확장자추출
-            if (originalFilename == null || originalFilename.lastIndexOf(".") == -1) {
-                fileExtension = "";
-            } else fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-//            byte[] bytes = dto.file().getBytes();
-            Path path = Paths.get(uploadDir + binaryContent.getId() + fileExtension);
-            File newFile = new File(uploadDir + binaryContent.getId() + fileExtension);
-            try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                fos.write(dto.file().getBytes());
-            }
-            binaryContent.setFilePath(newFile.getPath());
             repository.save(binaryContent);
             return binaryContent;
         } catch (IOException e) {   // MultipartFile 오류 발생 시

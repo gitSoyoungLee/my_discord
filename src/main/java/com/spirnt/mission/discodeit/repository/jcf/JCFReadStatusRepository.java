@@ -2,6 +2,7 @@ package com.spirnt.mission.discodeit.repository.jcf;
 
 import com.spirnt.mission.discodeit.enity.ReadStatus;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "jcf")
 public class JCFReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> data;
 

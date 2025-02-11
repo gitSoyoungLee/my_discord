@@ -15,10 +15,6 @@ public abstract class FileRepository<T extends Serializable> {
         this.DIRECTORY = Path.of(fileDirectory);
     }
 
-    protected FileRepository(Path directory) {
-        this.DIRECTORY = directory;
-    }
-
     protected Path getDIRECTORY() {
         return DIRECTORY;
     }
