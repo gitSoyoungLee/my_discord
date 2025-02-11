@@ -168,12 +168,7 @@ public class DiscodeitApplication {
         ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
         UserStatusService userStatusService = context.getBean(UserStatusService.class);
         BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
-        // 서비스 의존성 주입
-        userService.setService(channelService, messageService, binaryContentService, userStatusService);
-        channelService.setService(userService, messageService, readStatusService);
-        messageService.setService(userService, channelService, binaryContentService);
-        readStatusService.setService(userService, channelService);
-        userStatusService.setService(userService);
+
 
         // 스프린트 미션 3 테스트
         clearDataFiles();

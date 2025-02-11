@@ -12,23 +12,22 @@ import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 
+@Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
+    @Autowired
     private UserService userService;
+    @Autowired
     private MessageService messageService;
+    @Autowired
     private ReadStatusService readStatusService;
-
-    @Override
-    public void setService(UserService userService, MessageService messageService, ReadStatusService readStatusService) {
-        this.userService = userService;
-        this.messageService = messageService;
-        this.readStatusService = readStatusService;
-    }
 
     @Override
     public Channel createChannelPublic(ChannelCreateRequest dto) {

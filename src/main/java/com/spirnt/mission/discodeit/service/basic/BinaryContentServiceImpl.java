@@ -5,6 +5,7 @@ import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+@Service
 @RequiredArgsConstructor
 public class BinaryContentServiceImpl implements BinaryContentService {
     private final BinaryContentRepository repository;

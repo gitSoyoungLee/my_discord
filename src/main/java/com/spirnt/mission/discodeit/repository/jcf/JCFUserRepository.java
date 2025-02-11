@@ -2,11 +2,14 @@ package com.spirnt.mission.discodeit.repository.jcf;
 
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+@Repository
 
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;   // 모든 유저 데이터, key=id

@@ -5,11 +5,13 @@ import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;

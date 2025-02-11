@@ -10,27 +10,24 @@ import com.spirnt.mission.discodeit.enity.UserStatusType;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 
+@Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    @Autowired
     private ChannelService channelService;
+    @Autowired
     private MessageService messageService;
+    @Autowired
     private BinaryContentService binaryContentService;
+    @Autowired
     private UserStatusService userStatusService;
-
-
-    @Override
-    public void setService(ChannelService channelService, MessageService messageService,
-                           BinaryContentService binaryContentService, UserStatusService userStatusService) {
-        this.channelService = channelService;
-        this.messageService = messageService;
-        this.binaryContentService = binaryContentService;
-        this.userStatusService = userStatusService;
-    }
 
 
     @Override

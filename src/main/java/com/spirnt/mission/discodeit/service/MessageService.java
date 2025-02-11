@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void setService(UserService userService, ChannelService channelService, BinaryContentService binaryContentService);
-
     // Create
     Message create(MessageCreateRequest messageCreateRequest); // 메세지 전송
 

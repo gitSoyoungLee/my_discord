@@ -2,12 +2,14 @@ package com.spirnt.mission.discodeit.repository.jcf;
 
 import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> data;
 

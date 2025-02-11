@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserStatusService {
-    void setService(UserService userService);
 
     UserStatus create(UserStatusCreate userStatusCreate);
 

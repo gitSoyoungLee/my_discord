@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-
-    void setService(UserService userService, ChannelService channelService);
-
     ReadStatus create(ReadStatusDto readStatusDto);
 
     ReadStatus find(UUID readStatusId);

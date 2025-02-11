@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    void setService(ChannelService channelService, MessageService messageService,
-                    BinaryContentService binaryContentService, UserStatusService userStatusService);
 
     // Create
     User create(UserCreateRequest userCreateRequest);  // 유저 생성

@@ -2,12 +2,14 @@ package com.spirnt.mission.discodeit.repository.jcf;
 
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> data;

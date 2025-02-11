@@ -2,9 +2,11 @@ package com.spirnt.mission.discodeit.repository.jcf;
 
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data;
 

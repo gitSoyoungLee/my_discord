@@ -7,6 +7,8 @@ import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -14,18 +16,15 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class ReadStatusServiceImpl implements ReadStatusService {
     private final ReadStatusRepository repository;
+    @Autowired
     private UserService userService;
+    @Autowired
     private ChannelService channelService;
 
-
-    @Override
-    public void setService(UserService userService, ChannelService channelService) {
-        this.userService = userService;
-        this.channelService = channelService;
-    }
 
     @Override
     public ReadStatus create(ReadStatusDto readStatusDto) {

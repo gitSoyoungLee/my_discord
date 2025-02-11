@@ -14,25 +14,24 @@ import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.*;
 
+@Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    @Autowired
     private UserService userService;
+    @Autowired
     private ChannelService channelService;
+    @Autowired
     private BinaryContentService binaryContentService;
 
-
-    @Override
-    public void setService(UserService userService, ChannelService channelService, BinaryContentService binaryContentService) {
-        this.userService = userService;
-        this.channelService = channelService;
-        this.binaryContentService = binaryContentService;
-    }
 
     @Override
     public Message create(MessageCreateRequest dto) {

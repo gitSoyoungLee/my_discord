@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    void setService(UserService userService, MessageService messageService, ReadStatusService readStatusService);
-
     // Create
     Channel createChannelPublic(ChannelCreateRequest channelCreateRequest);    // 채널 생성
 

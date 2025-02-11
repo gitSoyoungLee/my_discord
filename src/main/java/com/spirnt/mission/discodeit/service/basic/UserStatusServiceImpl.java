@@ -7,6 +7,8 @@ import com.spirnt.mission.discodeit.repository.UserStatusRepository;
 import com.spirnt.mission.discodeit.service.UserService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -14,15 +16,12 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class UserStatusServiceImpl implements UserStatusService {
     private final UserStatusRepository repository;
+    @Autowired
     private UserService userService;
-
-    @Override
-    public void setService(UserService userService) {
-        this.userService = userService;
-    }
 
     @Override
     public UserStatus create(UserStatusCreate userStatusCreate) {
