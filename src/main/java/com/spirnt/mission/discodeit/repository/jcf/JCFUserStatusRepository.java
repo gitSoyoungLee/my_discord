@@ -39,4 +39,9 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     public Map<UUID, UserStatus> findAll() {
         return new HashMap<>(data);
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
+    }
 }

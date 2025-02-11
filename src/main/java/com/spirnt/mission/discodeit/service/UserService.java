@@ -14,9 +14,9 @@ public interface UserService {
     User create(UserCreateRequest userCreateRequest);  // 유저 생성
 
     // Read
-    UserResponse find(UUID userId);    // 유저 정보 단건 조회
+    User find(UUID userId);    // 유저 정보 단건 조회
 
-    List<UserResponse> findAll(); // 모든 유저 조회
+    List<User> findAll(); // 모든 유저 조회
 
     // Update
     User update(UUID userId, UserUpdateRequest userUpdateRequest);
@@ -27,4 +27,6 @@ public interface UserService {
     boolean checkEmailDuplicate(String email);  //이메일 중복 검사
 
     boolean checkNameDuplicate(String name);    // 이름 중복 검사
+
+    boolean existsById(UUID id);
 }

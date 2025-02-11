@@ -54,4 +54,9 @@ public class FileMessageRepository extends FileRepository implements MessageRepo
 
         return messages;
     }
+    @Override
+    public boolean existsById(UUID userId) {
+        Path path = resolvePath(userId);
+        return Files.exists(path);
+    }
 }

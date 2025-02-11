@@ -75,4 +75,18 @@ public class BinaryContentServiceImpl implements BinaryContentService {
                 .forEach(binaryContent -> list.add(binaryContent));
         return list;
     }
+
+    @Override
+    public void deleteUserProfile(UUID userId) {
+        BinaryContent binaryContent = findUserProfile(userId);
+        delete(binaryContent.getId());
+    }
+
+    @Override
+    public void deleteByMessageId(UUID messageId) {
+        List<BinaryContent> list = findByMessageId(messageId);
+        for(BinaryContent binaryContent : list){
+            delete(binaryContent.getId());
+        }
+    }
 }

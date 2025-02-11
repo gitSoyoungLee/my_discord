@@ -15,9 +15,9 @@ public interface ChannelService {
     Channel createChannelPrivate(ChannelCreateRequest channelCreateRequest);    // 채널 생성
 
     // Read
-    ChannelResponse find(UUID channelId);  // 채널 정보 단건 조회
+    Channel find(UUID channelId);  // 채널 정보 단건 조회
 
-    List<ChannelResponse> findAllByUserId(UUID userId); // 전체 채널 다건 조회
+    List<Channel> findAllByUserId(UUID userId); // 전체 채널 다건 조회
 
     // Update
     Channel update(UUID channelId, ChannelUpdateRequest channelUpdateRequest);
@@ -30,4 +30,5 @@ public interface ChannelService {
     void deleteUserInChannel(UUID channelId, UUID userId);   // 유저를 채널에서 삭제
 
     void deleteUserInAllChannels(UUID userId);  // 유저를 모든 채널에서 삭제(유저 삭제를 위한 메소드)
+    boolean existsById(UUID id);
 }

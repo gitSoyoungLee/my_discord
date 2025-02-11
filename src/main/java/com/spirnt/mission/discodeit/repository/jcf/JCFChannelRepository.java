@@ -38,4 +38,9 @@ public class JCFChannelRepository implements ChannelRepository {
     public Map<UUID, Channel> findAll() {
         return new HashMap<>(data);
     }
+
+    @Override
+    public boolean existsById(UUID channelId) {
+        return data.containsKey(channelId);
+    }
 }

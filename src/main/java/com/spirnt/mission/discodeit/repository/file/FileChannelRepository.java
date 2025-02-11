@@ -55,4 +55,9 @@ public class FileChannelRepository extends FileRepository implements ChannelRepo
 
         return channels;
     }
+    @Override
+    public boolean existsById(UUID userId) {
+        Path path = resolvePath(userId);
+        return Files.exists(path);
+    }
 }

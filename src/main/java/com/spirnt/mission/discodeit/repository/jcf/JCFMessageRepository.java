@@ -40,4 +40,9 @@ public class JCFMessageRepository implements MessageRepository {
     public Map<UUID, Message> findAll() {
         return new HashMap<>(data);
     }
+
+    @Override
+    public boolean existsById(UUID messageId) {
+        return data.containsKey(messageId);
+    }
 }

@@ -15,4 +15,6 @@ public interface ChannelRepository {
     Optional<Channel> findById(UUID channelId);
 
     Map<UUID, Channel> findAll();
+    // 존재 검증
+    boolean existsById(UUID channelId);
 }

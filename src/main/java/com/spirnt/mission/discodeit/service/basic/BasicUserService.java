@@ -24,14 +24,14 @@ import java.util.*;
 public class BasicUserService implements UserService {
     @Autowired
     private final UserRepository userRepository;
-    @Autowired
-    private ChannelService channelService;
-    @Autowired
-    private MessageService messageService;
-    @Autowired
-    private BinaryContentService binaryContentService;
-    @Autowired
-    private UserStatusService userStatusService;
+//    @Autowired
+//    private ChannelService channelService;
+//    @Autowired
+//    private MessageService messageService;
+//    @Autowired
+//    private BinaryContentService binaryContentService;
+//    @Autowired
+//    private UserStatusService userStatusService;
 
 
     @Override
@@ -43,32 +43,31 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException(dto.getName() + "Name Already Exists");
         }
         User user = new User(dto);
-        //프로필 이미지 저장
-        if (dto.getProfileImage() != null)
-            binaryContentService.create(new BinaryContentCreate(user.getId(), null, dto.getProfileImage()));
+//        //프로필 이미지 저장
+//        if (dto.getProfileImage() != null)
+//            binaryContentService.create(new BinaryContentCreate(user.getId(), null, dto.getProfileImage()));
         userRepository.save(user);
-        // UserStatus 생성
-        UserStatusCreate userStatusCreate = new UserStatusCreate(user.getId(), UserStatusType.ONLINE, Instant.now());
-        userStatusService.create(userStatusCreate);
+//        // UserStatus 생성
+//        UserStatusCreate userStatusCreate = new UserStatusCreate(user.getId(), UserStatusType.ONLINE, Instant.now());
+//        userStatusService.create(userStatusCreate);
         return user;
     }
 
     @Override
-    public UserResponse find(UUID userId) {
-        User user = userRepository.findById(userId)
+    public User find(UUID userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
-        return new UserResponse(user);
     }
 
     @Override
-    public List<UserResponse> findAll() {
+    public List<User> findAll() {
         Map<UUID, User> data = userRepository.findAll();
-        List<UserResponse> list = new ArrayList<>();
+        List<User> list = new ArrayList<>();
         if (data.isEmpty()) return list;
         data.values().stream()
                 .sorted(Comparator.comparing(user -> user.getCreatedAt()))
                 .forEach(user -> {
-                    list.add(new UserResponse(user));
+                    list.add(user);
                 });
         return list;
     }
@@ -93,12 +92,11 @@ public class BasicUserService implements UserService {
         // 존재하는 유저인지 검증
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
-        // 해당 유저가 속한 모든 채널에서 삭제하기 위해 채널 서비스 호출
-        channelService.deleteUserInAllChannels(userId);
-        // 유저의 프로필 삭제
-
-        // UserStatus 삭제
-        userStatusService.deleteByUserId(userId);
+//        // 해당 유저가 속한 모든 채널에서 삭제하기 위해 채널 서비스 호출
+//        channelService.deleteUserInAllChannels(userId);
+//        // 유저의 프로필 삭제
+//        // UserStatus 삭제
+//        userStatusService.deleteByUserId(userId);
         userRepository.delete(userId);
     }
 
@@ -123,4 +121,8 @@ public class BasicUserService implements UserService {
                 .anyMatch(user -> user.getName().equals(name));
     }
 
+    @Override
+    public boolean existsById(UUID id) {
+        return userRepository.existsById(id);
+    }
 }

@@ -24,67 +24,40 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     @Autowired
     private final MessageRepository messageRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ChannelService channelService;
-    @Autowired
-    private BinaryContentService binaryContentService;
+//    @Autowired
+//    private UserService userService;
+//    @Autowired
+//    private ChannelService channelService;
+//    @Autowired
+//    private BinaryContentService binaryContentService;
 
 
     @Override
     public Message create(MessageCreateRequest dto) {
-        ChannelResponse channel;
-        UserResponse user;
-        // 존재하는 User, Channel인지 검증
-        try {
-            channel = channelService.find(dto.getChannelId());
-            user = userService.find(dto.getUserId());
-        } catch (NoSuchElementException e) {
-            throw e;
-        }
-        // Private 채널은 입장한 경우에만 가능
-        if (channel.getType() == ChannelType.PRIVATE &&
-                !channel.getUsersId().contains(user.getId())) {
-            throw new IllegalStateException("User has not joined this private channel.");
-        }
         Message message = new Message(dto);
         messageRepository.save(message);
-        // 첨부 파일 업로드
-        for (MultipartFile file : dto.getFiles()) {
-            BinaryContentCreate binaryContentCreate = new BinaryContentCreate(dto.getUserId(), message.getId(), file);
-            binaryContentService.create(binaryContentCreate);
-        }
         return message;
     }
 
     @Override
-    public MessageResponse find(UUID messageId) {
-        Message message = messageRepository.findById(messageId)
+    public Message find(UUID messageId) {
+        return messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
-        return new MessageResponse(message);
     }
 
     @Override
-    public List<MessageResponse> findAll() {
+    public List<Message> findAll() {
         Map<UUID, Message> data = messageRepository.findAll();
-        if (data == null || data.isEmpty()) {
-            System.out.println("메세지가 없습니다.");
-            return new ArrayList<>();
-        }
-        List<MessageResponse> list = new ArrayList<>();
-        data.values().stream()
-                .sorted(Comparator.comparing(message -> message.getCreatedAt()))
-                .forEach(message -> {
-                    list.add(new MessageResponse(message));
-                });
-        return list;
+        return data.values().stream()
+                .sorted(Comparator.comparing(message->message.getCreatedAt()))
+                .collect(Collectors.toList());
     }
 
 
@@ -129,5 +102,10 @@ public class BasicMessageService implements MessageService {
                 .map(Message::getCreatedAt)
                 .findFirst();
         return lastSeenAt;
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return messageRepository.existsById(id);
     }
 }

@@ -37,4 +37,9 @@ public class JCFUserRepository implements UserRepository {
     public Map<UUID, User> findAll() {
         return new HashMap<>(data);
     }
+
+    @Override
+    public boolean existsById(UUID userId) {
+        return data.containsKey(userId);
+    }
 }

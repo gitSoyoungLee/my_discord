@@ -55,4 +55,9 @@ public class FileBinaryContentRepository extends FileRepository implements Binar
 
         return map;
     }
+    @Override
+    public boolean existsById(UUID userId) {
+        Path path = resolvePath(userId);
+        return Files.exists(path);
+    }
 }

@@ -38,4 +38,9 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     public Map<UUID, BinaryContent> findAll() {
         return new HashMap<>(data);
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
+    }
 }

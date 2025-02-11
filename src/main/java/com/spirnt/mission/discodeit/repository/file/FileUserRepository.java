@@ -56,4 +56,10 @@ public class FileUserRepository extends FileRepository implements UserRepository
 
         return users;
     }
+
+    @Override
+    public boolean existsById(UUID userId) {
+        Path path = resolvePath(userId);
+        return Files.exists(path);
+    }
 }

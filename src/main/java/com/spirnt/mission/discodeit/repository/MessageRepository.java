@@ -14,4 +14,6 @@ public interface MessageRepository {
     Optional<Message> findById(UUID messageId);
 
     Map<UUID, Message> findAll();
+    // 존재 검증
+    boolean existsById(UUID messageId);
 }

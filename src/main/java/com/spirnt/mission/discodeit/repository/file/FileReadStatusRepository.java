@@ -55,4 +55,10 @@ public class FileReadStatusRepository extends FileRepository implements ReadStat
 
         return map;
     }
+
+    @Override
+    public boolean existsById(UUID userId) {
+        Path path = resolvePath(userId);
+        return Files.exists(path);
+    }
 }

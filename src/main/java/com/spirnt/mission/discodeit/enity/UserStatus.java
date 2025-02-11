@@ -4,12 +4,14 @@ import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Getter
-public class UserStatus extends Common {
+public class UserStatus extends Common implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID userId;
     private UserStatusType userStatusType;
     private Instant lastSeenAt; // 마지막으로 확인된 접속 시간

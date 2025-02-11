@@ -3,12 +3,14 @@ package com.spirnt.mission.discodeit.enity;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 // 사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현하는 도메인
 @Getter
-public class ReadStatus extends Common {
+public class ReadStatus extends Common implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final UUID userId;
     private final UUID channelId;
     private Instant lastReadAt;

@@ -57,4 +57,5 @@ public abstract class FileRepository<T extends Serializable> {
             System.out.println("파일 삭제 중 오류 발생: " + e.getMessage());
         }
     }
+
 }

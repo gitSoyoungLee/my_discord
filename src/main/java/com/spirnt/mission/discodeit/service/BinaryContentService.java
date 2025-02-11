@@ -18,4 +18,8 @@ public interface BinaryContentService {
     BinaryContent findUserProfile(UUID userId);
 
     List<BinaryContent> findByMessageId(UUID messageId);
+
+    void deleteUserProfile(UUID userId);
+
+    void deleteByMessageId(UUID messageId);
 }

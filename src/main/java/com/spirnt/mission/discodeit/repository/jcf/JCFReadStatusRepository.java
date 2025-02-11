@@ -38,4 +38,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     public Map<UUID, ReadStatus> findAll() {
         return new HashMap<>(data);
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
+    }
 }

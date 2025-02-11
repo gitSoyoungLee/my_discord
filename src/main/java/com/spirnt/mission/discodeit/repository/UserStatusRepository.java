@@ -14,4 +14,6 @@ public interface UserStatusRepository {
     Optional<UserStatus> findById(UUID id);
 
     Map<UUID, UserStatus> findAll();
+    // 존재 검증
+    boolean existsById(UUID id);
 }
