@@ -19,11 +19,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ReadStatusServiceImpl implements ReadStatusService {
-    @Autowired
     private final ReadStatusRepository repository;
-    @Autowired
     private final UserService userService;
-    @Autowired
     private final ChannelService channelService;
 
     @Override

@@ -15,7 +15,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    @Autowired
     private final UserRepository userRepository;
 
     @Override

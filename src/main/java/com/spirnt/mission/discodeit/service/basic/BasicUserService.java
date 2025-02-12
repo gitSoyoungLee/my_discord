@@ -14,7 +14,6 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    @Autowired
     private final UserRepository userRepository;
 
     @Override

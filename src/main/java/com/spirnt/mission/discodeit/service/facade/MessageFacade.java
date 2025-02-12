@@ -24,13 +24,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MessageFacade {
-    @Autowired
     private final MessageService messageService;
-    @Autowired
     private final UserService userService;
-    @Autowired
     private final ChannelService channelService;
-    @Autowired
     private final BinaryContentService binaryContentService;
 
     public Message createMessage(MessageCreateRequest messageCreateRequest) {

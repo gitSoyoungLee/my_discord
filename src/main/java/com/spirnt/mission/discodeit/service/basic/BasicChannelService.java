@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
-    @Autowired
     private final ChannelRepository channelRepository;
 
     @Override

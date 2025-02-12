@@ -19,9 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserStatusServiceImpl implements UserStatusService {
-    @Autowired
     private final UserStatusRepository repository;
-    @Autowired
     private final UserService userService;
 
     @Override

@@ -14,7 +14,6 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class BinaryContentServiceImpl implements BinaryContentService {
-    @Autowired
     private final BinaryContentRepository repository;
 
 

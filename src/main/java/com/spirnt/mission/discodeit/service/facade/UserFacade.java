@@ -23,13 +23,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserFacade {
-    @Autowired
     private final UserService userService;
-    @Autowired
     private final ChannelService channelService;
-    @Autowired
     private final BinaryContentService binaryContentService;
-    @Autowired
     private final UserStatusService userStatusService;
 
     public User createUser(UserCreateRequest userCreateRequest) {

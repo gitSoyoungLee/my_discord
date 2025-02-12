@@ -21,11 +21,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ChannelFacade {
-    @Autowired
     private final ChannelService channelService;
-    @Autowired
     private final MessageService messageService;
-    @Autowired
     private final ReadStatusService readStatusService;
 
     public Channel createChannelPublic(ChannelCreateRequest channelCreateRequest) {
