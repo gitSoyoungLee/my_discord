@@ -1,26 +1,13 @@
 package com.spirnt.mission.discodeit.service.basic;
 
-import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreate;
-import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
-import com.spirnt.mission.discodeit.dto.message.MessageResponse;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.spirnt.mission.discodeit.dto.user.UserResponse;
-import com.spirnt.mission.discodeit.enity.Channel;
-import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.enity.Message;
-import com.spirnt.mission.discodeit.enity.User;
-import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
-import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.service.BinaryContentService;
-import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.MessageService;
-import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.*;
@@ -31,12 +18,6 @@ import java.util.stream.Collectors;
 public class BasicMessageService implements MessageService {
     @Autowired
     private final MessageRepository messageRepository;
-//    @Autowired
-//    private UserService userService;
-//    @Autowired
-//    private ChannelService channelService;
-//    @Autowired
-//    private BinaryContentService binaryContentService;
 
 
     @Override
@@ -56,7 +37,7 @@ public class BasicMessageService implements MessageService {
     public List<Message> findAll() {
         Map<UUID, Message> data = messageRepository.findAll();
         return data.values().stream()
-                .sorted(Comparator.comparing(message->message.getCreatedAt()))
+                .sorted(Comparator.comparing(message -> message.getCreatedAt()))
                 .collect(Collectors.toList());
     }
 
@@ -72,9 +53,12 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
-        messageRepository.delete(messageId);
+        if (existsById(messageId)) {
+            messageRepository.delete(messageId);
+        } else {
+            throw new NoSuchElementException("Message ID: " + messageId + "Not Found");
+        }
+
     }
 
     // 해당 채널에 쓰여진 메세지들을 모두 삭제

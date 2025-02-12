@@ -4,7 +4,6 @@ import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import com.spirnt.mission.discodeit.enity.UserStatus;
 import com.spirnt.mission.discodeit.repository.UserStatusRepository;
-import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.UserService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class UserStatusServiceImpl implements UserStatusService {
     @Override
     public UserStatus create(UserStatusCreate userStatusCreate) {
         // User가 존재하지 않으면 예외 발생
-        if(!userService.existsById(userStatusCreate.userId()))
+        if (!userService.existsById(userStatusCreate.userId()))
             throw new NoSuchElementException("User ID Not Found");
         // 이미 User와 관련된 객체가 존재하면 예외 발생
         if (repository.findAll().values().stream()

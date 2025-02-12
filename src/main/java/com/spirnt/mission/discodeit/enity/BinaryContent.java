@@ -9,12 +9,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.UUID;
 
 // 이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델
 @Getter
-public class BinaryContent extends Common implements Serializable {
+public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
     private UUID userId;    // 업로드한 유저
     private UUID messageId; //첨부된 메세지
     private String fileName;    // 파일 원본 이름
@@ -22,7 +25,8 @@ public class BinaryContent extends Common implements Serializable {
     private String filePath;    // 서버에 저장된 경로
 
     public BinaryContent(BinaryContentCreate dto) throws IOException {
-        super();
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
         this.userId = dto.userId();
         this.messageId = dto.messageId();
         this.fileName = dto.file().getOriginalFilename();
@@ -36,7 +40,7 @@ public class BinaryContent extends Common implements Serializable {
             fileExtension = "";
         } else fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
         Path path = Paths.get(uploadDir + this.getId() + fileExtension);
-        File newFile = new File(uploadDir + this.getId() + fileExtension);
+        File newFile = new File(String.valueOf(path));
         try (FileOutputStream fos = new FileOutputStream(newFile)) {
             fos.write(dto.file().getBytes());
         }

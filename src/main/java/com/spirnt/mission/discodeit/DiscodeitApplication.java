@@ -9,12 +9,14 @@ import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserResponse;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
-import com.spirnt.mission.discodeit.enity.*;
+import com.spirnt.mission.discodeit.enity.BinaryContent;
+import com.spirnt.mission.discodeit.enity.Channel;
+import com.spirnt.mission.discodeit.enity.Message;
+import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.service.*;
 import com.spirnt.mission.discodeit.service.facade.ChannelFacade;
 import com.spirnt.mission.discodeit.service.facade.MessageFacade;
 import com.spirnt.mission.discodeit.service.facade.UserFacade;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -162,6 +164,7 @@ public class DiscodeitApplication {
 
         // 서비스 초기화
         // TODO context에서 Bean을 조회하여 각 서비스 구현체 할당 코드 작성하세요.
+        // + Facade class 이용하면 필요 x
         UserService userService = context.getBean(UserService.class);
         ChannelService channelService = context.getBean(ChannelService.class);
         MessageService messageService = context.getBean(MessageService.class);

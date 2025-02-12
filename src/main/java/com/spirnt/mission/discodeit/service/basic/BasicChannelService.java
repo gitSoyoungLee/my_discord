@@ -1,24 +1,19 @@
 package com.spirnt.mission.discodeit.service.basic;
 
 import com.spirnt.mission.discodeit.dto.channel.ChannelCreateRequest;
-import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
 import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
-import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
-import com.spirnt.mission.discodeit.repository.MessageRepository;
-import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
-import com.spirnt.mission.discodeit.service.MessageService;
-import com.spirnt.mission.discodeit.service.ReadStatusService;
-import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,12 +21,6 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     @Autowired
     private final ChannelRepository channelRepository;
-//    @Autowired
-//    private UserService userService;
-//    @Autowired
-//    private MessageService messageService;
-//    @Autowired
-//    private ReadStatusService readStatusService;
 
     @Override
     public Channel createChannelPublic(ChannelCreateRequest dto) {
@@ -44,16 +33,12 @@ public class BasicChannelService implements ChannelService {
     public Channel createChannelPrivate(ChannelCreateRequest dto) {
         Channel channel = new Channel(dto, ChannelType.PRIVATE);
         channelRepository.save(channel);
-//        //ReadStatus 생성
-//        for (UUID userId : dto.getUsersId()) {
-//            readStatusService.create(new ReadStatusDto(userId, channel.getId(), Instant.now()));
-//        }
         return channel;
     }
 
     @Override
     public Channel find(UUID channelId) {
-        return  channelRepository.findById(channelId)
+        return channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
     }
 
@@ -84,14 +69,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void addUserIntoChannel(UUID channelId, UUID userId) {
-        // 존재하는지 검증
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
-//        try {
-//            userService.find(userId);
-//        } catch (NoSuchElementException e) {
-//            throw e;
-//        }
         // 유저가 채널에 이미 입장한 경우 조건 불만족으로 실패
         if (channel.containsUser(userId)) {
             return;
@@ -102,14 +81,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteUserInChannel(UUID channelId, UUID userId) {
-        // 존재하는지 검증
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
-//        try {
-//            userService.find(userId);
-//        } catch (NoSuchElementException e) {
-//            throw e;
-//        }
         // 유저가 채널에 없는 경우 조건 불만족으로 실패
         if (!channel.containsUser(userId)) {
             return;

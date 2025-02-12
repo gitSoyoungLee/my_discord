@@ -14,12 +14,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 @Repository
-@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository extends FileRepository implements MessageRepository {
     public FileMessageRepository(@Value("${discodeit.repository.Message}") String fileDirectory) {
         super(fileDirectory);
     }
+
     @Override
     public void save(Message message) {
         Path path = resolvePath(message.getId());
@@ -54,6 +56,7 @@ public class FileMessageRepository extends FileRepository implements MessageRepo
 
         return messages;
     }
+
     @Override
     public boolean existsById(UUID userId) {
         Path path = resolvePath(userId);

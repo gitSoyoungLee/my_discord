@@ -14,8 +14,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 @Repository
-@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository extends FileRepository implements ChannelRepository {
 
     public FileChannelRepository(@Value("${discodeit.repository.Channel}") String fileDirectory) {
@@ -55,6 +56,7 @@ public class FileChannelRepository extends FileRepository implements ChannelRepo
 
         return channels;
     }
+
     @Override
     public boolean existsById(UUID userId) {
         Path path = resolvePath(userId);

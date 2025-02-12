@@ -14,8 +14,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 @Repository
-@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository extends FileRepository implements UserRepository {
 
     public FileUserRepository(@Value("${discodeit.repository.User}") String fileDirectory) {

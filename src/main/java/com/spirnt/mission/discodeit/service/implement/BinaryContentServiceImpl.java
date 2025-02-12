@@ -8,11 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -85,7 +81,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     @Override
     public void deleteByMessageId(UUID messageId) {
         List<BinaryContent> list = findByMessageId(messageId);
-        for(BinaryContent binaryContent : list){
+        for (BinaryContent binaryContent : list) {
             delete(binaryContent.getId());
         }
     }

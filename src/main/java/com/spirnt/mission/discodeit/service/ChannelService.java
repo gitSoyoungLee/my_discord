@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.service;
 
 import com.spirnt.mission.discodeit.dto.channel.ChannelCreateRequest;
-import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
 import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.spirnt.mission.discodeit.enity.Channel;
 
@@ -30,5 +29,6 @@ public interface ChannelService {
     void deleteUserInChannel(UUID channelId, UUID userId);   // 유저를 채널에서 삭제
 
     void deleteUserInAllChannels(UUID userId);  // 유저를 모든 채널에서 삭제(유저 삭제를 위한 메소드)
+
     boolean existsById(UUID id);
 }

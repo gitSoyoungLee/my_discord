@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,7 +33,7 @@ public class UserFacade {
     private final UserStatusService userStatusService;
 
     public User createUser(UserCreateRequest userCreateRequest) {
-        User user=userService.create(userCreateRequest);
+        User user = userService.create(userCreateRequest);
         //프로필 이미지 저장
         if (userCreateRequest.getProfileImage() != null)
             binaryContentService.create(new BinaryContentCreate(user.getId(), null, userCreateRequest.getProfileImage()));
@@ -49,6 +48,7 @@ public class UserFacade {
     private void createUserStatus(UserStatusCreate userStatusCreate) {
         userStatusService.create(userStatusCreate);
     }
+
     public UserResponse findUser(UUID userId) {
         User user = userService.find(userId);
         return new UserResponse(user);

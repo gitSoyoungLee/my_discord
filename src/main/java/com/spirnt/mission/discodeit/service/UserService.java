@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.service;
 
 import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
-import com.spirnt.mission.discodeit.dto.user.UserResponse;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import com.spirnt.mission.discodeit.enity.User;
 

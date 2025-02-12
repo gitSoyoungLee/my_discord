@@ -14,13 +14,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 @Repository
-@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileBinaryContentRepository extends FileRepository implements BinaryContentRepository {
 
     public FileBinaryContentRepository(@Value("${discodeit.repository.BinaryContent}") String fileDirectory) {
         super(fileDirectory);
     }
+
     @Override
     public void save(BinaryContent binaryContent) {
         Path path = resolvePath(binaryContent.getId());
@@ -55,6 +57,7 @@ public class FileBinaryContentRepository extends FileRepository implements Binar
 
         return map;
     }
+
     @Override
     public boolean existsById(UUID userId) {
         Path path = resolvePath(userId);

@@ -3,7 +3,6 @@ package com.spirnt.mission.discodeit.service.implement;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.spirnt.mission.discodeit.enity.ReadStatus;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
-import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import com.spirnt.mission.discodeit.service.UserService;
@@ -30,10 +29,10 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     @Override
     public ReadStatus create(ReadStatusDto readStatusDto) {
         // User와 Channel 존재하지 않으면 예외 발생
-        if(!userService.existsById(readStatusDto.userId())){
+        if (!userService.existsById(readStatusDto.userId())) {
             throw new NoSuchElementException("User ID Not Found");
         }
-        if(!channelService.existsById(readStatusDto.channelId())){
+        if (!channelService.existsById(readStatusDto.channelId())) {
             throw new NoSuchElementException("Channel ID Not Found");
         }
         //이미 해당 채널-유저를 가진 ReadStatus가 있으면 예외 발생

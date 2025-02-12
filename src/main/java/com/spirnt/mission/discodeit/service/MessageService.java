@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.service;
 
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
-import com.spirnt.mission.discodeit.dto.message.MessageResponse;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.enity.Message;
 
@@ -29,5 +28,6 @@ public interface MessageService {
     void deleteByChannelId(UUID channelId);   // 채널 삭제 시 해당 채널에 속한 메세지를 모두 삭제
 
     Optional<Instant> findLastMessageInChannel(UUID channelId);   // 해당 채널의 가장 최근 메세지 시간 정보
+
     boolean existsById(UUID id);
 }

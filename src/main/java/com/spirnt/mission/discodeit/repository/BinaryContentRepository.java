@@ -14,6 +14,7 @@ public interface BinaryContentRepository {
     Optional<BinaryContent> findById(UUID id);
 
     Map<UUID, BinaryContent> findAll();
+
     // 존재 검증
     boolean existsById(UUID id);
 }

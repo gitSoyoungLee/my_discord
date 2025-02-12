@@ -14,8 +14,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 @Repository
-@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileReadStatusRepository extends FileRepository implements ReadStatusRepository {
     public FileReadStatusRepository(@Value("${discodeit.repository.ReadStatus}") String fileDirectory) {
         super(fileDirectory);
