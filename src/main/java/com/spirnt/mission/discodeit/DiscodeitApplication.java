@@ -213,7 +213,7 @@ public class DiscodeitApplication {
         readUser(userFacade, user2);
 
         //User Update
-        userFacade.updateUser(user1.getId(), new UserUpdateRequest("Andy", "Andy@gmail.com", "password", null));
+        userFacade.updateUser(user1.getId(), new UserUpdateRequest("Andy", "Andy@gmail.com", "password", testImageFile1));
         readUser(userFacade, user1);
         // User Delete
         userFacade.deleteUser(user2.getId());

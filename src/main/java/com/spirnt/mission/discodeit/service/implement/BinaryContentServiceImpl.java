@@ -75,7 +75,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     @Override
     public void deleteUserProfile(UUID userId) {
         BinaryContent binaryContent = findUserProfile(userId);
-        delete(binaryContent.getId());
+        if(binaryContent!=null) {
+            delete(binaryContent.getId());
+        }
     }
 
     @Override

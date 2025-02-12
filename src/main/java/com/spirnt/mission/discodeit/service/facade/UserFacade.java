@@ -40,8 +40,6 @@ public class UserFacade {
         // UserStatus 생성
         UserStatusCreate userStatusCreate = new UserStatusCreate(user.getId(), UserStatusType.ONLINE, Instant.now());
         userStatusService.create(userStatusCreate);
-        // userRepository 트랜잭션 문제로 메소드 분리
-//        createUserStatus(userStatusCreate);
         return user;
     }
 
@@ -62,6 +60,11 @@ public class UserFacade {
     }
 
     public User updateUser(UUID userId, UserUpdateRequest userUpdateRequest) {
+        //프로필 이미지 선택적 대체
+        if(userUpdateRequest.getProfileImage()!=null){
+            binaryContentService.deleteUserProfile(userId);
+            binaryContentService.create(new BinaryContentCreate(userId, null, userUpdateRequest.getProfileImage()));
+        }
         return userService.update(userId, userUpdateRequest);
     }
 
