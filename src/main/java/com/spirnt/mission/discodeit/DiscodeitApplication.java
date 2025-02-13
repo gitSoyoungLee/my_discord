@@ -53,11 +53,11 @@ public class DiscodeitApplication {
                                 try {
                                     Files.delete(path);
                                 } catch (IOException e) {
-                                    System.out.println("파일 삭제 실패: " + path + " - " + e.getMessage());
+                                    System.out.println("Error:" + "파일 삭제 실패: " + path + " - " + e.getMessage());
                                 }
                             });
                 } catch (IOException e) {
-                    System.out.println("폴더 접근 실패: " + folderPath + " - " + e.getMessage());
+                    System.out.println("Error:" + "폴더 접근 실패: " + folderPath + " - " + e.getMessage());
                 }
             }
         }
@@ -80,11 +80,11 @@ public class DiscodeitApplication {
                                 try {
                                     Files.delete(path);
                                 } catch (IOException e) {
-                                    System.out.println("파일 삭제 실패: " + path + " - " + e.getMessage());
+                                    System.out.println("Error:" + "파일 삭제 실패: " + path + " - " + e.getMessage());
                                 }
                             });
                 } catch (IOException e) {
-                    System.out.println("폴더 접근 실패: " + folderPath + " - " + e.getMessage());
+                    System.out.println("Error:" + "폴더 접근 실패: " + folderPath + " - " + e.getMessage());
                 }
             }
         }
@@ -102,12 +102,23 @@ public class DiscodeitApplication {
         );
     }
 
+    //User
+    static User setupUser(UserFacade userFacade, UserCreateRequest userCreateRequest) {
+        try {
+            User user = userFacade.createUser(userCreateRequest);
+            return user;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error:" + e.getMessage());
+            return null;
+        }
+    }
+
     static void readUser(UserFacade userFacade, User user) {
         try {
             UserResponse userResponse = userFacade.findUser(user.getId());
             System.out.println(userResponse);
         } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error:" + e.getMessage());
         }
 
 
@@ -122,12 +133,42 @@ public class DiscodeitApplication {
         System.out.println("-------------------");
     }
 
+    static User updateUser(UserFacade userFacade, User user, UserUpdateRequest userUpdateRequest) {
+        try {
+            return userFacade.updateUser(user.getId(), userUpdateRequest);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error:" + e.getMessage());
+            return null;
+        } catch (NoSuchElementException e) {
+            System.out.println("Error:" + e.getMessage());
+            return null;
+        }
+    }
+
+    static void deleteUser(UserFacade userFacade, User user) {
+        try {
+            userFacade.deleteUser(user.getId());
+        } catch (NoSuchElementException e) {
+            System.out.println("Error:" + e.getMessage());
+        }
+    }
+
+    // Channel
+
+    static Channel setupPublicChannel(ChannelFacade channelFacade, ChannelCreateRequest channelCreateRequest) {
+        return channelFacade.createChannelPublic(channelCreateRequest);
+    }
+
+    static Channel setupPrivateChannel(ChannelFacade channelFacade, ChannelCreateRequest channelCreateRequest) {
+        return channelFacade.createChannelPrivate(channelCreateRequest);
+    }
+
     static void readChannel(ChannelFacade channelFacade, Channel channel) {
         try {
             ChannelResponse channelResponse = channelFacade.findChannel(channel.getId());
             System.out.println(channelResponse);
         } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error:" + e.getMessage());
         }
     }
 
@@ -140,11 +181,42 @@ public class DiscodeitApplication {
         System.out.println("---------------------------------------------");
     }
 
+    static Channel updateChannel(ChannelFacade channelFacade, Channel channel, ChannelUpdateRequest channelUpdateRequest) {
+        try {
+            return channelFacade.updateChannel(channel.getId(), channelUpdateRequest);
+        } catch (NoSuchElementException e) {
+            System.out.println("Error:" + e.getMessage());
+            return null;
+        }
+    }
+
+    static void deleteChannel(ChannelFacade channelFacade, Channel channel) {
+        try {
+            channelFacade.deleteChannel(channel.getId());
+        } catch (NoSuchElementException e) {
+            System.out.println("Error:" + e.getMessage());
+        }
+    }
+
+    // Message
+
+    static Message setupMessage(MessageFacade messageFacade, MessageCreateRequest messageCreateRequest) {
+        try {
+            return messageFacade.createMessage(messageCreateRequest);
+        } catch (NoSuchElementException e) {
+            System.out.println("Error:" + e.getMessage());
+            return null;
+        } catch (IllegalStateException e) {
+            System.out.println("Error:" + e.getMessage());
+            return null;
+        }
+    }
+
     static void readMessage(MessageFacade messageFacade, Message message) {
         try {
             System.out.println(messageFacade.findMessage(message.getId()));
         } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error:" + e.getMessage());
         }
     }
 
@@ -155,6 +227,22 @@ public class DiscodeitApplication {
             System.out.println(messageResponse);
         }
         System.out.println("----------------------");
+    }
+
+    static void updateMessage(MessageFacade messageFacade, Message message, MessageUpdateRequest messageUpdateRequest) {
+        try {
+            messageFacade.updateMessage(message.getId(), messageUpdateRequest);
+        } catch (NoSuchElementException e) {
+            System.out.println("Error:" + e.getMessage());
+        }
+    }
+
+    static void deleteMessage(MessageFacade messageFacade, Message message) {
+        try {
+            messageFacade.deleteMessage(message.getId());
+        } catch (NoSuchElementException e) {
+            System.out.println("Error:" + e.getMessage());
+        }
     }
 
     public static void main(String[] args) {
@@ -199,35 +287,34 @@ public class DiscodeitApplication {
 
         // User Create
         UserCreateRequest ucr1 = new UserCreateRequest("Alice", "Alice@gmail.com", "password", null);
-        User user1 = userFacade.createUser(ucr1);
+        User user1 = setupUser(userFacade, ucr1);
         UserCreateRequest ucr2 = new UserCreateRequest("Bob", "Bob@gmail.com", "password", testImageFile1);
-        User user2 = userFacade.createUser(ucr2);
+        User user2 = setupUser(userFacade, ucr2);
         // 중복 검증
-        try {
-            userFacade.createUser(new UserCreateRequest("Alice", "Alice@gmail.com", "password", null));
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error occured while creating User: " + e.getMessage());
-        }
+        setupUser(userFacade, new UserCreateRequest("Alice", "Alice@gmail.com", "password", null));
+
         // User Read
         readUser(userFacade, user1);
         readUser(userFacade, user2);
+        readAllUsers(userFacade);
 
         //User Update
-        userFacade.updateUser(user1.getId(), new UserUpdateRequest("Andy", "Andy@gmail.com", "password", testImageFile1));
+        updateUser(userFacade, user1, new UserUpdateRequest("Andy", "Andy@gmail.com", "password", testImageFile1));
         readUser(userFacade, user1);
         // User Delete
-        userFacade.deleteUser(user2.getId());
+        deleteUser(userFacade, user2);
+        System.out.println("After delete user2");
         readAllUsers(userFacade);
 
         // Channel Create - PUBLIC
         ChannelCreateRequest ccr1 = new ChannelCreateRequest("Ch 1", "This is public", null);
-        Channel channel1 = channelFacade.createChannelPublic(ccr1);
+        Channel channel1 = setupPublicChannel(channelFacade, ccr1);
         // Channel Create - PRIVATE
-        user2 = userFacade.createUser(ucr2);
+        user2 = setupUser(userFacade, ucr2);
         ChannelCreateRequest ccr2 = new ChannelCreateRequest("Ch 2 ", "This is private", List.of(user1.getId(), user2.getId()));
-        Channel channel2 = channelFacade.createChannelPrivate(ccr2);
+        Channel channel2 = setupPrivateChannel(channelFacade, ccr2);
         ccr2 = new ChannelCreateRequest("Ch 3 ", "This is private", List.of(user2.getId()));
-        Channel channel3 = channelFacade.createChannelPrivate(ccr2);
+        Channel channel3 = setupPrivateChannel(channelFacade, ccr2);
 
         // Channel Read
         readChannel(channelFacade, channel1);
@@ -237,37 +324,34 @@ public class DiscodeitApplication {
 
         // Channel Update
         ChannelUpdateRequest cur = new ChannelUpdateRequest("New Ch 1", "This is public!");
-        channelFacade.updateChannel(channel1.getId(), cur);
+        updateChannel(channelFacade, channel1, cur);
         readChannel(channelFacade, channel1);
 
         // Channel Delete
-        channelFacade.deleteChannel(channel3.getId());
+        deleteChannel(channelFacade, channel3);
         readChannel(channelFacade, channel3);
 
         // Message Create
         MessageCreateRequest mcr1 = new MessageCreateRequest(user1.getId(), channel1.getId(), "Hi Ch 1", null);
-        Message message1 = messageFacade.createMessage(mcr1);
+        Message message1 = setupMessage(messageFacade, mcr1);
         // 입장하지 않은 private 채널에 메세지 생성 시도 시 예외 발생
-        User user3 = userFacade.createUser(new UserCreateRequest("Cindy", "Cindy@gmail.com", "12345", null));
-        try {
-            MessageCreateRequest mcr2 = new MessageCreateRequest(user3.getId(), channel2.getId(), "This message will not be sent", null);
-            messageFacade.createMessage(mcr2);
-        } catch (IllegalStateException e) {
-            System.out.println("Error occured while creating message: " + e.getMessage());
-        }
+        User user3 = setupUser(userFacade, new UserCreateRequest("Cindy", "Cindy@gmail.com", "12345", null));
+        MessageCreateRequest mcr2 = new MessageCreateRequest(user3.getId(), channel2.getId(), "This message will not be sent", null);
+        setupMessage(messageFacade, mcr2);
+        // 메세지에 파일 첨부
         mcr1 = new MessageCreateRequest(user2.getId(), channel2.getId(), "Hi Ch 2", List.of(testImageFile1));
-        Message message2 = messageFacade.createMessage(mcr1);
+        Message message2 = setupMessage(messageFacade, mcr1);
 
         // Message Read
         readMessage(messageFacade, message1);
         readAllMessages(messageFacade);
 
         // Message Update
-        messageFacade.updateMessage(message1.getId(), new MessageUpdateRequest("New Message"));
+        updateMessage(messageFacade, message1, new MessageUpdateRequest("New Message"));
         readMessage(messageFacade, message1);
 
         // Message Delete
-        messageFacade.deleteMessage(message2.getId());
+        deleteMessage(messageFacade, message2);
         readAllMessages(messageFacade);
 
         // UserStatus
