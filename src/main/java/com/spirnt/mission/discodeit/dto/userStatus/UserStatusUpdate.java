@@ -6,6 +6,6 @@ import java.time.Instant;
 
 public record UserStatusUpdate(
         UserStatusType type,
-        Instant lastSennAt
+        Instant lastSeenAt
 ) {
 }

@@ -1,13 +1,25 @@
 package com.spirnt.mission.discodeit.service.basic;
 
+import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreate;
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
+import com.spirnt.mission.discodeit.dto.message.MessageResponse;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
+import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.Message;
+import com.spirnt.mission.discodeit.enity.ReadStatus;
+import com.spirnt.mission.discodeit.enity.UserStatusType;
+import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
+import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.MessageService;
+import com.spirnt.mission.discodeit.service.ReadStatusService;
+import com.spirnt.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.*;
@@ -17,26 +29,50 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
+    private final BinaryContentService binaryContentService;
+    private final UserStatusService userStatusService;
 
     @Override
-    public Message create(MessageCreateRequest dto) {
-        Message message = new Message(dto);
+    public Message create(MessageCreateRequest messageCreateRequest) {
+        // User와 Channel이 존재하는지 검증
+        UUID userId = messageCreateRequest.getUserId();
+        UUID channelId=messageCreateRequest.getChannelId();
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel id " + messageCreateRequest.getChannelId() + " does not exist");
+        }
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("User id " + messageCreateRequest.getUserId() + " does not exist");
+        }
+        Message message = new Message(messageCreateRequest.getContent(),
+                channelId,
+                userId);
         messageRepository.save(message);
+        // 첨부 파일 업로드
+        for (MultipartFile file : messageCreateRequest.getFiles()) {
+            BinaryContentCreate binaryContentCreate = new BinaryContentCreate(userId, message.getId(), file);
+            binaryContentService.create(binaryContentCreate);
+        }
+        // 메세지 작성자를 Online 상태로
+        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE, Instant.now()));
         return message;
     }
 
     @Override
-    public Message find(UUID messageId) {
-        return messageRepository.findById(messageId)
+    public MessageResponse find(UUID messageId) {
+        Message message =messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
+        return new MessageResponse(message);
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<MessageResponse> findAll() {
         Map<UUID, Message> data = messageRepository.findAll();
         return data.values().stream()
                 .sorted(Comparator.comparing(message -> message.getCreatedAt()))
+                .map(message->new MessageResponse(message))
                 .collect(Collectors.toList());
     }
 
@@ -45,14 +81,15 @@ public class BasicMessageService implements MessageService {
     public void update(UUID messageId, MessageUpdateRequest dto) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
-        message.update(dto);
-        // 객체 수정 후 저장
+        message.update(dto.getContent());
         messageRepository.save(message);
     }
 
     @Override
     public void delete(UUID messageId) {
-        if (existsById(messageId)) {
+        if (messageRepository.existsById(messageId)) {
+            // 첨푸 파일 삭제
+            binaryContentService.deleteByMessageId(messageId);
             messageRepository.delete(messageId);
         } else {
             throw new NoSuchElementException("Message ID: " + messageId + "Not Found");
@@ -60,35 +97,4 @@ public class BasicMessageService implements MessageService {
 
     }
 
-    // 해당 채널에 쓰여진 메세지들을 모두 삭제
-    @Override
-    public void deleteByChannelId(UUID channelId) {
-        Map<UUID, Message> data = messageRepository.findAll();
-        if (data == null) return;
-        data.values().stream()
-                .forEach(message -> {
-                    // 해당 채널에 쓰여진 메세지 객체를 찾고
-                    if (message.getChannelId().equals(channelId)) {
-                        // 그 객체를 레포지토리에서 삭제
-                        messageRepository.delete(message.getId());
-                    }
-                });
-    }
-
-    // 해당 채널 메세지를 정렬하여 가장 최근 메세지 시간 찾기
-    @Override
-    public Optional<Instant> findLastMessageInChannel(UUID channelId) {
-        List<Message> messages = messageRepository.findAll().values().stream().toList();
-        Optional<Instant> lastSeenAt = messages.stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
-                .map(Message::getCreatedAt)
-                .findFirst();
-        return lastSeenAt;
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return messageRepository.existsById(id);
-    }
 }

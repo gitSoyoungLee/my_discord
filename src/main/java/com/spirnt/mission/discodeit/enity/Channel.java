@@ -1,15 +1,11 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.spirnt.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
 public class Channel extends Common implements Serializable {
@@ -17,27 +13,21 @@ public class Channel extends Common implements Serializable {
     String name;
     String description;
     ChannelType type;
-    List<UUID> usersId;
-
-
-    public Channel(ChannelCreateRequest dto, ChannelType type) {
+    public Channel(String name, String description, ChannelType type) {
         super();
-        this.name = dto.getName();
-        this.description = dto.getDescription();
-        this.type = type;
-        if (dto.getUsersId() != null) this.usersId = dto.getUsersId();
-        else this.usersId = new ArrayList<>();
+        this.name = name;
+        this.description = description;
+        this.type=type;
     }
 
-
-    public void update(ChannelUpdateRequest dto) {
+    public void update(String name, String description) {
         boolean anyValueUpdated = false;
-        if (dto.getName() != null && !dto.getName().equals(this.name)) {
-            this.name = dto.getName();
+        if (name != null && !name.equals(this.name)) {
+            this.name = name;
             anyValueUpdated = true;
         }
-        if (dto.getDescription() != null && !dto.getDescription().equals(this.description)) {
-            this.description = dto.getDescription();
+        if (description != null && description.equals(this.description)) {
+            this.description = description;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {
@@ -45,9 +35,6 @@ public class Channel extends Common implements Serializable {
         }
     }
 
-    public boolean containsUser(UUID userID) {
-        return this.usersId.contains(userID);
-    }
 
     @Override
     public String toString() {

@@ -5,29 +5,39 @@ import com.spirnt.mission.discodeit.enity.ChannelType;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class ChannelResponse extends ChannelBase {
+public class ChannelResponse {
     private UUID channelId;
+    private String name;
+    private String description;
     private ChannelType type;
     private List<UUID> usersId;
-    private Instant lastMessage;
+    private Instant lastMessageAt;
 
-    public ChannelResponse(Channel channel, Instant lastMessage) {
-        super(channel.getName(), channel.getDescription());
+    public ChannelResponse(Channel channel, List<UUID> usersId, Instant lastMessageAt) {
+        this.name = channel.getName();
+        this.description = channel.getDescription();
         this.channelId = channel.getId();
         this.type = channel.getType();
-        this.usersId = channel.getUsersId();
-        this.lastMessage = lastMessage;
+        this.usersId = (usersId==null)? new ArrayList<>():usersId;
+        this.lastMessageAt = lastMessageAt;
     }
 
     @Override
     public String toString() {
-        return "Channel[Name: " + this.getName() +
-                " Description: " + this.getDescription() +
-                " Type: " + this.type +
-                " ID: " + this.channelId + "]";
+        if(this.type==ChannelType.PUBLIC) {
+            return "PUBLIC Channel[Name: " + this.getName() +
+                    " Description: " + this.getDescription() +
+                    " ID: " + this.channelId +" ]";
+        } else if(this.type==ChannelType.PRIVATE) {
+            return "PRIVATE Channel[" +
+                    " ID: " + this.channelId + "]"+
+                    "\nParticipants: "+usersId;
+        }
+        else return "";
     }
 }

@@ -16,25 +16,18 @@ public class Message extends Common implements Serializable {
     private UUID senderId;
     private UUID channelId;
 
-
-    public Message(MessageCreateRequest dto) {
+    public Message(String content, UUID channelId, UUID senderId) {
         super();
-        this.content = dto.getContent();
-        this.channelId = dto.getChannelId();
-        this.senderId = dto.getUserId();
-    }
-
-    // Update
-    public void updateContent(String content) {
-        if (content == null || content.equals(this.content)) return;
         this.content = content;
-        updateClass(Instant.now());
+        this.channelId = channelId;
+        this.senderId = senderId;
     }
 
-    public void update(MessageUpdateRequest dto) {
+
+    public void update(String content) {
         boolean anyValueUpdated = false;
-        if (dto.getContent() != null && !dto.getContent().equals(this.content)) {
-            this.content = dto.getContent();
+        if (content != null && !content.equals(this.content)) {
+            this.content = content;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {

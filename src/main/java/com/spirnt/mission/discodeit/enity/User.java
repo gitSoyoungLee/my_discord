@@ -16,45 +16,29 @@ public class User extends Common implements Serializable {
 
     private transient String password;
 
-    public User(UserCreateRequest dto) {
+
+    public User(String name, String email, String password) {
         super();
-        this.name = dto.getName();
-        this.email = dto.getEmail();
-        this.password = dto.getPassword();
-    }
-
-
-    // Update
-    public void updateName(String name) {
-        if (name == null || name.equals(this.name)) return;
         this.name = name;
-        updateClass(Instant.now());
-    }
-
-    public void updateEmail(String email) {
-        if (email == null || email.equals(this.email)) return;
         this.email = email;
-        updateClass(Instant.now());
-    }
-
-    public void updatePassword(String password) {
-        if (password == null || password.equals(this.password)) return;
         this.password = password;
-        updateClass(Instant.now());
     }
 
-    public void update(UserUpdateRequest dto) {
+
+
+
+    public void update(String name, String email, String password) {
         boolean anyValueUpdated = false;
-        if (dto.getName() != null && !dto.getName().equals(this.name)) {
-            this.name = dto.getName();
+        if (name != null && !name.equals(this.name)) {
+            this.name = name;
             anyValueUpdated = true;
         }
-        if (dto.getEmail() != null && !dto.getEmail().equals(this.email)) {
-            this.email = dto.getEmail();
+        if (email != null && !email.equals(this.email)) {
+            this.email = email;
             anyValueUpdated = true;
         }
-        if (dto.getPassword() != null && !dto.getPassword().equals(this.password)) {
-            this.password = dto.getPassword();
+        if (email != null && !email.equals(this.password)) {
+            this.password = email;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {

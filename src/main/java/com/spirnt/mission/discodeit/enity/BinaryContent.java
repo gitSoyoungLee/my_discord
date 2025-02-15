@@ -24,29 +24,15 @@ public class BinaryContent implements Serializable {
     private String fileType;    // 파일 타입
     private String filePath;    // 서버에 저장된 경로
 
-    public BinaryContent(BinaryContentCreate dto) throws IOException {
+    public BinaryContent(UUID id, UUID userId, UUID messageId, String fileName, String fileType, String filePath) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.userId = dto.userId();
-        this.messageId = dto.messageId();
-        this.fileName = dto.file().getOriginalFilename();
-        this.fileType = dto.file().getContentType();
-        // 파일 업로드
-        // uploadedFiles 디렉토리에 {UUID.확장자} 형태로 저장
-        String uploadDir = "uploadedFiles/";
-        String originalFilename = dto.file().getOriginalFilename();
-        String fileExtension;   //확장자추출
-        if (originalFilename == null || originalFilename.lastIndexOf(".") == -1) {
-            fileExtension = "";
-        } else fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        Path path = Paths.get(uploadDir + this.getId() + fileExtension);
-        File newFile = new File(String.valueOf(path));
-        try (FileOutputStream fos = new FileOutputStream(newFile)) {
-            fos.write(dto.file().getBytes());
-        }
-        this.filePath = newFile.getPath();
+        this.userId = userId;
+        this.messageId = messageId;
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.filePath = filePath;
     }
-
     @Override
     public String toString() {
         return "BinaryContent[ID:" + this.getId() +

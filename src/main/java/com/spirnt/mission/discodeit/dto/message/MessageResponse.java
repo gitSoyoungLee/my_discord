@@ -7,7 +7,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class MessageResponse extends MessageBase {
+public class MessageResponse {
+    private String content;
     private UUID userId;
     private UUID channelId;
     private UUID messageId;
@@ -15,7 +16,7 @@ public class MessageResponse extends MessageBase {
     private Instant updatedAt;
 
     public MessageResponse(Message message) {
-        super(message.getContent());
+        this.content = message.getContent();
         this.userId = message.getSenderId();
         this.channelId = message.getChannelId();
         this.messageId = message.getId();
