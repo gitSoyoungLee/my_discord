@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.dto.user;
 
 import lombok.Getter;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.UUID;
 

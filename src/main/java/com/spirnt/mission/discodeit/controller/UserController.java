@@ -58,7 +58,7 @@ public class UserController {
         // 모든 필드가 null인지 확인
         if (name == null && email == null && password == null && profileImage == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("You should enter at least one."));
+                    .body(new ErrorResponse("You should enter at least one element to update."));
         }
         try {
             UserUpdateRequest userUpdateRequest = new UserUpdateRequest(name, email, password, profileImage) ;

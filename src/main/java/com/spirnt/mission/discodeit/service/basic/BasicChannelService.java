@@ -9,6 +9,7 @@ import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import com.spirnt.mission.discodeit.enity.*;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
+import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
 
     private final ReadStatusService readStatusService;
     private final UserStatusService userStatusService;
@@ -83,6 +85,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelResponse> findAllByUserId(UUID userId) {
+        // User가 존재하지 않으면 예외 발생
+        if (!userRepository.existsById(userId))
         // UserStatus 업데이트 -> 온라인 && 현재 활동 중으로 간주
         userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
         Map<UUID, Channel> data = channelRepository.findAll();

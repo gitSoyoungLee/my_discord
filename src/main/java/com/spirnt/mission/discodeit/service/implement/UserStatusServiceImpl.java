@@ -71,6 +71,9 @@ public class UserStatusServiceImpl implements UserStatusService {
 
     @Override
     public UserStatus updateByUserId(UUID userId, UserStatusUpdate userStatusUpdate, Instant serverTime) {
+        // User가 존재하지 않으면 예외 발생
+        if (!userRepository.existsById(userId))
+            throw new NoSuchElementException("User ID Not Found");
         Map<UUID, UserStatus> map = userStatusRepository.findAll();
         UserStatus userStatus = map.values().stream()
                 .filter(value -> value.getUserId().equals(userId))
