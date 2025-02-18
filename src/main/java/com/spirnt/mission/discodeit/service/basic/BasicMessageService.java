@@ -68,9 +68,12 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageResponse> findAll() {
+    public List<MessageResponse> findAllByChannelId(UUID channelId) {
+        if(!channelRepository.existsById(channelId))
+            throw new NoSuchElementException("Channel ID: "+channelId+" Not Found");
         Map<UUID, Message> data = messageRepository.findAll();
         return data.values().stream()
+                .filter(message -> message.getChannelId()==channelId)
                 .sorted(Comparator.comparing(message -> message.getCreatedAt()))
                 .map(message->new MessageResponse(message))
                 .collect(Collectors.toList());

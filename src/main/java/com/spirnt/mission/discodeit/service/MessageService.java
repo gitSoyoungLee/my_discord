@@ -17,7 +17,7 @@ public interface MessageService {
     // Read
     MessageResponse find(UUID messageId);  // 메세지 단건 조회
 
-    List<MessageResponse> findAll(); // 모든 메세지 조회
+    List<MessageResponse> findAllByChannelId(UUID channelId); // 모든 메세지 조회
 
     // Update
     void update(UUID messageId, MessageUpdateRequest messageUpdateRequest);    // 메시지 수정
