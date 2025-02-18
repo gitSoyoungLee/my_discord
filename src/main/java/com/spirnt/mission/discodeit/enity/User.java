@@ -13,8 +13,7 @@ public class User extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
     private String email;
-
-    private transient String password;
+    private String password;
 
 
     public User(String name, String email, String password) {
