@@ -56,7 +56,7 @@ public class BasicMessageService implements MessageService {
             binaryContentService.create(binaryContentCreate);
         }
         // 메세지 작성자를 Online 상태로
-        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE, Instant.now()));
+        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
         return message;
     }
 

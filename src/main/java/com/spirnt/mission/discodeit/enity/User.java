@@ -37,8 +37,8 @@ public class User extends Common implements Serializable {
             this.email = email;
             anyValueUpdated = true;
         }
-        if (email != null && !email.equals(this.password)) {
-            this.password = email;
+        if (password != null && !password.equals(this.password)) {
+            this.password = password;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {

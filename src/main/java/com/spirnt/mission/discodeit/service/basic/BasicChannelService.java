@@ -76,7 +76,7 @@ public class BasicChannelService implements ChannelService {
                 .orElse(null);
         if(readStatus!=null) readStatusService.update(readStatus.getId(), new ReadStatusDto(userId, channelId,Instant.now()));
         // UserStatus 업데이트 -> 온라인 && 현재 활동 중으로 간주
-        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE, Instant.now()));
+        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
 
         return new ChannelResponse(channel, participantIds, lastMessageAt);
     }
@@ -84,7 +84,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public List<ChannelResponse> findAllByUserId(UUID userId) {
         // UserStatus 업데이트 -> 온라인 && 현재 활동 중으로 간주
-        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE, Instant.now()));
+        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
         Map<UUID, Channel> data = channelRepository.findAll();
         return data.values().stream()
                 //PUBLIC이거나 User가 참여한 PRIVATE 채널이거나

@@ -59,6 +59,23 @@ public class DiscodeitApplication {
                 }
             }
         }
+
+        File folder = new File(System.getProperty("user.dir"), "uploadedFiles");
+
+        // 폴더가 존재하는지 확인
+        if (folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles(); // 폴더 내 파일 목록 가져오기
+
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        file.delete();
+                    }
+                }
+            }
+        } else {
+            System.out.println("uploadedFiles 폴더가 존재하지 않습니다.");
+        }
     }
 
 

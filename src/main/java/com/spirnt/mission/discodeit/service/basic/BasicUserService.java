@@ -46,7 +46,7 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException(userCreateRequest.getEmail() + " Email Already Exists");
         }
         if (checkNameDuplicate(userCreateRequest.getName())) {
-            throw new IllegalArgumentException(userCreateRequest.getName() + "Name Already Exists");
+            throw new IllegalArgumentException(userCreateRequest.getName() + " Name Already Exists");
         }
         // User 생성, 저장
         User user = new User(userCreateRequest.getName(),
@@ -85,22 +85,22 @@ public class BasicUserService implements UserService {
 
     @Override
     public User update(UUID userId, UserUpdateRequest userUpdateRequest) {
+        // User 객체 변경
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not found"));
         if (checkEmailDuplicate(userUpdateRequest.getEmail())) {
             throw new IllegalArgumentException(userUpdateRequest.getEmail() + " Email Already Exists");
         }
         if (checkNameDuplicate(userUpdateRequest.getName())) {
-            throw new IllegalArgumentException(userUpdateRequest.getName() + "Name Already Exists");
+            throw new IllegalArgumentException(userUpdateRequest.getName() + " Name Already Exists");
         }
+        user.update(userUpdateRequest.getName(), userUpdateRequest.getEmail(),
+                userUpdateRequest.getPassword());
         //프로필 이미지 선택적 대체
         if(userUpdateRequest.getProfileImage()!=null){
             binaryContentService.deleteUserProfile(userId);
             binaryContentService.create(new BinaryContentCreate(userId, null, userUpdateRequest.getProfileImage()));
         }
-        // User 객체 변경
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("Usre ID: " + userId + " Not found"));
-        user.update(userUpdateRequest.getName(), userUpdateRequest.getEmail(),
-                userUpdateRequest.getPassword());
         userRepository.save(user);
         return user;
     }
