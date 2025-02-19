@@ -73,7 +73,11 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("Channel ID: "+channelId+" Not Found");
         Map<UUID, Message> data = messageRepository.findAll();
         return data.values().stream()
-                .filter(message -> message.getChannelId()==channelId)
+//                .filter(message -> message.getChannelId()==channelId)
+                /* 왜 ==이 안 됐을까? ==은 메모리 주소가 같은지 확인하는 연산자이고
+                *  Message 객체 속 값과 클라이언트로부터 받아온 값은 주소가 같을 수 없으니까
+                * 내용의 동등성을 확인하는 equals()가 적절함 */
+                .filter(message -> message.getChannelId().equals(channelId))
                 .sorted(Comparator.comparing(message -> message.getCreatedAt()))
                 .map(message->new MessageResponse(message))
                 .collect(Collectors.toList());
