@@ -6,6 +6,8 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,12 +17,14 @@ public class Message extends Common implements Serializable {
     private String content;
     private UUID senderId;
     private UUID channelId;
+    private List<UUID> attachedFiles;
 
-    public Message(String content, UUID channelId, UUID senderId) {
+    public Message(String content, UUID channelId, UUID senderId, List<UUID> attachedFiles) {
         super();
         this.content = content;
         this.channelId = channelId;
         this.senderId = senderId;
+        this.attachedFiles = (attachedFiles==null)? new ArrayList<>():attachedFiles;
     }
 
 

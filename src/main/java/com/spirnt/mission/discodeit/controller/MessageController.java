@@ -36,7 +36,10 @@ public class MessageController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new MessageCreateResponse(message.getId(), message.getContent()));
         } catch (NoSuchElementException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse(e.getMessage()));
         }
     }

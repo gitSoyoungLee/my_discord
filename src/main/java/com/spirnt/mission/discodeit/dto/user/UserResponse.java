@@ -14,11 +14,13 @@ public class UserResponse  {
     private String name;
     private String email;
     private UserStatusType userStatusType;
+    private UUID profileImage;
 
     public UserResponse(User user, UserStatus userStatus) {
         this.name = user.getName();
         this.email=user.getEmail();
         this.id = user.getId();
+        this.profileImage = user.getProfileImageId();
         this.userStatusType = userStatus.getUserStatusType();
     }
 

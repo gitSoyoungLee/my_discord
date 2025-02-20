@@ -18,17 +18,13 @@ public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
     private Instant createdAt;
-    private UUID userId;    // 업로드한 유저
-    private UUID messageId; //첨부된 메세지
     private String fileName;    // 파일 원본 이름
     private String fileType;    // 파일 타입
     private String filePath;    // 서버에 저장된 경로
 
-    public BinaryContent(UUID id, UUID userId, UUID messageId, String fileName, String fileType, String filePath) {
+    public BinaryContent(UUID id, String fileName, String fileType, String filePath) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.userId = userId;
-        this.messageId = messageId;
         this.fileName = fileName;
         this.fileType = fileType;
         this.filePath = filePath;

@@ -40,7 +40,7 @@ public class UserController {
             UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password, profileImage) ;
             User user = userService.create(userCreateRequest);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new UserCreateResponse(user.getId(), name, email));
+                    .body(new UserCreateResponse(user.getId(), name, email, user.getProfileImageId()));
 //                    .body(userService.find(user.getId()));    // test
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)

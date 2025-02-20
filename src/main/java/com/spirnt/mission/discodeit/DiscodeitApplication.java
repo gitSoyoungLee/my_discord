@@ -18,7 +18,6 @@ import com.spirnt.mission.discodeit.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -41,24 +40,24 @@ public class DiscodeitApplication {
         // 삭제할 폴더 목록
         List<String> folders = List.of("User", "Channel", "Message", "ReadStatus", "UserStatus", "BinaryContent");
 
-//        for (String folder : folders) {
-//            Path folderPath = basePath.resolve(folder);
-//            if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
-//                try (Stream<Path> files = Files.list(folderPath)) {
-//                    files
-//                            .filter(path -> path.toString().endsWith(".ser")) // .ser 파일만 선택
-//                            .forEach(path -> {
-//                                try {
-//                                    Files.delete(path);
-//                                } catch (IOException e) {
-//                                    System.out.println("Error:" + "파일 삭제 실패: " + path + " - " + e.getMessage());
-//                                }
-//                            });
-//                } catch (IOException e) {
-//                    System.out.println("Error:" + "폴더 접근 실패: " + folderPath + " - " + e.getMessage());
-//                }
-//            }
-//        }
+        for (String folder : folders) {
+            Path folderPath = basePath.resolve(folder);
+            if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
+                try (Stream<Path> files = Files.list(folderPath)) {
+                    files
+                            .filter(path -> path.toString().endsWith(".ser")) // .ser 파일만 선택
+                            .forEach(path -> {
+                                try {
+                                    Files.delete(path);
+                                } catch (IOException e) {
+                                    System.out.println("Error:" + "파일 삭제 실패: " + path + " - " + e.getMessage());
+                                }
+                            });
+                } catch (IOException e) {
+                    System.out.println("Error:" + "폴더 접근 실패: " + folderPath + " - " + e.getMessage());
+                }
+            }
+        }
 
         File folder = new File(System.getProperty("user.dir"), "uploadedFiles");
 
@@ -82,7 +81,7 @@ public class DiscodeitApplication {
 
     public static void main(String[] args) {
 
-        clearDataFiles("file-data-map");
+        //clearDataFiles("file-data-map");
 
         SpringApplication.run(DiscodeitApplication.class, args);
     }

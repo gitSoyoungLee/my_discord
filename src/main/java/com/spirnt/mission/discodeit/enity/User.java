@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 public class User extends Common implements Serializable {
@@ -14,19 +15,21 @@ public class User extends Common implements Serializable {
     private String name;
     private String email;
     private String password;
+    private UUID profileImageId;
 
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, UUID profileImageId) {
         super();
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profileImageId = profileImageId;
     }
 
 
 
 
-    public void update(String name, String email, String password) {
+    public void update(String name, String email, String password, UUID profileImageId) {
         boolean anyValueUpdated = false;
         if (name != null && !name.equals(this.name)) {
             this.name = name;
@@ -39,6 +42,10 @@ public class User extends Common implements Serializable {
         if (password != null && !password.equals(this.password)) {
             this.password = password;
             anyValueUpdated = true;
+        }
+        if(profileImageId!= null&&!profileImageId.equals(this.profileImageId)) {
+            this.profileImageId= profileImageId;
+            anyValueUpdated=true;
         }
         if (anyValueUpdated) {
             this.updateClass(Instant.now());

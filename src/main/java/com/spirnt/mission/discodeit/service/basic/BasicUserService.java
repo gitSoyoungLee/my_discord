@@ -48,17 +48,21 @@ public class BasicUserService implements UserService {
         if (checkNameDuplicate(userCreateRequest.getName())) {
             throw new IllegalArgumentException(userCreateRequest.getName() + " Name Already Exists");
         }
+        // 프로필 이미지 저장
+        // request dto에서 profileImage가 null이 아니면 BinaryContent 생성
+        BinaryContent profileImage = Optional.ofNullable(userCreateRequest.getProfileImage())
+                .map(BinaryContentCreate::new)
+                .map(binaryContentService::create)
+                .orElse(null);
+        UUID profileImageId = (profileImage==null)? null: profileImage.getId();
+
         // User 생성, 저장
         User user = new User(userCreateRequest.getName(),
-                userCreateRequest.getEmail(), userCreateRequest.getPassword());
+                userCreateRequest.getEmail(),
+                userCreateRequest.getPassword(),
+                profileImageId);
         userRepository.save(user);
 
-        // 프로필 이미지 저장
-        if(userCreateRequest.getProfileImage()!=null){
-            BinaryContentCreate binaryContentDto = new BinaryContentCreate(user.getId(), null,
-                    userCreateRequest.getProfileImage());
-            binaryContentService.create(binaryContentDto);
-        }
         // UserStatus 생성
         UserStatusCreate userStatusCreate = new UserStatusCreate(user.getId(), UserStatusType.ONLINE, Instant.now());
         userStatusService.create(userStatusCreate);
@@ -94,29 +98,28 @@ public class BasicUserService implements UserService {
         if (checkNameDuplicate(userUpdateRequest.getName())) {
             throw new IllegalArgumentException(userUpdateRequest.getName() + " Name Already Exists");
         }
-        user.update(userUpdateRequest.getName(), userUpdateRequest.getEmail(),
-                userUpdateRequest.getPassword());
         //프로필 이미지 선택적 대체
+        UUID profileImageId = null;
         if(userUpdateRequest.getProfileImage()!=null){
-            binaryContentService.deleteUserProfile(userId);
-            binaryContentService.create(new BinaryContentCreate(userId, null, userUpdateRequest.getProfileImage()));
+            binaryContentService.delete(user.getProfileImageId());
+            BinaryContent newProfileImage = binaryContentService.create(new BinaryContentCreate(userUpdateRequest.getProfileImage()));
+            profileImageId = newProfileImage.getId();
         }
+        user.update(userUpdateRequest.getName(), userUpdateRequest.getEmail(),
+                userUpdateRequest.getPassword(),profileImageId);
         userRepository.save(user);
         return user;
     }
 
     @Override
     public void delete(UUID userId) {
-        // 존재하는 유저인지 검증
-        if (userRepository.existsById(userId)) {
-            userRepository.delete(userId);
-            // 유저의 프로필  BinaryContent 삭제
-            binaryContentService.deleteUserProfile(userId);
-            // UserStatus 삭제
-            userStatusService.deleteByUserId(userId);
-        } else {
-            throw new NoSuchElementException("User ID: " + userId + " Not Found");
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not found"));
+        // 유저의 프로필  BinaryContent 삭제
+        binaryContentService.delete(user.getProfileImageId());
+        // UserStatus 삭제
+        userStatusService.deleteByUserId(userId);
+        userRepository.delete(userId);
     }
 
 

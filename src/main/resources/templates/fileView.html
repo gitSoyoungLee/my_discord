@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>파일 보기</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<h2>파일 보기</h2>
+
+<!-- 이미지인 경우 -->
+<div th:if="${isImage}">
+    <img th:src="${downloadUrl}" th:alt="${fileName}" style="max-width: 100%; height: auto;">
+</div>
+
+<!-- 일반 파일인 경우 -->
+<div th:unless="${isImage}">
+    <p>파일명: <span th:text="${fileName}"></span></p>
+    <a th:href="${downloadUrl}" class="btn" download>파일 다운로드</a>
+</div>
+
+</body>
+</html>

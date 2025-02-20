@@ -35,9 +35,14 @@ public class ChannelController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("There are no participants."));
         }
-        Channel channel = channelService.createChannelPrivate(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ChannelCreateResponse(channel.getId()));
+        try {
+            Channel channel = channelService.createChannelPrivate(request);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ChannelCreateResponse(channel.getId()));
+        }catch (NoSuchElementException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     // 공개 채널 정보 수정

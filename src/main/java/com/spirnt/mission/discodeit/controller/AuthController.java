@@ -26,7 +26,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
         try{
             User user = authService.login(loginRequest);
-            return ResponseEntity.ok(new UserCreateResponse(user.getId(), user.getName(), user.getEmail()));
+            return ResponseEntity.ok(new UserCreateResponse(user.getId(), user.getName(), user.getEmail(), user.getProfileImageId()));
         } catch (NoSuchElementException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(e.getMessage()));
