@@ -46,7 +46,7 @@ public class ChannelController {
     }
 
     // 공개 채널 정보 수정
-    @RequestMapping(value = "/{channelId}", method=RequestMethod.PATCH)
+    @RequestMapping(value = "/{channelId}", method=RequestMethod.PUT)
     public ResponseEntity<?> updatePublicChannel(@PathVariable UUID channelId,
                                                  @RequestBody ChannelUpdateRequest request) {
         try {

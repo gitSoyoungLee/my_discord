@@ -70,9 +70,9 @@ public class MessageController {
 
     // 특정 채널의 메시지 목록 조회
     @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.GET)
-    public ResponseEntity<?> getAllMessagesByChannel(@PathVariable UUID channelId, @RequestBody MessageReadRequest request) {
+    public ResponseEntity<?> getAllMessagesByChannel(@PathVariable UUID channelId, @RequestParam UUID userId) {
         try{
-            List<MessageResponse> messageResponses = messageService.findAllByChannelId(channelId, request.userId());
+            List<MessageResponse> messageResponses = messageService.findAllByChannelId(channelId, userId);
             return ResponseEntity.ok(messageResponses);
         } catch (NoSuchElementException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

@@ -44,7 +44,6 @@ public class UserController {
             User user = userService.create(userCreateRequest);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new UserCreateResponse(user.getId(), name, email, user.getProfileImageId()));
-//                    .body(userService.find(user.getId()));    // test
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse(e.getMessage()));
@@ -52,11 +51,11 @@ public class UserController {
     }
 
     // 사용자 정보 수정
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateUser(@PathVariable UUID userId,
-                                        @RequestParam(required = false) String name,
-                                        @RequestParam(required = false) String email,
-                                        @RequestParam(required = false) String password,
+                                        @RequestParam String name,
+                                        @RequestParam String email,
+                                        @RequestParam String password,
                                         @RequestParam(required = false) MultipartFile profileImage) {
         // 모든 필드가 null인지 확인
         if (name == null && email == null && password == null && profileImage == null) {
@@ -65,9 +64,8 @@ public class UserController {
         }
         try {
             UserUpdateRequest userUpdateRequest = new UserUpdateRequest(name, email, password, profileImage) ;
-            User user = userService.update(userId, userUpdateRequest);
+            userService.update(userId, userUpdateRequest);
             return ResponseEntity.status(HttpStatus.OK).build();
-//                    .body(userService.find(user.getId()));    //test
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse(e.getMessage()));
@@ -95,7 +93,8 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @RequestMapping(value = "/{userId}/status", method = RequestMethod.PATCH)
+    // 사용자의 온라인 상태 업데이트
+    @RequestMapping(value = "/{userId}/status", method = RequestMethod.PUT)
     public ResponseEntity<?> updateUserStatus(@PathVariable UUID userId,
                                               @RequestBody UserStatusUpdate userStatusUpdate) {
         try {
