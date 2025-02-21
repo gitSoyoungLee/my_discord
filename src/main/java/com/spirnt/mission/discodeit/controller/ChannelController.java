@@ -5,13 +5,11 @@ import com.spirnt.mission.discodeit.dto.channel.*;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.LifecycleState;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -22,7 +20,7 @@ public class ChannelController {
 
     // 공개 채널 생성
     @RequestMapping(value = "/public", method = RequestMethod.POST)
-    public ResponseEntity<?> creatChannelPublic(@RequestBody PublicChannelCreateRequest request){
+    public ResponseEntity<?> creatChannelPublic(@RequestBody PublicChannelCreateRequest request) {
         Channel channel = channelService.createChannelPublic(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ChannelCreateResponse(channel.getId()));
@@ -30,8 +28,8 @@ public class ChannelController {
 
     // 비공개 채널 생성
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<?> createChannelPrivate(@RequestBody PrivateChannelRequest request){
-        if(request.getUsersId().isEmpty()) {
+    public ResponseEntity<?> createChannelPrivate(@RequestBody PrivateChannelRequest request) {
+        if (request.getUsersId().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("There are no participants."));
         }
@@ -41,10 +39,10 @@ public class ChannelController {
     }
 
     // 공개 채널 정보 수정
-    @RequestMapping(value = "/{channelId}", method=RequestMethod.PUT)
+    @RequestMapping(value = "/{channelId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updatePublicChannel(@PathVariable UUID channelId,
                                                  @RequestBody ChannelUpdateRequest request) {
-        if(request.getName()==null && request.getDescription()==null){
+        if (request.getName() == null && request.getDescription() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("You should enter at least one element to update."));
         }
@@ -53,7 +51,7 @@ public class ChannelController {
     }
 
     // 채널 삭제
-    @RequestMapping(value = "/{channelId}", method=RequestMethod.DELETE)
+    @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteChannel(@PathVariable UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.ok().build();

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,7 +36,7 @@ public class ReadStatusController {
     public ResponseEntity<?> updateReadStatus(@PathVariable UUID readStatusId,
                                               @RequestBody ReadStatusUpdate request) {
         // 읽은 시간을 미래로 설정하려는 경우
-        if(request.lastReadAt().isAfter(Instant.now())) {
+        if (request.lastReadAt().isAfter(Instant.now())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse("Invalid Time Statement"));
         }

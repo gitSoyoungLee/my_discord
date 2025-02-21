@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.enity.UserStatus;
 import com.spirnt.mission.discodeit.enity.UserStatusType;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.repository.UserStatusRepository;
-import com.spirnt.mission.discodeit.service.UserService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,8 +44,8 @@ public class UserStatusServiceImpl implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
         // 만약 마지막으로 기록된 접속 시간으로부터 5분 이상 지나있으면 OFFLINE으로 업데이트 후 반환
-        if(userStatus.getUserStatusType()==UserStatusType.ONLINE && !userStatus.isOnline()) {
-            update(userStatusId, new UserStatusUpdate(UserStatusType.OFFLINE),userStatus.getLastSeenAt());  // 마지막 접속 시간은 그대로 유지
+        if (userStatus.getUserStatusType() == UserStatusType.ONLINE && !userStatus.isOnline()) {
+            update(userStatusId, new UserStatusUpdate(UserStatusType.OFFLINE), userStatus.getLastSeenAt());  // 마지막 접속 시간은 그대로 유지
         }
         return userStatus;
     }

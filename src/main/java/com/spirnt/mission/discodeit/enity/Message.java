@@ -1,7 +1,5 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
-import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -24,7 +22,7 @@ public class Message extends Common implements Serializable {
         this.content = content;
         this.channelId = channelId;
         this.senderId = senderId;
-        this.attachedFiles = (attachedFiles==null)? new ArrayList<>():attachedFiles;
+        this.attachedFiles = (attachedFiles == null) ? new ArrayList<>() : attachedFiles;
     }
 
 

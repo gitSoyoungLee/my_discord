@@ -1,7 +1,9 @@
 package com.spirnt.mission.discodeit.controller;
 
-import com.spirnt.mission.discodeit.dto.ErrorResponse;
-import com.spirnt.mission.discodeit.dto.message.*;
+import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
+import com.spirnt.mission.discodeit.dto.message.MessageCreateResponse;
+import com.spirnt.mission.discodeit.dto.message.MessageResponse;
+import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -26,7 +26,7 @@ public class MessageController {
     public ResponseEntity<?> createMessage(@RequestParam String content,
                                            @RequestParam UUID userId,
                                            @RequestParam UUID channelId,
-                                           @RequestParam(required = false)List<MultipartFile> files) {
+                                           @RequestParam(required = false) List<MultipartFile> files) {
         MessageCreateRequest request = new MessageCreateRequest(userId, channelId, content, files);
         Message message = messageService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)

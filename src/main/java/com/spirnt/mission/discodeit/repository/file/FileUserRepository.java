@@ -44,7 +44,7 @@ public class FileUserRepository extends FileRepository implements UserRepository
     @Override
     public Optional<User> findByName(String name) {
         return this.findAll().values().stream()
-                .filter(user->user.getName().equals(name))
+                .filter(user -> user.getName().equals(name))
                 .findAny();
     }
 

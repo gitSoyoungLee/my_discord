@@ -24,7 +24,7 @@ public class MessageResponse {
         this.messageId = message.getId();
         this.createdAt = message.getCreatedAt();
         this.updatedAt = message.getUpdatedAt();
-        this.attachedFiles=message.getAttachedFiles();
+        this.attachedFiles = message.getAttachedFiles();
     }
 
     @Override

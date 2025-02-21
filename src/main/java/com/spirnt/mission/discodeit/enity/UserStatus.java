@@ -1,8 +1,5 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -39,11 +36,11 @@ public class UserStatus extends Common implements Serializable {
             this.lastSeenAt = lastSeenAt;
             anyValueUpdated = true;
         }
-        if(userStatusType!=null && this.userStatusType!=userStatusType){
-            this.userStatusType=userStatusType;
-            anyValueUpdated=true;
+        if (userStatusType != null && this.userStatusType != userStatusType) {
+            this.userStatusType = userStatusType;
+            anyValueUpdated = true;
         }
-        if(anyValueUpdated) {
+        if (anyValueUpdated) {
             updateClass(Instant.now());
         }
     }

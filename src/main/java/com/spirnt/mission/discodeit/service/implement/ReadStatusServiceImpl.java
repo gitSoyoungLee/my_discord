@@ -54,7 +54,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     @Override
     public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
         return readStatusRepository.findByUserIdAndChannelId(userId, channelId)
-                .orElseThrow(()->new NoSuchElementException("Invalid User ID And Channel ID."));
+                .orElseThrow(() -> new NoSuchElementException("Invalid User ID And Channel ID."));
     }
 
     @Override

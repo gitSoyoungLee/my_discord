@@ -1,33 +1,14 @@
 package com.spirnt.mission.discodeit;
 
-import com.spirnt.mission.discodeit.dto.channel.PrivateChannelRequest;
-import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
-import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
-import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
-import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
-import com.spirnt.mission.discodeit.dto.message.MessageResponse;
-import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
-import com.spirnt.mission.discodeit.dto.user.UserResponse;
-import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
-import com.spirnt.mission.discodeit.enity.BinaryContent;
-import com.spirnt.mission.discodeit.enity.Channel;
-import com.spirnt.mission.discodeit.enity.Message;
-import com.spirnt.mission.discodeit.enity.User;
-import com.spirnt.mission.discodeit.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 @SpringBootApplication
@@ -76,7 +57,6 @@ public class DiscodeitApplication {
             System.out.println("uploadedFiles 폴더가 존재하지 않습니다.");
         }
     }
-
 
 
     public static void main(String[] args) {

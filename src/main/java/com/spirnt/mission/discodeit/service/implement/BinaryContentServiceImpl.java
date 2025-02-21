@@ -12,7 +12,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +35,14 @@ public class BinaryContentServiceImpl implements BinaryContentService {
                 fileExtension = "";
             } else fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
             // 경로 지정
-            UUID binaryContentId=UUID.randomUUID();
+            UUID binaryContentId = UUID.randomUUID();
             Path path = Paths.get(uploadDir + binaryContentId + fileExtension);
             File newFile = new File(String.valueOf(path));
             try (FileOutputStream fos = new FileOutputStream(newFile)) {
                 fos.write(binaryContentCreate.file().getBytes());
             }
             // entity 생성, 저장
-            BinaryContent binaryContent = new BinaryContent(binaryContentId,originalFilename, binaryContentCreate.file().getContentType(),
+            BinaryContent binaryContent = new BinaryContent(binaryContentId, originalFilename, binaryContentCreate.file().getContentType(),
                     String.valueOf(path));
             binaryContentRepository.save(binaryContent);
             return binaryContent;

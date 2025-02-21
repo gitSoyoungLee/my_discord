@@ -7,7 +7,9 @@ import com.spirnt.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,9 +33,9 @@ public class ViewController {
     // 특정 채널 내 메시지 목록 조회 화면 서빙
     // 파일 표시 잘 되는지 확인용
     @RequestMapping(value = "/messages/channel/{channelId}", method = RequestMethod.GET)
-    public String getAllMessagesInChannel(Model model, @PathVariable UUID channelId){
+    public String getAllMessagesInChannel(Model model, @PathVariable UUID channelId) {
         // 임의의 User ID 세팅
-        UUID userId= UUID.fromString("3b6ff632-372b-4e22-a363-6b8326797089");
+        UUID userId = UUID.fromString("3b6ff632-372b-4e22-a363-6b8326797089");
         List<MessageResponse> messageResponses = messageService.findAllByChannelId(channelId, userId);
         model.addAttribute("messages", messageResponses);
         return "message-list";

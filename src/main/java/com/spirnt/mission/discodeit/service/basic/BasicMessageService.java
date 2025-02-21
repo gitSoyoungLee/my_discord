@@ -15,7 +15,6 @@ import com.spirnt.mission.discodeit.service.MessageService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,15 +37,15 @@ public class BasicMessageService implements MessageService {
     public Message create(MessageCreateRequest messageCreateRequest) {
         // User와 Channel이 존재하는지 검증
         UUID userId = messageCreateRequest.getUserId();
-        UUID channelId=messageCreateRequest.getChannelId();
+        UUID channelId = messageCreateRequest.getChannelId();
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(()->new NoSuchElementException("Channel id " + messageCreateRequest.getChannelId() + " does not exist"));
+                .orElseThrow(() -> new NoSuchElementException("Channel id " + messageCreateRequest.getChannelId() + " does not exist"));
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("User id " + messageCreateRequest.getUserId() + " does not exist");
         }
         // PRIVATE 채널인데 입장하지 않은 유저가 메시지를 쓰려고 하는 경우
-        if(channel.getType().equals(ChannelType.PRIVATE)
-            && !readStatusService.existsByUserIdChannelId(userId, channelId)){
+        if (channel.getType().equals(ChannelType.PRIVATE)
+                && !readStatusService.existsByUserIdChannelId(userId, channelId)) {
             throw new IllegalStateException("User did not joined this private channel");
         }
         // 첨부 파일 업로드
@@ -68,15 +67,15 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResponse find(UUID messageId) {
-        Message message =messageRepository.findById(messageId)
+        Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
         return new MessageResponse(message);
     }
 
     @Override
     public List<MessageResponse> findAllByChannelId(UUID channelId, UUID userId) {
-        if(!channelRepository.existsById(channelId))
-            throw new NoSuchElementException("Channel ID: "+channelId+" Not Found");
+        if (!channelRepository.existsById(channelId))
+            throw new NoSuchElementException("Channel ID: " + channelId + " Not Found");
 
         // User의 ReadStatus, UserStatus 업데이트
         // ReadStatus를 현재 시간으로 업데이트
@@ -89,11 +88,11 @@ public class BasicMessageService implements MessageService {
         return data.values().stream()
 //                .filter(message -> message.getChannelId()==channelId)
                 /* 왜 ==이 안 됐을까? ==은 메모리 주소가 같은지 확인하는 연산자이고
-                *  Message 객체 속 값과 클라이언트로부터 받아온 값은 주소가 같을 수 없으니까
-                * 내용의 동등성을 확인하는 equals()가 적절함 */
+                 *  Message 객체 속 값과 클라이언트로부터 받아온 값은 주소가 같을 수 없으니까
+                 * 내용의 동등성을 확인하는 equals()가 적절함 */
                 .filter(message -> message.getChannelId().equals(channelId))
                 .sorted(Comparator.comparing(message -> message.getCreatedAt()))
-                .map(message->new MessageResponse(message))
+                .map(message -> new MessageResponse(message))
                 .collect(Collectors.toList());
     }
 

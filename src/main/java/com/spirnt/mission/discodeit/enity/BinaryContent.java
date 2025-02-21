@@ -1,14 +1,8 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreate;
 import lombok.Getter;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -29,6 +23,7 @@ public class BinaryContent implements Serializable {
         this.fileType = fileType;
         this.filePath = filePath;
     }
+
     @Override
     public String toString() {
         return "BinaryContent[ID:" + this.getId() +

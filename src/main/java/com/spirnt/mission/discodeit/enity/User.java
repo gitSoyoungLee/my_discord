@@ -1,7 +1,5 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
-import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -27,8 +25,6 @@ public class User extends Common implements Serializable {
     }
 
 
-
-
     public void update(String name, String email, String password, UUID profileImageId) {
         boolean anyValueUpdated = false;
         if (name != null && !name.equals(this.name)) {
@@ -43,9 +39,9 @@ public class User extends Common implements Serializable {
             this.password = password;
             anyValueUpdated = true;
         }
-        if(profileImageId!= null&&!profileImageId.equals(this.profileImageId)) {
-            this.profileImageId= profileImageId;
-            anyValueUpdated=true;
+        if (profileImageId != null && !profileImageId.equals(this.profileImageId)) {
+            this.profileImageId = profileImageId;
+            anyValueUpdated = true;
         }
         if (anyValueUpdated) {
             this.updateClass(Instant.now());

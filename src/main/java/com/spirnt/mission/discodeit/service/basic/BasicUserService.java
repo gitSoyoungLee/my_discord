@@ -5,28 +5,17 @@ import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserResponse;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.enity.UserStatus;
 import com.spirnt.mission.discodeit.enity.UserStatusType;
-import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
-import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.repository.UserStatusRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
-import com.spirnt.mission.discodeit.service.ReadStatusService;
 import com.spirnt.mission.discodeit.service.UserService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,7 +43,7 @@ public class BasicUserService implements UserService {
                 .map(BinaryContentCreate::new)
                 .map(binaryContentService::create)
                 .orElse(null);
-        UUID profileImageId = (profileImage==null)? null: profileImage.getId();
+        UUID profileImageId = (profileImage == null) ? null : profileImage.getId();
 
         // User 생성, 저장
         User user = new User(userCreateRequest.getName(),
@@ -83,7 +72,7 @@ public class BasicUserService implements UserService {
         Map<UUID, User> data = userRepository.findAll();
         return data.values().stream()
                 .sorted(Comparator.comparing(user -> user.getCreatedAt()))
-                .map(user->find(user.getId()))
+                .map(user -> find(user.getId()))
                 .collect(Collectors.toList());
     }
 
@@ -100,13 +89,13 @@ public class BasicUserService implements UserService {
         }
         //프로필 이미지 선택적 대체
         UUID profileImageId = null;
-        if(userUpdateRequest.getProfileImage()!=null){
+        if (userUpdateRequest.getProfileImage() != null) {
             binaryContentService.delete(user.getProfileImageId());
             BinaryContent newProfileImage = binaryContentService.create(new BinaryContentCreate(userUpdateRequest.getProfileImage()));
             profileImageId = newProfileImage.getId();
         }
         user.update(userUpdateRequest.getName(), userUpdateRequest.getEmail(),
-                userUpdateRequest.getPassword(),profileImageId);
+                userUpdateRequest.getPassword(), profileImageId);
         userRepository.save(user);
         return user;
     }

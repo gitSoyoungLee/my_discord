@@ -3,7 +3,6 @@ package com.spirnt.mission.discodeit.controller;
 import com.spirnt.mission.discodeit.dto.ErrorResponse;
 import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserCreateResponse;
-import com.spirnt.mission.discodeit.dto.user.UserResponse;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusResponse;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
@@ -12,18 +11,12 @@ import com.spirnt.mission.discodeit.enity.UserStatus;
 import com.spirnt.mission.discodeit.service.UserService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -38,8 +31,8 @@ public class UserController {
     public ResponseEntity<?> createUser(@RequestParam(required = true) String name,
                                         @RequestParam(required = true) String email,
                                         @RequestParam(required = true) String password,
-                                        @RequestParam(required = false)MultipartFile profileImage) {
-        UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password, profileImage) ;
+                                        @RequestParam(required = false) MultipartFile profileImage) {
+        UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password, profileImage);
         User user = userService.create(userCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new UserCreateResponse(user.getId(), name, email, user.getProfileImageId()));
@@ -57,7 +50,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("You should enter at least one element to update."));
         }
-        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(name, email, password, profileImage) ;
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(name, email, password, profileImage);
         userService.update(userId, userUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -70,7 +63,7 @@ public class UserController {
     }
 
     // 모든 사용자 조회
-    @RequestMapping(value="", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.findAll());
     }

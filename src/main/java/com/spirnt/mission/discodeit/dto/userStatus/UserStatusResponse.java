@@ -12,9 +12,9 @@ public class UserStatusResponse {
     private UserStatusType type;
     private Instant lastSeenAt;
 
-    public UserStatusResponse(UUID userId, UserStatusType type, Instant lastSeenAt){
-        this.userId=userId;
-        this.type=type;
-        this.lastSeenAt=lastSeenAt;
+    public UserStatusResponse(UUID userId, UserStatusType type, Instant lastSeenAt) {
+        this.userId = userId;
+        this.type = type;
+        this.lastSeenAt = lastSeenAt;
     }
 }

@@ -11,9 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,15 +19,16 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
     private final UserStatusService userStatusService;
+
     @Override
     public User login(LoginRequest loginRequest) {
         User user = userRepository.findByName(loginRequest.name())
-                .orElseThrow(()->new NoSuchElementException("A User with Name: "+loginRequest.name()+" Not Found"));
-        if(!user.getPassword().equals(loginRequest.password())){
+                .orElseThrow(() -> new NoSuchElementException("A User with Name: " + loginRequest.name() + " Not Found"));
+        if (!user.getPassword().equals(loginRequest.password())) {
             throw new NoSuchElementException("Invalid password");
         }
         // UserStatus Online으로 업데이트
-        userStatusService.updateByUserId(user.getId(),new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
+        userStatusService.updateByUserId(user.getId(), new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
         return user;
     }
 }
