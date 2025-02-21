@@ -1,10 +1,7 @@
 package com.spirnt.mission.discodeit.controller;
 
 import com.spirnt.mission.discodeit.dto.ErrorResponse;
-import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
-import com.spirnt.mission.discodeit.dto.message.MessageCreateResponse;
-import com.spirnt.mission.discodeit.dto.message.MessageResponse;
-import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.spirnt.mission.discodeit.dto.message.*;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -73,9 +70,9 @@ public class MessageController {
 
     // 특정 채널의 메시지 목록 조회
     @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.GET)
-    public ResponseEntity<?> getAllMessagesByChannel(@PathVariable UUID channelId) {
+    public ResponseEntity<?> getAllMessagesByChannel(@PathVariable UUID channelId, @RequestBody MessageReadRequest request) {
         try{
-            List<MessageResponse> messageResponses = messageService.findAllByChannelId(channelId);
+            List<MessageResponse> messageResponses = messageService.findAllByChannelId(channelId, request.userId());
             return ResponseEntity.ok(messageResponses);
         } catch (NoSuchElementException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

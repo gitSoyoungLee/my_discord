@@ -35,7 +35,7 @@ async function renderUserList(users) {
         // Get profile image URL
         const profileUrl = user.profileImage ?
             `${ENDPOINTS.BINARY_CONTENT}/${user.profileImage}` :
-            '/default-avatar.png';
+            '/testFiles/userprofile.jpg';
 
         userElement.innerHTML = `
             <img src="${profileUrl}" alt="${user.name}" class="user-avatar">

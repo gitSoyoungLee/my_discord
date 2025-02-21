@@ -4,6 +4,7 @@ import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreate;
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageResponse;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdate;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import com.spirnt.mission.discodeit.enity.*;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
@@ -73,9 +74,20 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageResponse> findAllByChannelId(UUID channelId) {
+    public List<MessageResponse> findAllByChannelId(UUID channelId, UUID userId) {
         if(!channelRepository.existsById(channelId))
             throw new NoSuchElementException("Channel ID: "+channelId+" Not Found");
+
+        // User의 ReadStatus, UserStatus 업데이트
+        // ReadStatus를 현재 시간으로 업데이트
+        ReadStatus readStatus = readStatusService.findAllByUserId(userId).stream()
+                .filter(rs->rs.getChannelId().equals(channelId))
+                .findAny()
+                .orElse(null);
+        if(readStatus!=null) readStatusService.update(readStatus.getId(), new ReadStatusUpdate(Instant.now()));
+        // UserStatus 업데이트 -> 온라인, 현재 활동 중으로 간주
+        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
+
         Map<UUID, Message> data = messageRepository.findAll();
         return data.values().stream()
 //                .filter(message -> message.getChannelId()==channelId)

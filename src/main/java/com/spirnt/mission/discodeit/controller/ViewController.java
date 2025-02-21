@@ -18,7 +18,7 @@ public class ViewController {
     private final UserService userService;
 
     // 모든 사용자 조회 화면 서빙
-    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/findAll", method = RequestMethod.GET)
     public String getAllUsersView(Model model) {
         List<UserResponse> users = userService.findAll();
         model.addAttribute("users", users);

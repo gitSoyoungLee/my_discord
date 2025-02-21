@@ -77,15 +77,6 @@ public class BasicChannelService implements ChannelService {
         Instant lastMessageAt = findLastMessageInChannel(channelId)
                 .orElse(channel.getCreatedAt());    // 채널 내 메세지가 없는 경우 채널 생성 시간을 디폴트로 함
 
-//        // ReadStatus 업데이트
-//        ReadStatus readStatus = readStatusService.findAllByUserId(userId).stream()
-//                .filter(rs->rs.getChannelId().equals(channelId) && rs.getUserId().equals(userId))
-//                .findAny()
-//                .orElse(null);
-//        if(readStatus!=null) readStatusService.update(readStatus.getId(), new ReadStatusUpdate(Instant.now()));
-//        // UserStatus 업데이트 -> 온라인 && 현재 활동 중으로 간주
-//        userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
-
         return new ChannelResponse(channel, participantIds, lastMessageAt);
     }
 
