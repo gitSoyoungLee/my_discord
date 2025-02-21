@@ -35,7 +35,13 @@ public class BasicChannelService implements ChannelService {
     public Channel createChannelPublic(PublicChannelCreateRequest publicChannelCreateRequest) {
         Channel channel = new Channel(publicChannelCreateRequest.getName(),
             publicChannelCreateRequest.getDescription(), ChannelType.PUBLIC);
+        // 채널을 만든 사람 = 채널 참여자로 ReadStatus 생성
+        // 유저가 존재하지 않으면 예외 발생
+        if(!userRepository.existsById(publicChannelCreateRequest.getUserId())){
+            throw new IllegalStateException("User ID: "+publicChannelCreateRequest.getUserId()+" Not Found. Can't create a channel.");
+        }
         channelRepository.save(channel);
+        readStatusService.create(new ReadStatusCreate(publicChannelCreateRequest.getUserId(), channel.getId()));
         return channel;
     }
 
@@ -44,7 +50,7 @@ public class BasicChannelService implements ChannelService {
         // 모두 존재하는 유저인지 검증
         for(UUID userID:privateChannelCreateRequest.getUsersId()){
             if(!userRepository.existsById(userID)){
-                throw new NoSuchElementException("User ID: "+userID+" Not Found. Can't craete a private channel.");
+                throw new NoSuchElementException("User ID: "+userID+" Not Found. Can't create a private channel.");
             }
         }
         Channel channel = new Channel(null,null, ChannelType.PRIVATE);

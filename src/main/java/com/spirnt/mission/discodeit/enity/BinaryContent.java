@@ -23,7 +23,7 @@ public class BinaryContent implements Serializable {
     private String filePath;    // 서버에 저장된 경로
 
     public BinaryContent(UUID id, String fileName, String fileType, String filePath) {
-        this.id = UUID.randomUUID();
+        this.id = id;
         this.createdAt = Instant.now();
         this.fileName = fileName;
         this.fileType = fileType;

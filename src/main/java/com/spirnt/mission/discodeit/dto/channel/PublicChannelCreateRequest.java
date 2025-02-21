@@ -9,8 +9,10 @@ import java.util.UUID;
 public class PublicChannelCreateRequest {
     private String name;
     private String description;
-    public PublicChannelCreateRequest(String name, String description) {
+    private UUID userId;    // 채널을 만든 사람
+    public PublicChannelCreateRequest(String name, String description, UUID userId) {
         this.name = name;
         this.description = description;
+        this.userId = userId;
     }
 }
