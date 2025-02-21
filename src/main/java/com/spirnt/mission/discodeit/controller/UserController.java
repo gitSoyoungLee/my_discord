@@ -39,15 +39,10 @@ public class UserController {
                                         @RequestParam(required = true) String email,
                                         @RequestParam(required = true) String password,
                                         @RequestParam(required = false)MultipartFile profileImage) {
-        try {
-            UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password, profileImage) ;
-            User user = userService.create(userCreateRequest);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new UserCreateResponse(user.getId(), name, email, user.getProfileImageId()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password, profileImage) ;
+        User user = userService.create(userCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new UserCreateResponse(user.getId(), name, email, user.getProfileImageId()));
     }
 
     // 사용자 정보 수정
@@ -62,29 +57,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("You should enter at least one element to update."));
         }
-        try {
-            UserUpdateRequest userUpdateRequest = new UserUpdateRequest(name, email, password, profileImage) ;
-            userService.update(userId, userUpdateRequest);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new ErrorResponse(e.getMessage()));
-        }  catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(name, email, password, profileImage) ;
+        userService.update(userId, userUpdateRequest);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     // 사용자 삭제
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
-        try {
-            userService.delete(userId);
-            return ResponseEntity.noContent().build();
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        userService.delete(userId);
+        return ResponseEntity.noContent().build();
     }
 
     // 모든 사용자 조회
@@ -97,15 +79,10 @@ public class UserController {
     @RequestMapping(value = "/{userId}/status", method = RequestMethod.PUT)
     public ResponseEntity<?> updateUserStatus(@PathVariable UUID userId,
                                               @RequestBody UserStatusUpdate userStatusUpdate) {
-        try {
-            UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdate, Instant.now());
-            UserStatusResponse userStatusResponse = new UserStatusResponse(userStatus.getUserId(),
-                    userStatus.getUserStatusType(), userStatus.getLastSeenAt());
-            return ResponseEntity.ok(userStatusResponse);
-        } catch (NoSuchElementException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdate, Instant.now());
+        UserStatusResponse userStatusResponse = new UserStatusResponse(userStatus.getUserId(),
+                userStatus.getUserStatusType(), userStatus.getLastSeenAt());
+        return ResponseEntity.ok(userStatusResponse);
     }
 
 }

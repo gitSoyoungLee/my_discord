@@ -32,32 +32,22 @@ public class BinaryContentController {
     // 단건 조회 및 다운로드
     @RequestMapping(value = "/{fileId}", method = RequestMethod.GET)
     public ResponseEntity<?> getFile(@PathVariable UUID fileId) {
-        try {
-            BinaryContent binaryContent = binaryContentService.find(fileId);
-            Resource resource = new FileSystemResource(Paths.get(binaryContent.getFilePath()));
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, binaryContent.getFileType())
-                    // 이미지인 경우 inline으로 바로 보이게, 아닌 경우 다운로드 가능한 첨부파일 형태로
-                    .header(HttpHeaders.CONTENT_DISPOSITION, isImage(binaryContent.getFileType())
-                            ? "inline"
-                            : "attachment; filename=\"" + binaryContent.getFileName() + "\"")
-                    .body(resource);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        BinaryContent binaryContent = binaryContentService.find(fileId);
+        Resource resource = new FileSystemResource(Paths.get(binaryContent.getFilePath()));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, binaryContent.getFileType())
+                // 이미지인 경우 inline으로 바로 보이게, 아닌 경우 다운로드 가능한 첨부파일 형태로
+                .header(HttpHeaders.CONTENT_DISPOSITION, isImage(binaryContent.getFileType())
+                        ? "inline"
+                        : "attachment; filename=\"" + binaryContent.getFileName() + "\"")
+                .body(resource);
     }
 
     // 삭제
     @RequestMapping(value = "/{fileId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteFile(@PathVariable UUID fileId) {
-        try {
-            binaryContentService.delete(fileId);
-            return ResponseEntity.noContent().build();
-        } catch (NoSuchElementException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        binaryContentService.delete(fileId);
+        return ResponseEntity.noContent().build();
     }
 
 }

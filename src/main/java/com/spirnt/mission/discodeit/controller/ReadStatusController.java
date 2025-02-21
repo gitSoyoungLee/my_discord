@@ -26,18 +26,10 @@ public class ReadStatusController {
     // 특정 채널의 메시지 수신 정보 생성
     @RequestMapping(value = "/channel", method = RequestMethod.POST)
     public ResponseEntity<?> createReadStatus(@RequestBody ReadStatusCreate request) {
-        try {
-            ReadStatus readStatus = readStatusService.create(request);
-            ReadStatusResponse response = new ReadStatusResponse(readStatus.getId(),
-                    readStatus.getUserId(), readStatus.getChannelId(), readStatus.getLastReadAt());
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        ReadStatus readStatus = readStatusService.create(request);
+        ReadStatusResponse response = new ReadStatusResponse(readStatus.getId(),
+                readStatus.getUserId(), readStatus.getChannelId(), readStatus.getLastReadAt());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 특정 채널의 메시지 수신 정보 수정
@@ -49,15 +41,10 @@ public class ReadStatusController {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse("Invalid Time Statement"));
         }
-        try {
-            ReadStatus readStatus = readStatusService.update(readStatusId, request);
-            ReadStatusResponse response = new ReadStatusResponse(readStatus.getId(),
-                    readStatus.getUserId(), readStatus.getChannelId(), readStatus.getLastReadAt());
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        ReadStatus readStatus = readStatusService.update(readStatusId, request);
+        ReadStatusResponse response = new ReadStatusResponse(readStatus.getId(),
+                readStatus.getUserId(), readStatus.getChannelId(), readStatus.getLastReadAt());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 특정 사용자의 메시지 수신 정보 조회

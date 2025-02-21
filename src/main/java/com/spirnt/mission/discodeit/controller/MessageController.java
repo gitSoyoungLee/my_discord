@@ -28,17 +28,9 @@ public class MessageController {
                                            @RequestParam UUID channelId,
                                            @RequestParam(required = false)List<MultipartFile> files) {
         MessageCreateRequest request = new MessageCreateRequest(userId, channelId, content, files);
-        try {
-            Message message = messageService.create(request);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new MessageCreateResponse(message.getId(), message.getContent()));
-        } catch (NoSuchElementException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        Message message = messageService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new MessageCreateResponse(message.getId(), message.getContent()));
     }
 
     // 메시지 수정
@@ -46,37 +38,22 @@ public class MessageController {
     public ResponseEntity<?> updateMessage(@PathVariable UUID messageId,
                                            @RequestBody String content) {
         MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(content);
-        try {
-            messageService.update(messageId, messageUpdateRequest);
-            return ResponseEntity.ok().build();
-        } catch (NoSuchElementException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        messageService.update(messageId, messageUpdateRequest);
+        return ResponseEntity.ok().build();
     }
 
     // 메시지 삭제
     @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteMessage(@PathVariable UUID messageId) {
-        try {
-            messageService.delete(messageId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .build();
-        } catch (NoSuchElementException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        messageService.delete(messageId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     // 특정 채널의 메시지 목록 조회
     @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.GET)
     public ResponseEntity<?> getAllMessagesByChannel(@PathVariable UUID channelId, @RequestParam UUID userId) {
-        try{
-            List<MessageResponse> messageResponses = messageService.findAllByChannelId(channelId, userId);
-            return ResponseEntity.ok(messageResponses);
-        } catch (NoSuchElementException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+        List<MessageResponse> messageResponses = messageService.findAllByChannelId(channelId, userId);
+        return ResponseEntity.ok(messageResponses);
     }
 }
