@@ -80,11 +80,8 @@ public class BasicMessageService implements MessageService {
 
         // User의 ReadStatus, UserStatus 업데이트
         // ReadStatus를 현재 시간으로 업데이트
-        ReadStatus readStatus = readStatusService.findAllByUserId(userId).stream()
-                .filter(rs->rs.getChannelId().equals(channelId))
-                .findAny()
-                .orElse(null);
-        if(readStatus!=null) readStatusService.update(readStatus.getId(), new ReadStatusUpdate(Instant.now()));
+        ReadStatus readStatus = readStatusService.findByUserIdAndChannelId(userId, channelId);
+        readStatusService.update(readStatus.getId(), new ReadStatusUpdate(Instant.now()));
         // UserStatus 업데이트 -> 온라인, 현재 활동 중으로 간주
         userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
 

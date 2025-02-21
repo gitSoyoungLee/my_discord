@@ -23,12 +23,11 @@ public class AuthServiceImpl implements AuthService {
     private final UserStatusService userStatusService;
     @Override
     public User login(LoginRequest loginRequest) {
-        Map<UUID, User> users = userRepository.findAll();
-        User user = users.values().stream()
-                .filter(value -> value.getName().equals(loginRequest.name()) &&
-                        value.getPassword().equals(loginRequest.password()))
-                .findAny()
-                .orElseThrow(() -> new NoSuchElementException("User Not Found"));
+        User user = userRepository.findByName(loginRequest.name())
+                .orElseThrow(()->new NoSuchElementException("A User with Name: "+loginRequest.name()+" Not Found"));
+        if(!user.getPassword().equals(loginRequest.password())){
+            throw new NoSuchElementException("Invalid password");
+        }
         // UserStatus Online으로 업데이트
         userStatusService.updateByUserId(user.getId(),new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
         return user;

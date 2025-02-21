@@ -9,10 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Repository
@@ -38,6 +36,14 @@ public class FileMessageRepository extends FileRepository implements MessageRepo
     public Optional<Message> findById(UUID messageId) {
         Path path = resolvePath(messageId);
         return loadFromFile(path);
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return this.findAll().values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .collect(Collectors.toList());
     }
 
     @Override

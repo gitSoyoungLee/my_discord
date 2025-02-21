@@ -142,10 +142,7 @@ public class BasicChannelService implements ChannelService {
 
     // 해당 채널 메세지를 정렬하여 가장 최근 메세지 시간 찾기
     public Optional<Instant> findLastMessageInChannel(UUID channelId) {
-        List<Message> messages = messageRepository.findAll().values().stream().toList();
-        Optional<Instant> lastSeenAt = messages.stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+        Optional<Instant> lastSeenAt = messageRepository.findAllByChannelId(channelId).stream()
                 .map(Message::getCreatedAt)
                 .findFirst();
         return lastSeenAt;
