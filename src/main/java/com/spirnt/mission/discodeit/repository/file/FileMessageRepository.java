@@ -44,7 +44,7 @@ public class FileMessageRepository extends FileRepository implements MessageRepo
     public Map<UUID, Message> findAll() {
         Map<UUID, Message> messages = new HashMap<>();
         // 폴더 내 모든 .ser 파일을 찾음
-        try (Stream<Path> paths = Files.walk(this.getDIRECTORY())) {
+        try (Stream<Path> paths = Files.walk(this.getDirectory())) {
             paths.filter(path -> path.toString().endsWith(".ser"))  // .ser 파일만 필터링
                     .forEach(path -> {
                         Optional<Message> messageOptional = loadFromFile(path);

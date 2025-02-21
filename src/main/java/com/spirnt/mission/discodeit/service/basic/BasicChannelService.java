@@ -4,7 +4,8 @@ import com.spirnt.mission.discodeit.dto.channel.PrivateChannelRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
 import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
-import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
+import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreate;
+import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdate;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import com.spirnt.mission.discodeit.enity.*;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
@@ -50,7 +51,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(channel);
         // 채널에 참여하는 유저별 ReadStatus 생성
         for(UUID userId: privateChannelCreateRequest.getUsersId()){
-            readStatusService.create(new ReadStatusDto(userId, channel.getId(), null));
+            readStatusService.create(new ReadStatusCreate(userId, channel.getId()));
         }
         return channel;
     }
@@ -82,7 +83,7 @@ public class BasicChannelService implements ChannelService {
                 .filter(rs->rs.getChannelId().equals(channelId) && rs.getUserId().equals(userId))
                 .findAny()
                 .orElse(null);
-        if(readStatus!=null) readStatusService.update(readStatus.getId(), new ReadStatusDto(userId, channelId,Instant.now()));
+        if(readStatus!=null) readStatusService.update(readStatus.getId(), new ReadStatusUpdate(Instant.now()));
         // UserStatus 업데이트 -> 온라인 && 현재 활동 중으로 간주
         userStatusService.updateByUserId(userId, new UserStatusUpdate(UserStatusType.ONLINE), Instant.now());
 

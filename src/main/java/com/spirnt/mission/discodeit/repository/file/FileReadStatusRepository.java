@@ -44,7 +44,7 @@ public class FileReadStatusRepository extends FileRepository implements ReadStat
     public Map<UUID, ReadStatus> findAll() {
         Map<UUID, ReadStatus> map = new HashMap<>();
         // 폴더 내 모든 .ser 파일을 찾음
-        try (Stream<Path> paths = Files.walk(this.getDIRECTORY())) {
+        try (Stream<Path> paths = Files.walk(this.getDirectory())) {
             paths.filter(path -> path.toString().endsWith(".ser"))  // .ser 파일만 필터링
                     .forEach(path -> {
                         Optional<ReadStatus> readStatus = loadFromFile(path);
@@ -58,8 +58,8 @@ public class FileReadStatusRepository extends FileRepository implements ReadStat
     }
 
     @Override
-    public boolean existsById(UUID userId) {
-        Path path = resolvePath(userId);
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
         return Files.exists(path);
     }
 }
