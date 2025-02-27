@@ -1,28 +1,28 @@
 package com.spirnt.mission.discodeit.service;
 
-import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreate;
-import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdate;
+import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
+import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.ReadStatus;
-
 import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    ReadStatus create(ReadStatusCreate readStatusCreate);
 
-    ReadStatus find(UUID readStatusId);
+  ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest);
 
-    ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId);
+  ReadStatus find(UUID readStatusId);
 
-    List<ReadStatus> findAllByUserId(UUID userId);
+  ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId);
 
-    List<ReadStatus> findAllByChannelId(UUID ChannelId);
+  List<ReadStatus> findAllByUserId(UUID userId);
 
-    ReadStatus update(UUID readStatusId, ReadStatusUpdate readStatusUpdate);
+  List<ReadStatus> findAllByChannelId(UUID ChannelId);
 
-    void delete(UUID id);
+  ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest);
 
-    void deleteByChannelId(UUID channelId);
+  void delete(UUID id);
 
-    boolean existsByUserIdChannelId(UUID userId, UUID channelId);
+  void deleteByChannelId(UUID channelId);
+
+  boolean existsByUserIdChannelId(UUID userId, UUID channelId);
 }
