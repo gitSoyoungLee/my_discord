@@ -1,9 +1,8 @@
 package com.spirnt.mission.discodeit.service.implement;
 
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
+import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.UserStatus;
-import com.spirnt.mission.discodeit.enity.UserStatusType;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.repository.UserStatusRepository;
 import com.spirnt.mission.discodeit.service.UserStatusService;
@@ -24,18 +23,18 @@ public class UserStatusServiceImpl implements UserStatusService {
   private final UserRepository userRepository;
 
   @Override
-  public UserStatus create(UserStatusCreate userStatusCreate) {
+  public UserStatus create(UserStatusCreateRequest userStatusCreateRequest) {
     // User가 존재하지 않으면 예외 발생
-      if (!userRepository.existsById(userStatusCreate.userId())) {
-          throw new NoSuchElementException("User ID Not Found");
-      }
+    if (!userRepository.existsById(userStatusCreateRequest.userId())) {
+      throw new NoSuchElementException("User ID Not Found");
+    }
     // 이미 User와 관련된 객체가 존재하면 예외 발생
     if (userStatusRepository.findAll().values().stream()
-        .anyMatch(userStatus -> userStatus.getUserId().equals(userStatusCreate.userId()))) {
-      throw new IllegalStateException("The ReadStatus with UserId and ChannelId Already Exists");
+        .anyMatch(userStatus -> userStatus.getUserId().equals(userStatusCreateRequest.userId()))) {
+      throw new IllegalArgumentException("The ReadStatus with UserId and ChannelId Already Exists");
     }
-    UserStatus userStatus = new UserStatus(userStatusCreate.userId(),
-        userStatusCreate.type(), Instant.now());
+    UserStatus userStatus = new UserStatus(userStatusCreateRequest.userId(),
+        userStatusCreateRequest.type(), Instant.now());
     userStatusRepository.save(userStatus);
     return userStatus;
   }
@@ -44,11 +43,6 @@ public class UserStatusServiceImpl implements UserStatusService {
   public UserStatus find(UUID userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
-    // 만약 마지막으로 기록된 접속 시간으로부터 5분 이상 지나있으면 OFFLINE으로 업데이트 후 반환
-    if (userStatus.getUserStatusType() == UserStatusType.ONLINE && !userStatus.isOnline()) {
-      update(userStatusId, new UserStatusUpdateRequest(UserStatusType.OFFLINE),
-          userStatus.getLastSeenAt());  // 마지막 접속 시간은 그대로 유지
-    }
     return userStatus;
   }
 
@@ -66,24 +60,24 @@ public class UserStatusServiceImpl implements UserStatusService {
       Instant serverTime) {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
-    userStatus.update(userStatusUpdateRequest.type(), serverTime);
+    userStatus.update(userStatusUpdateRequest.newLastActiveAt());
     userStatusRepository.save(userStatus);
     return userStatus;
   }
 
   @Override
-  public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest,
-      Instant serverTime) {
+  public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
     // User가 존재하지 않으면 예외 발생
-      if (!userRepository.existsById(userId)) {
-          throw new NoSuchElementException("User ID Not Found");
-      }
+    if (!userRepository.existsById(userId)) {
+      throw new NoSuchElementException("User ID Not Found");
+    }
     Map<UUID, UserStatus> map = userStatusRepository.findAll();
     UserStatus userStatus = map.values().stream()
         .filter(value -> value.getUserId().equals(userId))
         .findAny()
         .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
-    userStatus = this.update(userStatus.getId(), userStatusUpdateRequest, serverTime);
+    userStatus.update(userStatusUpdateRequest.newLastActiveAt());
+    userStatusRepository.save(userStatus);
     return userStatus;
   }
 

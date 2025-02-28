@@ -1,20 +1,20 @@
 package com.spirnt.mission.discodeit.dto.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
+@Schema(description = "수정할 User 정보")
 public class UserUpdateRequest {
-    private String name;
-    private String email;
-    private String password;
-    private MultipartFile profileImage;   // 프로필 사진
 
-    public UserUpdateRequest(String name, String email,
-                             String password, MultipartFile profileImage) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.profileImage = profileImage;
-    }
+  private String newUsername;
+  private String newEmail;
+  private String newPassword;
+
+  public UserUpdateRequest(String newUsername, String newEmail,
+      String newPassword) {
+    this.newUsername = newUsername;
+    this.newEmail = newEmail;
+    this.newPassword = newPassword;
+  }
 }

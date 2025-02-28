@@ -1,5 +1,6 @@
 package com.spirnt.mission.discodeit.enity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -10,15 +11,16 @@ import lombok.Getter;
 public class User extends Common implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private String name;
+  private String username;
   private String email;
+  @JsonIgnore // password는 json으로 넘어가지 못하게
   private String password;
   private UUID profileId;
 
 
-  public User(String name, String email, String password, UUID profileId) {
+  public User(String username, String email, String password, UUID profileId) {
     super();
-    this.name = name;
+    this.username = username;
     this.email = email;
     this.password = password;
     this.profileId = profileId;
@@ -27,8 +29,8 @@ public class User extends Common implements Serializable {
 
   public void update(String name, String email, String password, UUID profileImageId) {
     boolean anyValueUpdated = false;
-    if (name != null && !name.equals(this.name)) {
-      this.name = name;
+    if (name != null && !name.equals(this.username)) {
+      this.username = name;
       anyValueUpdated = true;
     }
     if (email != null && !email.equals(this.email)) {
@@ -52,7 +54,7 @@ public class User extends Common implements Serializable {
   public String toString() {
     return "User{" +
         "id='" + this.getId() + '\'' +
-        ", name='" + this.name + '\'' +
+        ", username='" + this.username + '\'' +
         ", email='" + this.email + '\'' +
         '}';
   }
@@ -60,12 +62,12 @@ public class User extends Common implements Serializable {
   // UUID만으로 객체를 비교하기 위해 추가
   @Override
   public boolean equals(Object obj) {
-      if (this == obj) {
-          return true;
-      }
-      if (obj == null || getClass() != obj.getClass()) {
-          return false;
-      }
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
     User user = (User) obj;
     return Objects.equals(this.getId(), user.getId());
   }

@@ -22,12 +22,5 @@ public class AuthController implements AuthApiDocs {
   public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
     User user = authService.login(loginRequest);
     return ResponseEntity.ok(user);
-//    try {
-//      User user = authService.login(loginRequest);
-//      return ResponseEntity.ok(user);
-//    } catch (NoSuchElementException e) {
-//      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//          .body(new ErrorResponse(e.getMessage()));
-//    }
   }
 }

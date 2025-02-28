@@ -2,51 +2,51 @@ package com.spirnt.mission.discodeit.repository.jcf;
 
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data;   // 모든 유저 데이터, key=id
 
-    public JCFUserRepository() {
-        this.data = new HashMap<>();
-    }
+  private final Map<UUID, User> data;   // 모든 유저 데이터, key=id
 
-    @Override
-    public void save(User user) {
-        data.put(user.getId(), user);
-    }
+  public JCFUserRepository() {
+    this.data = new HashMap<>();
+  }
 
-    @Override
-    public void delete(UUID userId) {
-        data.remove(userId);
-    }
+  @Override
+  public void save(User user) {
+    data.put(user.getId(), user);
+  }
 
-    @Override
-    public Optional<User> findById(UUID userId) {
-        return Optional.ofNullable(this.data.get(userId));
-    }
+  @Override
+  public void delete(UUID userId) {
+    data.remove(userId);
+  }
 
-    @Override
-    public Optional<User> findByName(String name) {
-        return data.values().stream()
-                .filter(user -> user.getName().equals(name))
-                .findAny();
-    }
+  @Override
+  public Optional<User> findById(UUID userId) {
+    return Optional.ofNullable(this.data.get(userId));
+  }
 
-    public Map<UUID, User> findAll() {
-        return new HashMap<>(data);
-    }
+  @Override
+  public Optional<User> findByName(String name) {
+    return data.values().stream()
+        .filter(user -> user.getUsername().equals(name))
+        .findAny();
+  }
 
-    @Override
-    public boolean existsById(UUID userId) {
-        return data.containsKey(userId);
-    }
+  public Map<UUID, User> findAll() {
+    return new HashMap<>(data);
+  }
+
+  @Override
+  public boolean existsById(UUID userId) {
+    return data.containsKey(userId);
+  }
 }

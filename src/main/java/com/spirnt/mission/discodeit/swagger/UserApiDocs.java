@@ -44,7 +44,7 @@ public interface UserApiDocs {
           content = @Content(examples = @ExampleObject(value = "User with email {email} already exists")))
   })
   ResponseEntity<User> createUser(@RequestPart UserCreateRequest userCreateRequest,
-      @Parameter(description = "User 프로필 이미지") @RequestPart(required = false) MultipartFile profileImage);
+      @Parameter(description = "User 프로필 이미지") @RequestPart(required = false) MultipartFile profile);
 
   // 사용자 정보 수정
   @Operation(summary = "User 정보 수정", operationId = "update")
@@ -72,7 +72,7 @@ public interface UserApiDocs {
       @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "User with id {id} not found")))
   })
-  ResponseEntity<?> deleteUser(
+  ResponseEntity<Void> deleteUser(
       @Parameter(name = "userId", description = "삭제할 User ID") @PathVariable UUID userId);
 
   // 사용자의 온라인 상태 업데이트

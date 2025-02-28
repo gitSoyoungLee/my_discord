@@ -41,17 +41,17 @@ public class MessageController implements MessageApiDocs {
   }
 
   // 메시지 수정
-  @PatchMapping("/{channelId}")
+  @PatchMapping("/{messageId}")
   public ResponseEntity<Message> updateMessage(@PathVariable UUID messageId,
-      @RequestBody String content) {
-    MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(content);
+      @RequestBody String newContent) {
+    MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(newContent);
     Message message = messageService.update(messageId, messageUpdateRequest);
     return ResponseEntity.ok(message);
   }
 
   // 메시지 삭제
   @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteMessage(@PathVariable UUID messageId) {
+  public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT)
         .build();

@@ -6,9 +6,7 @@ import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.enity.Channel;
-import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.enity.Message;
-import com.spirnt.mission.discodeit.enity.UserStatusType;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
@@ -46,20 +44,21 @@ public class BasicMessageService implements MessageService {
   public Message create(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
     // User와 Channel이 존재하는지 검증
-    UUID userId = messageCreateRequest.getUserId();
+    UUID userId = messageCreateRequest.getAuthorId();
     UUID channelId = messageCreateRequest.getChannelId();
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException(
-            "Channel id " + messageCreateRequest.getChannelId() + " does not exist"));
+            "Channel with id " + messageCreateRequest.getChannelId() + " not found"));
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException(
-          "User id " + messageCreateRequest.getUserId() + " does not exist");
+          "User with id " + messageCreateRequest.getAuthorId() + " not found");
     }
-    // PRIVATE 채널인데 입장하지 않은 유저가 메시지를 쓰려고 하는 경우
-    if (channel.getType().equals(ChannelType.PRIVATE)
-        && !readStatusService.existsByUserIdChannelId(userId, channelId)) {
-      throw new IllegalStateException("User did not joined this private channel");
-    }
+    // 스펙에 명시되지 않은 예외 주석 처리
+//    // PRIVATE 채널인데 입장하지 않은 유저가 메시지를 쓰려고 하는 경우
+//    if (channel.getType().equals(ChannelType.PRIVATE)
+//        && !readStatusService.existsByUserIdChannelId(userId, channelId)) {
+//      throw new IllegalArgumentException("User did not joined this private channel");
+//    }
     // 첨부 파일 업로드
     List<UUID> attachedFilesId = new ArrayList<>();
     for (MultipartFile file : Optional.ofNullable(attachments)
@@ -74,31 +73,23 @@ public class BasicMessageService implements MessageService {
         attachedFilesId);
     messageRepository.save(message);
     // 메세지 작성자를 Online 상태로
-    userStatusService.updateByUserId(userId, new UserStatusUpdateRequest(UserStatusType.ONLINE),
-        Instant.now());
+    userStatusService.updateByUserId(userId, new UserStatusUpdateRequest(Instant.now()));
     return message;
   }
 
   @Override
   public Message find(UUID messageId) {
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
+        .orElseThrow(
+            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     return message;
   }
 
   @Override
   public List<Message> findAllByChannelId(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException("Channel ID: " + channelId + " Not Found");
+      throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
-
-//    // User의 ReadStatus, UserStatus 업데이트
-//    // ReadStatus를 현재 시간으로 업데이트
-//    ReadStatus readStatus = readStatusService.findByUserIdAndChannelId(userId, channelId);
-//    readStatusService.update(readStatus.getId(), new ReadStatusUpdate(Instant.now()));
-//    // UserStatus 업데이트 -> 온라인, 현재 활동 중으로 간주
-//    userStatusService.updateByUserId(userId, new UserStatusUpdateRequest(UserStatusType.ONLINE),
-//        Instant.now());
 
     Map<UUID, Message> data = messageRepository.findAll();
     return data.values().stream()
@@ -115,8 +106,9 @@ public class BasicMessageService implements MessageService {
   @Override
   public Message update(UUID messageId, MessageUpdateRequest dto) {
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
-    message.update(dto.getContent());
+        .orElseThrow(
+            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    message.update(dto.getNewContent());
     messageRepository.save(message);
     return message;
   }
@@ -124,9 +116,10 @@ public class BasicMessageService implements MessageService {
   @Override
   public void delete(UUID messageId) {
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("Message ID: " + messageId + " Not Found"));
+        .orElseThrow(
+            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     // 첨푸 파일 삭제
-    List<UUID> attachedFiles = message.getAttachedFiles();
+    List<UUID> attachedFiles = message.getAttachmentIds();
     for (UUID id : attachedFiles) {
       binaryContentService.delete(id);
     }

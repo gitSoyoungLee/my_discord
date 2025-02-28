@@ -1,15 +1,14 @@
 package com.spirnt.mission.discodeit.service.basic;
 
 import com.spirnt.mission.discodeit.dto.channel.ChannelDto;
-import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.spirnt.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.enity.Message;
-import com.spirnt.mission.discodeit.enity.UserStatusType;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
@@ -49,18 +48,24 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createChannelPrivate(PrivateChannelCreateRequest privateChannelCreateRequest) {
-    // 모두 존재하는 유저인지 검증
-    for (UUID userID : privateChannelCreateRequest.getUsersId()) {
-      if (!userRepository.existsById(userID)) {
-        throw new NoSuchElementException(
-            "User ID: " + userID + " Not Found. Can't create a private channel.");
-      }
-    }
+    // 스펙에 명시되지 않은 경우이므로 주석 처리
+//    // 참여자를 입력하지 않은 경우
+//    if (privateChannelCreateRequest.getParticipantIds() == null
+//        || privateChannelCreateRequest.getParticipantIds().isEmpty()) {
+//      throw new IllegalArgumentException("There are no participants.");
+//    }
+//    // 모두 존재하는 유저인지 검증
+//    for (UUID userID : privateChannelCreateRequest.getParticipantIds()) {
+//      if (!userRepository.existsById(userID)) {
+//        throw new NoSuchElementException(
+//            "User with id " + userID + " not found. Can't create a private channel.");
+//      }
+//    }
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
     // 채널에 참여하는 유저별 ReadStatus 생성
-    for (UUID userId : privateChannelCreateRequest.getUsersId()) {
-      readStatusService.create(new ReadStatusCreateRequest(userId, channel.getId()));
+    for (UUID userId : privateChannelCreateRequest.getParticipantIds()) {
+      readStatusService.create(new ReadStatusCreateRequest(userId, channel.getId(), Instant.now()));
     }
     return channel;
   }
@@ -69,12 +74,13 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto find(UUID userId, UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
-    // PRIVATE 채널인 경우 참여한 유저만 조회 가능
-    // ReadStatus 존재 여부로 확인
-    if (channel.getType().equals(ChannelType.PRIVATE) &&
-        !readStatusService.existsByUserIdChannelId(userId, channelId)) {
-      throw new IllegalStateException("User did not joined this private channel");
-    }
+    // 스펙에 명시되지 않은 경우이므로 주석 처리
+//    // PRIVATE 채널인 경우 참여한 유저만 조회 가능
+//    // ReadStatus 존재 여부로 확인
+//    if (channel.getType().equals(ChannelType.PRIVATE) &&
+//        !readStatusService.existsByUserIdChannelId(userId, channelId)) {
+//      throw new IllegalArgumentException("User did not joined this private channel");
+//    }
     // PRIVATE 채널인 경우 참여 유저 찾기
     List<UUID> participantIds = new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {
@@ -92,11 +98,9 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     // User가 존재하지 않으면 예외 발생
-    if (!userRepository.existsById(userId))
-    // UserStatus 업데이트 -> 온라인 && 현재 활동 중으로 간주
-    {
-      userStatusService.updateByUserId(userId, new UserStatusUpdateRequest(UserStatusType.ONLINE),
-          Instant.now());
+    if (!userRepository.existsById(userId)) {
+      // UserStatus 업데이트 -> 온라인 && 현재 활동 중으로 간주
+      userStatusService.updateByUserId(userId, new UserStatusUpdateRequest(Instant.now()));
     }
     Map<UUID, Channel> data = channelRepository.findAll();
     return data.values().stream()
@@ -112,14 +116,16 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public Channel update(UUID channelId, ChannelUpdateRequest channelUpdateRequest) {
+  public Channel update(UUID channelId, PublicChannelUpdateRequest publicChannelUpdateRequest) {
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
+        .orElseThrow(
+            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
     // PRIVATE 채널은 업데이트할 수 없음
     if (channel.getType() == ChannelType.PRIVATE) {
-      throw new IllegalStateException("Private Channel Cannot be updated");
+      throw new IllegalArgumentException("Private channel cannot be updated");
     }
-    channel.update(channelUpdateRequest.getName(), channelUpdateRequest.getDescription());
+    channel.update(publicChannelUpdateRequest.getNewName(),
+        publicChannelUpdateRequest.getNewDescription());
     channelRepository.save(channel);
     return channel;
   }
@@ -127,7 +133,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void delete(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException("Channel ID: " + channelId + " Not Found");
+      throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
     // 채널에 속한 메세지 삭제
     Map<UUID, Message> data = messageRepository.findAll();

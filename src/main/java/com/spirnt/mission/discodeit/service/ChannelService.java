@@ -1,9 +1,9 @@
 package com.spirnt.mission.discodeit.service;
 
 import com.spirnt.mission.discodeit.dto.channel.ChannelDto;
-import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.spirnt.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.spirnt.mission.discodeit.enity.Channel;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +21,7 @@ public interface ChannelService {
   List<ChannelDto> findAllByUserId(UUID userId); // 전체 채널 다건 조회
 
   // Update
-  Channel update(UUID channelId, ChannelUpdateRequest channelUpdateRequest);
+  Channel update(UUID channelId, PublicChannelUpdateRequest publicChannelUpdateRequest);
 
   // Delete
   void delete(UUID channelId);    // 채널 삭제

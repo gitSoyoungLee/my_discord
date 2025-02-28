@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.service;
 
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
+import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.UserStatus;
 import java.time.Instant;
@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface UserStatusService {
 
-  UserStatus create(UserStatusCreate userStatusCreate);
+  UserStatus create(UserStatusCreateRequest userStatusCreateRequest);
 
   UserStatus find(UUID userStatusId);
 
@@ -18,8 +18,7 @@ public interface UserStatusService {
   UserStatus update(UUID userStatusId, UserStatusUpdateRequest userStatusUpdateRequest,
       Instant serverTime);
 
-  UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest,
-      Instant serverTime);
+  UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest);
 
   void delete(UUID userStatusId);
 

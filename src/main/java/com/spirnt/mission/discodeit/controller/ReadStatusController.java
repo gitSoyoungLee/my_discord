@@ -37,11 +37,6 @@ public class ReadStatusController implements ReadStatusApiDocs {
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ReadStatus> updateReadStatus(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest request) {
-//    // 읽은 시간을 미래로 설정하려는 경우
-//    if (request.lastReadAt().isAfter(Instant.now())) {
-//      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//          .body(new ErrorResponse("Invalid Time Statement"));
-//    }
     ReadStatus readStatus = readStatusService.update(readStatusId, request);
     return ResponseEntity.status(HttpStatus.OK).body(readStatus);
   }

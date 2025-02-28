@@ -1,9 +1,9 @@
 package com.spirnt.mission.discodeit.swagger;
 
 import com.spirnt.mission.discodeit.dto.channel.ChannelDto;
-import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.spirnt.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.spirnt.mission.discodeit.enity.Channel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Tag(name = "Channel", description = "Channel API")
@@ -52,7 +53,7 @@ public interface ChannelApiDocs {
   })
   ResponseEntity<Channel> updatePublicChannel(
       @Parameter(name = "channelId", description = "수정할 Channel ID") @PathVariable UUID channelId,
-      @RequestBody ChannelUpdateRequest request);
+      @RequestBody PublicChannelUpdateRequest request);
 
   // 채널 삭제
   @Operation(summary = "Channel 삭제", operationId = "delete_2")
@@ -61,7 +62,7 @@ public interface ChannelApiDocs {
       @ApiResponse(responseCode = "404", description = "Channel을 찾을 수 없음",
           content = @Content(examples = @ExampleObject("Channel with id {channelId} not found")))
   })
-  ResponseEntity<?> deleteChannel(
+  ResponseEntity<Void> deleteChannel(
       @Parameter(name = "channelId", description = "삭제할 Channel ID") @PathVariable UUID channelId);
 
   // 특정 사용자가 볼 수 있는 채널 목록 조회
@@ -71,5 +72,5 @@ public interface ChannelApiDocs {
           content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChannelDto.class))))
   })
   ResponseEntity<List<ChannelDto>> getAllChannelsByUserId(
-      @Parameter(name = "userId", description = "조회할 User ID") @PathVariable UUID userId);
+      @Parameter(name = "userId", description = "조회할 User ID") @RequestParam UUID userId);
 }

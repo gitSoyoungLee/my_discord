@@ -1,10 +1,11 @@
 package com.spirnt.mission.discodeit.dto.userStatus;
 
-import com.spirnt.mission.discodeit.enity.UserStatusType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 
+@Schema(description = "변경할 User 온라인 상태 정보")
 public record UserStatusUpdateRequest(
-    UserStatusType type
-    // Instant lastSeenAt   // 클라이언트에서 받지 않고 서버에서 시간을 처리
+    Instant newLastActiveAt
 ) {
 
 }

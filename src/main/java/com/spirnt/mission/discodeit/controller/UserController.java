@@ -9,7 +9,6 @@ import com.spirnt.mission.discodeit.enity.UserStatus;
 import com.spirnt.mission.discodeit.service.UserService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
 import com.spirnt.mission.discodeit.swagger.UserApiDocs;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +45,8 @@ public class UserController implements UserApiDocs {
   // 사용자 등록
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<User> createUser(@RequestPart UserCreateRequest userCreateRequest,
-      @RequestPart(required = false) MultipartFile profileImage) {
-    User user = userService.create(userCreateRequest, profileImage);
+      @RequestPart(required = false) MultipartFile profile) {
+    User user = userService.create(userCreateRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(user);
   }
@@ -57,18 +56,13 @@ public class UserController implements UserApiDocs {
   public ResponseEntity<User> updateUser(@PathVariable UUID userId,
       @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile) {
-//    // 모든 필드가 null인지 확인
-//    if (name == null && email == null && password == null && profileImage == null) {
-//      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//          .body(new ErrorResponse("You should enter at least one element to update."));
-//    }
     User user = userService.update(userId, userUpdateRequest, profile);
     return ResponseEntity.ok(user);
   }
 
   // 사용자 삭제
   @DeleteMapping("/{userId}")
-  public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
+  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
     userService.delete(userId);
     return ResponseEntity.noContent().build();
   }
@@ -77,8 +71,7 @@ public class UserController implements UserApiDocs {
   @PatchMapping(value = "/{userId}/userStatus", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UserStatus> updateUserStatus(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
-    UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdateRequest,
-        Instant.now());
+    UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
     return ResponseEntity.ok(userStatus);
   }
 

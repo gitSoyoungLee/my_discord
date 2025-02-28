@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.swagger;
 
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
-import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusResponse;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,8 +29,7 @@ public interface ReadStatusApiDocs {
           content = @Content(schema = @Schema(implementation = ReadStatus.class))),
       @ApiResponse(responseCode = "400", description = "이미 읽음 상태가 존재함",
           content = @Content(examples = @ExampleObject(value =
-              "ReadStatus with userId {userId} and channelId {channelId}\n"
-                  + "                already exists"))),
+              "ReadStatus with userId {userId} and channelId {channelId} already exists"))),
       @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "Channel | User with id {channelId | userId} not found")))
   })
@@ -53,7 +51,7 @@ public interface ReadStatusApiDocs {
   @Operation(summary = "User의 Message 읽음 상태 목록 조회", operationId = "findAllByUserId")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Message 읽음 상태 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReadStatusResponse.class))))
+          content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class))))
   })
   ResponseEntity<List<ReadStatus>> findAllByUserId(
       @Parameter(name = "userId", description = "조회할 User ID") @RequestParam UUID userId);

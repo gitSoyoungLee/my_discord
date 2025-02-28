@@ -46,7 +46,7 @@ public interface MessageApiDocs {
   })
   ResponseEntity<Message> updateMessage(
       @Parameter(name = "messageId", description = "수정할 Message ID") @PathVariable UUID messageId,
-      @RequestBody String content);
+      @RequestBody String newContent);
 
 
   // 메시지 삭제
@@ -56,7 +56,7 @@ public interface MessageApiDocs {
       @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "Message with id {messageId} not found")))
   })
-  ResponseEntity<?> deleteMessage(
+  ResponseEntity<Void> deleteMessage(
       @Parameter(name = "messageId", description = "삭제할 Message ID") @PathVariable UUID messageId);
 
   // 특정 채널의 메시지 목록 조회

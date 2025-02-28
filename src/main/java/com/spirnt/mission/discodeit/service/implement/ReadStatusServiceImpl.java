@@ -7,7 +7,6 @@ import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -27,21 +26,25 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
   @Override
   public ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest) {
+    UUID userId = readStatusCreateRequest.userId();
+    UUID channelId = readStatusCreateRequest.channelId();
     // User와 Channel 존재하지 않으면 예외 발생
-    if (!userRepository.existsById(readStatusCreateRequest.userId())) {
-      throw new NoSuchElementException("User ID Not Found");
+    if (!userRepository.existsById(userId)) {
+      throw new NoSuchElementException("User with id " + userId + " not found");
     }
-    if (!channelRepository.existsById(readStatusCreateRequest.channelId())) {
-      throw new NoSuchElementException("Channel ID Not Found");
+    if (!channelRepository.existsById(channelId)) {
+      throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
     //이미 해당 채널-유저를 가진 ReadStatus가 있으면 예외 발생
-    if (existsByUserIdChannelId(readStatusCreateRequest.userId(),
-        readStatusCreateRequest.channelId())) {
-      throw new IllegalStateException("The ReadStatus with UserId and ChannelId Already Exists");
+    if (existsByUserIdChannelId(userId,
+        channelId)) {
+      throw new IllegalArgumentException(
+          "ReadStatus with userId " + userId + " and channelId "
+              + channelId + " already exists");
     }
-    ReadStatus readStatus = new ReadStatus(readStatusCreateRequest.userId(),
+    ReadStatus readStatus = new ReadStatus(userId,
         readStatusCreateRequest.channelId(),
-        Instant.now());
+        readStatusCreateRequest.lastReadAt());  // API 스펙을 보고 lastReadAt을 클라이언트에서 받긴 했는데, 그냥 서버에서 Instant.now() 하는 게 더 안전하지 않을까?
     readStatusRepository.save(readStatus);
     return readStatus;
   }
@@ -49,7 +52,8 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   @Override
   public ReadStatus find(UUID readStatusId) {
     return readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new NoSuchElementException("Read Status ID Not Found"));
+        .orElseThrow(
+            () -> new NoSuchElementException("Read Status with id " + readStatusId + " not found"));
   }
 
   @Override
@@ -80,7 +84,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> new NoSuchElementException("Read Status Not Found"));
-    readStatus.update(readStatusUpdateRequest.lastReadAt());
+    readStatus.update(readStatusUpdateRequest.newLastReadAt());
     readStatusRepository.save(readStatus);
     return readStatus;
   }

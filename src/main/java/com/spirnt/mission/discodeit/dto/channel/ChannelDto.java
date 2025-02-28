@@ -11,19 +11,19 @@ import lombok.Getter;
 @Getter
 public class ChannelDto {
 
-  private UUID channelId;
+  private UUID id;
   private String name;
   private String description;
   private ChannelType type;
-  private List<UUID> usersId;
+  private List<UUID> participantIds;
   private Instant lastMessageAt;
 
-  public ChannelDto(Channel channel, List<UUID> usersId, Instant lastMessageAt) {
+  public ChannelDto(Channel channel, List<UUID> participantIds, Instant lastMessageAt) {
     this.name = channel.getName();
     this.description = channel.getDescription();
-    this.channelId = channel.getId();
+    this.id = channel.getId();
     this.type = channel.getType();
-    this.usersId = (usersId == null) ? new ArrayList<>() : usersId;
+    this.participantIds = (participantIds == null) ? new ArrayList<>() : participantIds;
     this.lastMessageAt = lastMessageAt;
   }
 
@@ -32,13 +32,13 @@ public class ChannelDto {
     if (this.type == ChannelType.PUBLIC) {
       return "PUBLIC Channel[Name: " + this.getName() +
           " Description: " + this.getDescription() +
-          " ID: " + this.channelId + " ]";
+          " ID: " + this.id + " ]";
     } else if (this.type == ChannelType.PRIVATE) {
-        return "PRIVATE Channel[" +
-            " ID: " + this.channelId + "]" +
-            "\nParticipants: " + usersId;
+      return "PRIVATE Channel[" +
+          " ID: " + this.id + "]" +
+          "\nParticipants: " + participantIds;
     } else {
-        return "";
+      return "";
     }
   }
 }

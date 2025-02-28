@@ -4,7 +4,7 @@ import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreate;
 import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
+import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.enity.UserStatus;
@@ -38,10 +38,12 @@ public class BasicUserService implements UserService {
   public User create(UserCreateRequest userCreateRequest, MultipartFile profileImage) {
     // 파라미터 검증
     if (checkEmailDuplicate(userCreateRequest.getEmail())) {
-      throw new IllegalStateException(userCreateRequest.getEmail() + " Email Already Exists");
+      throw new IllegalArgumentException(
+          "User with email " + userCreateRequest.getEmail() + " already exists");
     }
-    if (checkNameDuplicate(userCreateRequest.getName())) {
-      throw new IllegalStateException(userCreateRequest.getName() + " Name Already Exists");
+    if (checkNameDuplicate(userCreateRequest.getUsername())) {
+      throw new IllegalArgumentException(
+          "User with name " + userCreateRequest.getUsername() + " already exists");
     }
     // 프로필 이미지 저장
     // request dto에서 profileImage가 null이 아니면 BinaryContent 생성
@@ -52,16 +54,17 @@ public class BasicUserService implements UserService {
     UUID profileImageId = (binaryContent == null) ? null : binaryContent.getId();
 
     // User 생성, 저장
-    User user = new User(userCreateRequest.getName(),
+    User user = new User(userCreateRequest.getUsername(),
         userCreateRequest.getEmail(),
         userCreateRequest.getPassword(),
         profileImageId);
     userRepository.save(user);
 
     // UserStatus 생성
-    UserStatusCreate userStatusCreate = new UserStatusCreate(user.getId(), UserStatusType.ONLINE,
+    UserStatusCreateRequest userStatusCreateRequest = new UserStatusCreateRequest(user.getId(),
+        UserStatusType.ONLINE,
         Instant.now());
-    userStatusService.create(userStatusCreate);
+    userStatusService.create(userStatusCreateRequest);
 
     return user;
   }
@@ -69,7 +72,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto find(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not Found"));
+        .orElseThrow(() -> new NoSuchElementException("User with id" + userId + " not found"));
     UserStatus userStatus = userStatusService.findByUserId(userId);
     return new UserDto(user, userStatus);
   }
@@ -87,12 +90,14 @@ public class BasicUserService implements UserService {
   public User update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile profileImage) {
     // User 객체 변경
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not found"));
-    if (checkEmailDuplicate(userUpdateRequest.getEmail())) {
-      throw new IllegalArgumentException(userUpdateRequest.getEmail() + " Email Already Exists");
+        .orElseThrow(() -> new NoSuchElementException("User with id" + userId + " not found"));
+    if (checkEmailDuplicate(userUpdateRequest.getNewEmail())) {
+      throw new IllegalArgumentException(
+          "User with email " + userUpdateRequest.getNewEmail() + " already exists");
     }
-    if (checkNameDuplicate(userUpdateRequest.getName())) {
-      throw new IllegalArgumentException(userUpdateRequest.getName() + " Name Already Exists");
+    if (checkNameDuplicate(userUpdateRequest.getNewUsername())) {
+      throw new IllegalArgumentException(
+          "User with name " + userUpdateRequest.getNewUsername() + " already exists");
     }
     //프로필 이미지 선택적 대체
     UUID profileImageId = null;
@@ -102,8 +107,8 @@ public class BasicUserService implements UserService {
           new BinaryContentCreate(profileImage));
       profileImageId = newProfileImage.getId();
     }
-    user.update(userUpdateRequest.getName(), userUpdateRequest.getEmail(),
-        userUpdateRequest.getPassword(), profileImageId);
+    user.update(userUpdateRequest.getNewUsername(), userUpdateRequest.getNewEmail(),
+        userUpdateRequest.getNewPassword(), profileImageId);
     userRepository.save(user);
     return user;
   }
@@ -111,7 +116,7 @@ public class BasicUserService implements UserService {
   @Override
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User ID: " + userId + " Not found"));
+        .orElseThrow(() -> new NoSuchElementException("User with id" + userId + " not found"));
     // 유저의 프로필  BinaryContent 삭제
     binaryContentService.delete(user.getProfileId());
     // UserStatus 삭제
@@ -135,7 +140,7 @@ public class BasicUserService implements UserService {
       return false;
     }
     return users.values().stream()
-        .anyMatch(user -> user.getName().equals(name));
+        .anyMatch(user -> user.getUsername().equals(name));
   }
 
 }
