@@ -1,6 +1,5 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -13,7 +12,6 @@ public class User extends Common implements Serializable {
   private static final long serialVersionUID = 1L;
   private String username;
   private String email;
-  @JsonIgnore // password는 json으로 넘어가지 못하게
   private String password;
   private UUID profileId;
 

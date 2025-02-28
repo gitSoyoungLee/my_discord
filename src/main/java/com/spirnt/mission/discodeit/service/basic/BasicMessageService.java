@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.service.basic;
 
-import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreate;
+import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
@@ -63,8 +63,8 @@ public class BasicMessageService implements MessageService {
     List<UUID> attachedFilesId = new ArrayList<>();
     for (MultipartFile file : Optional.ofNullable(attachments)
         .orElse(Collections.emptyList())) { // null 방지 optional 사용
-      BinaryContentCreate binaryContentCreate = new BinaryContentCreate(file);
-      BinaryContent binaryContent = binaryContentService.create(binaryContentCreate);
+      BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(file);
+      BinaryContent binaryContent = binaryContentService.create(binaryContentCreateRequest);
       attachedFilesId.add(binaryContent.getId());
     }
     Message message = new Message(messageCreateRequest.getContent(),

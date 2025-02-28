@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.service.basic;
 
-import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreate;
+import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
@@ -18,12 +18,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +33,8 @@ public class BasicUserService implements UserService {
   private final UserStatusService userStatusService;
 
   @Override
-  public User create(UserCreateRequest userCreateRequest, MultipartFile profileImage) {
+  public User create(UserCreateRequest userCreateRequest,
+      BinaryContentCreateRequest binaryContentCreateRequest) {
     // 파라미터 검증
     if (checkEmailDuplicate(userCreateRequest.getEmail())) {
       throw new IllegalArgumentException(
@@ -46,12 +45,9 @@ public class BasicUserService implements UserService {
           "User with name " + userCreateRequest.getUsername() + " already exists");
     }
     // 프로필 이미지 저장
-    // request dto에서 profileImage가 null이 아니면 BinaryContent 생성
-    BinaryContent binaryContent = Optional.ofNullable(profileImage)
-        .map(BinaryContentCreate::new)
-        .map(binaryContentService::create)
-        .orElse(null);
-    UUID profileImageId = (binaryContent == null) ? null : binaryContent.getId();
+    BinaryContent profile = (binaryContentCreateRequest != null) ? binaryContentService.create(
+        binaryContentCreateRequest) : null;
+    UUID profileImageId = (profile == null) ? null : profile.getId();
 
     // User 생성, 저장
     User user = new User(userCreateRequest.getUsername(),
@@ -59,7 +55,6 @@ public class BasicUserService implements UserService {
         userCreateRequest.getPassword(),
         profileImageId);
     userRepository.save(user);
-
     // UserStatus 생성
     UserStatusCreateRequest userStatusCreateRequest = new UserStatusCreateRequest(user.getId(),
         UserStatusType.ONLINE,
@@ -87,7 +82,8 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public User update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile profileImage) {
+  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
+      BinaryContentCreateRequest binaryContentCreateRequest) {
     // User 객체 변경
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id" + userId + " not found"));
@@ -99,14 +95,10 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException(
           "User with name " + userUpdateRequest.getNewUsername() + " already exists");
     }
-    //프로필 이미지 선택적 대체
-    UUID profileImageId = null;
-    if (profileImage != null) {
-      binaryContentService.delete(user.getProfileId());
-      BinaryContent newProfileImage = binaryContentService.create(
-          new BinaryContentCreate(profileImage));
-      profileImageId = newProfileImage.getId();
-    }
+    // 프로필 이미지 저장
+    BinaryContent profile = (binaryContentCreateRequest != null) ? binaryContentService.create(
+        binaryContentCreateRequest) : null;
+    UUID profileImageId = (profile == null) ? null : profile.getId();
     user.update(userUpdateRequest.getNewUsername(), userUpdateRequest.getNewEmail(),
         userUpdateRequest.getNewPassword(), profileImageId);
     userRepository.save(user);

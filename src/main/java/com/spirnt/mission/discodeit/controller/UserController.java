@@ -1,5 +1,6 @@
 package com.spirnt.mission.discodeit.controller;
 
+import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
@@ -46,7 +47,9 @@ public class UserController implements UserApiDocs {
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<User> createUser(@RequestPart UserCreateRequest userCreateRequest,
       @RequestPart(required = false) MultipartFile profile) {
-    User user = userService.create(userCreateRequest, profile);
+    BinaryContentCreateRequest binaryContentCreateRequest =
+        (profile == null) ? null : new BinaryContentCreateRequest(profile);
+    User user = userService.create(userCreateRequest, binaryContentCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(user);
   }
@@ -56,7 +59,9 @@ public class UserController implements UserApiDocs {
   public ResponseEntity<User> updateUser(@PathVariable UUID userId,
       @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile) {
-    User user = userService.update(userId, userUpdateRequest, profile);
+    BinaryContentCreateRequest binaryContentCreateRequest =
+        (profile == null) ? null : new BinaryContentCreateRequest(profile);
+    User user = userService.update(userId, userUpdateRequest, binaryContentCreateRequest);
     return ResponseEntity.ok(user);
   }
 
