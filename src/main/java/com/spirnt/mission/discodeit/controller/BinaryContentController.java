@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,20 +26,13 @@ public class BinaryContentController implements BinaryContentApiDocs {
 
   // 단건 조회 및 다운로드
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContent> getFile(@PathVariable UUID fileId) {
-    BinaryContent binaryContent = binaryContentService.find(fileId);
-//    return ResponseEntity.ok()
-//        .header(HttpHeaders.CONTENT_TYPE, binaryContent.getFileType())
-//        // 이미지인 경우 inline으로 바로 보이게, 아닌 경우 다운로드 가능한 첨부파일 형태로
-//        .header(HttpHeaders.CONTENT_DISPOSITION, isImage(binaryContent.getFileType())
-//            ? "inline"
-//            : "attachment; filename=\"" + binaryContent.getFileName() + "\"")
-//        .body(resource);
+  public ResponseEntity<BinaryContent> getFile(@PathVariable UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
     return ResponseEntity.ok(binaryContent);
   }
 
-  @GetMapping()
-  public ResponseEntity<List<BinaryContent>> getFiles(List<UUID> binaryContentIds) {
+  @GetMapping("")
+  public ResponseEntity<List<BinaryContent>> getFiles(@RequestParam List<UUID> binaryContentIds) {
     List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity.ok(binaryContents);
   }

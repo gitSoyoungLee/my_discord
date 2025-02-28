@@ -60,7 +60,7 @@ public class DiscodeitApplication {
 
   public static void main(String[] args) {
 
-    //clearDataFiles("file-data-map");
+    clearDataFiles("file-data-map");
 
     SpringApplication.run(DiscodeitApplication.class, args);
   }
