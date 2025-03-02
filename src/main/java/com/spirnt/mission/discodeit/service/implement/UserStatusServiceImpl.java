@@ -69,7 +69,7 @@ public class UserStatusServiceImpl implements UserStatusService {
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
     // User가 존재하지 않으면 예외 발생
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException("User ID Not Found");
+      throw new NoSuchElementException("UserStatus with userId" + userId + " not found");
     }
     Map<UUID, UserStatus> map = userStatusRepository.findAll();
     UserStatus userStatus = map.values().stream()

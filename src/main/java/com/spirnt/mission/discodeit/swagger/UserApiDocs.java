@@ -63,7 +63,7 @@ public interface UserApiDocs {
           required = true,
           schema = @Schema(type = "string", format = "uuid")) @PathVariable UUID userId,
       @RequestPart UserUpdateRequest userUpdateRequest,
-      @Parameter(description = "수정할 User 프로필 이미지") @RequestPart(required = false) MultipartFile profileImage);
+      @Parameter(description = "수정할 User 프로필 이미지") @RequestPart(required = false) MultipartFile profile);
 
   // 사용자 삭제
   @Operation(summary = "User 삭제", operationId = "delete")

@@ -83,7 +83,8 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   @Override
   public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new NoSuchElementException("Read Status Not Found"));
+        .orElseThrow(
+            () -> new NoSuchElementException("Read Status with id " + readStatusId + " not found"));
     readStatus.update(readStatusUpdateRequest.newLastReadAt());
     readStatusRepository.save(readStatus);
     return readStatus;
