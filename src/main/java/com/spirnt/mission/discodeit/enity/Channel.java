@@ -26,7 +26,7 @@ public class Channel extends Common implements Serializable {
       this.name = name;
       anyValueUpdated = true;
     }
-    if (description != null && description.equals(this.description)) {
+    if (description != null && !description.equals(this.description)) {
       this.description = description;
       anyValueUpdated = true;
     }
@@ -47,12 +47,12 @@ public class Channel extends Common implements Serializable {
   // 객체를 UUID로 비교하기 위해
   @Override
   public boolean equals(Object obj) {
-      if (this == obj) {
-          return true;
-      }
-      if (obj == null || getClass() != obj.getClass()) {
-          return false;
-      }
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
     Channel channel = (Channel) obj;
     return Objects.equals(this.getId(), channel.getId());
   }

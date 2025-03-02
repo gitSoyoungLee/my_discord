@@ -1,6 +1,7 @@
 package com.spirnt.mission.discodeit.swagger;
 
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
+import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.enity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,7 +47,7 @@ public interface MessageApiDocs {
   })
   ResponseEntity<Message> updateMessage(
       @Parameter(name = "messageId", description = "수정할 Message ID") @PathVariable UUID messageId,
-      @RequestBody String newContent);
+      @RequestBody MessageUpdateRequest messageUpdateRequest);
 
 
   // 메시지 삭제

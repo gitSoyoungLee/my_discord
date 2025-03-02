@@ -43,8 +43,7 @@ public class MessageController implements MessageApiDocs {
   // 메시지 수정
   @PatchMapping("/{messageId}")
   public ResponseEntity<Message> updateMessage(@PathVariable UUID messageId,
-      @RequestBody String newContent) {
-    MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(newContent);
+      @RequestBody MessageUpdateRequest messageUpdateRequest) {
     Message message = messageService.update(messageId, messageUpdateRequest);
     return ResponseEntity.ok(message);
   }
