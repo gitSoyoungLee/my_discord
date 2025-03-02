@@ -48,19 +48,6 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createChannelPrivate(PrivateChannelCreateRequest privateChannelCreateRequest) {
-    // 스펙에 명시되지 않은 경우이므로 주석 처리
-//    // 참여자를 입력하지 않은 경우
-//    if (privateChannelCreateRequest.getParticipantIds() == null
-//        || privateChannelCreateRequest.getParticipantIds().isEmpty()) {
-//      throw new IllegalArgumentException("There are no participants.");
-//    }
-//    // 모두 존재하는 유저인지 검증
-//    for (UUID userID : privateChannelCreateRequest.getParticipantIds()) {
-//      if (!userRepository.existsById(userID)) {
-//        throw new NoSuchElementException(
-//            "User with id " + userID + " not found. Can't create a private channel.");
-//      }
-//    }
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
     // 채널에 참여하는 유저별 ReadStatus 생성
