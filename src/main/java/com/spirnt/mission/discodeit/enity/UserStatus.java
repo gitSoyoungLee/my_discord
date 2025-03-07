@@ -1,23 +1,31 @@
 package com.spirnt.mission.discodeit.enity;
 
-import java.io.Serializable;
+import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "user_statuses")
+@NoArgsConstructor
 @Getter
-public class UserStatus extends Common implements Serializable {
+public class UserStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private UUID userId;
-  private UserStatusType userStatusType;
+  @OneToOne(mappedBy = "status")
+  @JoinColumn(name = "user_id")
+  private User user;
+  @Column(name = "last_active_at")
   private Instant lastActiveAt; // 마지막으로 확인된 접속 시간
 
-  public UserStatus(UUID userId, UserStatusType type, Instant lastActiveAt) {
+  public UserStatus(User user, UserStatusType type, Instant lastActiveAt) {
     super();
-    this.userId = userId;
-    this.userStatusType = type;
+    this.user = user;
     this.lastActiveAt = lastActiveAt;
   }
 
@@ -31,22 +39,10 @@ public class UserStatus extends Common implements Serializable {
   }
 
   public void update(Instant lastActiveAt) {
-    boolean anyValueUpdated = false;
     if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)
         && this.lastActiveAt.isBefore(lastActiveAt)) {
       this.lastActiveAt = lastActiveAt;
-      anyValueUpdated = true;
     }
-    if (anyValueUpdated) {
-      updateClass(Instant.now());
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "UserStatus[User: " + this.userId +
-        "(" + userStatusType + ")" +
-        " LastSeenAt: " + lastActiveAt + "]";
   }
 
 }

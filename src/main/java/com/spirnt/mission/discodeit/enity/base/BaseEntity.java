@@ -1,0 +1,30 @@
+package com.spirnt.mission.discodeit.enity.base;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import java.time.Instant;
+import java.util.UUID;
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+public abstract class BaseEntity {
+
+  @Id
+  @Column(updatable = false)
+  private UUID id;
+  @CreatedDate
+  @Column(updatable = false, name = "create_at")
+  private Instant createdAt;
+
+  public BaseEntity() {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+  }
+
+}
