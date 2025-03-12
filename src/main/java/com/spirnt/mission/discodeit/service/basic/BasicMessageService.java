@@ -5,12 +5,14 @@ import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageDto;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.spirnt.mission.discodeit.dto.response.PageResponse;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.mapper.MessageMapper;
+import com.spirnt.mission.discodeit.mapper.PageResponseMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
@@ -21,13 +23,13 @@ import com.spirnt.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class BasicMessageService implements MessageService {
 
   private final MessageMapper messageMapper;
-
+  private final PageResponseMapper pageResponseMapper;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
@@ -83,16 +85,12 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
+  public PageResponse findAllByChannelId(UUID channelId, Pageable pageable) {
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
-
-    List<Message> messages = messageRepository.findAllByChannelId(channelId);
-    return messages.stream()
-        .sorted(Comparator.comparing(message -> message.getCreatedAt()))
-        .map(messageMapper::toDto)
-        .collect(Collectors.toList());
+    Page<Message> messages = messageRepository.findAllByChannelId(pageable, channelId);
+    return pageResponseMapper.fromPage(messages);
   }
 
 

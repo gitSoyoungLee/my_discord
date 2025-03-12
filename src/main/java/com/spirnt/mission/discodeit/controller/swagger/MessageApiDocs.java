@@ -3,9 +3,10 @@ package com.spirnt.mission.discodeit.controller.swagger;
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageDto;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.spirnt.mission.discodeit.dto.response.PageResponse;
+import com.spirnt.mission.discodeit.enity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,8 +67,9 @@ public interface MessageApiDocs {
   @Operation(summary = "Channel의 Message 목록 조회", operationId = "findAllByChannelId")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Message 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = MessageDto.class))))
+          content = @Content(mediaType = MediaType.ALL_VALUE, schema = @Schema(implementation = PageResponse.class)))
   })
-  ResponseEntity<List<MessageDto>> getAllMessagesByChannel(
-      @Parameter(name = "channelId", description = "조회할 Channel ID") @RequestParam UUID channelId);
+  ResponseEntity<PageResponse<Message>> getAllMessagesByChannel(
+      @Parameter(name = "channelId", description = "조회할 Channel ID") @RequestParam UUID channelId,
+      @Parameter(name = "pageable", description = "페이징 정보") Pageable pageable);
 }

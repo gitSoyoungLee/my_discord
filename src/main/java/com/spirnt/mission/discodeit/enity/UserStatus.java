@@ -1,5 +1,6 @@
 package com.spirnt.mission.discodeit.enity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +21,7 @@ public class UserStatus extends BaseUpdatableEntity {
 
   @OneToOne(mappedBy = "status")
   @JoinColumn(name = "user_id")
+  @JsonIgnoreProperties("status")
   private User user;
   @Column(name = "last_active_at")
   private Instant lastActiveAt; // 마지막으로 확인된 접속 시간

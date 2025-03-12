@@ -30,7 +30,8 @@ public class ChannelMapper {
           .forEach(participants::add);
     }
     // 해당 채널의 가장 최근 메세지 작성 시간 찾기
-    Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
+    Instant lastMessageAt = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(
+            channel.getId()).stream()
         .map(Message::getCreatedAt)
         .findFirst()
         .orElse(channel.getCreatedAt());    // 채널 내 메세지가 없는 경우 채널 생성 시간을 디폴트로 함

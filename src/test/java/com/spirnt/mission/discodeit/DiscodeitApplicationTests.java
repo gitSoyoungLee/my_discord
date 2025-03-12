@@ -21,8 +21,9 @@ class DiscodeitApplicationTests {
   void pagingTest() {
     for (int i = 0; i < 300; i++) {
       this.messageService.create(
-          new MessageCreateRequest("Hello", UUID.fromString("701aa0cf-5e86-4396-a5e9-2b0c332f83c8"),
-              UUID.fromString("3b2fe432-13fc-4da6-badd-4c9604fb8e1b")), null);
+          new MessageCreateRequest(String.valueOf(i),
+              UUID.fromString("54020981-7a63-4c64-a735-85852294dcde"),
+              UUID.fromString("7de55284-3908-41e3-bf46-6d20334b5505")), null);
     }
   }
 

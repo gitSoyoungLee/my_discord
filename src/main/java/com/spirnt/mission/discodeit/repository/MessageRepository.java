@@ -5,6 +5,8 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,10 +24,11 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   Optional<Message> findById(UUID messageId);
 
+  Page<Message> findAllByChannelId(Pageable pageable, UUID channelId);
+
   List<Message> findAllByChannelId(UUID channelId);
 
-  List<Message> findAll();
-
+  Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId);
 
   // 존재 검증
   boolean existsById(UUID messageId);
