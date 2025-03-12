@@ -1,5 +1,6 @@
 package com.spirnt.mission.discodeit.dto.channel;
 
+import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import java.time.Instant;
@@ -16,27 +17,27 @@ public class ChannelDto {
   private String name;
   private String description;
   private ChannelType type;
-  private List<UUID> participantIds;
+  private List<UserDto> participants;
   private Instant lastMessageAt;
 
   @Builder
   public ChannelDto(UUID id, String name, String description, ChannelType type,
-      List<UUID> participantIds, Instant lastMessageAt) {
+      List<UserDto> participants, Instant lastMessageAt) {
     this.id = id;
     this.name = name;
     this.description = description;
     this.type = type;
-    this.participantIds = (participantIds == null) ? new ArrayList<>() : participantIds;
+    this.participants = (participants == null) ? new ArrayList<>() : participants;
     this.lastMessageAt = lastMessageAt;
   }
 
-  public static ChannelDto of(Channel channel, List<UUID> participantIds, Instant lastMessageAt) {
+  public static ChannelDto of(Channel channel, List<UserDto> participants, Instant lastMessageAt) {
     return ChannelDto.builder()
         .id(channel.getId())
         .name(channel.getName())
         .description(channel.getDescription())
         .type(channel.getType())
-        .participantIds(participantIds)
+        .participants(participants)
         .lastMessageAt(lastMessageAt)
         .build();
   }

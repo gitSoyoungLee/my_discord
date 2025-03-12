@@ -4,6 +4,7 @@ import com.spirnt.mission.discodeit.dto.auth.LoginRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.AuthService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+  private final UserMapper userMapper;
   private final UserRepository userRepository;
 
   private final UserStatusService userStatusService;
@@ -30,6 +32,6 @@ public class AuthServiceImpl implements AuthService {
     }
     // 로그인 성공 시 온라인 상태로 업데이트
     userStatusService.updateByUserId(user.getId(), new UserStatusUpdateRequest(Instant.now()));
-    return UserDto.from(user);
+    return userMapper.toDto(user);
   }
 }

@@ -1,5 +1,6 @@
 package com.spirnt.mission.discodeit.dto.user;
 
+import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.enity.User;
 import java.time.Instant;
 import java.util.UUID;
@@ -16,18 +17,18 @@ public class UserDto {
   private String username;
   private String email;
   private Boolean online;
-  private UUID profileId;
+  private BinaryContentDto profile;
 
   @Builder
   public UserDto(UUID id, Instant createdAt, Instant updatedAt, String username, String email,
-      Boolean online, UUID profileId) {
+      Boolean online, BinaryContentDto profile) {
     this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.username = username;
     this.email = email;
     this.online = online;
-    this.profileId = profileId;
+    this.profile = profile;
   }
 
   public static UserDto from(User user) {
@@ -38,7 +39,7 @@ public class UserDto {
         .username(user.getUsername())
         .email(user.getEmail())
         .online(user.getStatus().isOnline())
-        .profileId((user.getProfile() != null) ? user.getProfile().getId() : null)
+        .profile(BinaryContentDto.from(user.getProfile()))
         .build();
   }
 }

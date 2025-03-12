@@ -10,6 +10,7 @@ import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.mapper.MessageMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
@@ -34,6 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
+
+  private final MessageMapper messageMapper;
 
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
@@ -68,7 +71,7 @@ public class BasicMessageService implements MessageService {
         user, channel, attachedFiles));
     // 메세지 작성자를 Online 상태로
     userStatusService.updateByUserId(authorId, new UserStatusUpdateRequest(Instant.now()));
-    return MessageDto.from(message);
+    return messageMapper.toDto(message);
   }
 
   @Override
@@ -76,7 +79,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
-    return MessageDto.from(message);
+    return messageMapper.toDto(message);
   }
 
   @Override
@@ -88,7 +91,7 @@ public class BasicMessageService implements MessageService {
     List<Message> messages = messageRepository.findAllByChannelId(channelId);
     return messages.stream()
         .sorted(Comparator.comparing(message -> message.getCreatedAt()))
-        .map(MessageDto::from)
+        .map(messageMapper::toDto)
         .collect(Collectors.toList());
   }
 
@@ -99,7 +102,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
-    return MessageDto.from(message);
+    return messageMapper.toDto(message);
   }
 
   @Override

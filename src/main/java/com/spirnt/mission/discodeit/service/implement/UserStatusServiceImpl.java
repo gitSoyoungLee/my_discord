@@ -5,6 +5,7 @@ import com.spirnt.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.enity.UserStatus;
+import com.spirnt.mission.discodeit.mapper.UserStatusMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.repository.UserStatusRepository;
 import com.spirnt.mission.discodeit.service.UserStatusService;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserStatusServiceImpl implements UserStatusService {
+
+  private final UserStatusMapper userStatusMapper;
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
@@ -34,20 +37,20 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
     UserStatus userStatus = userStatusRepository.save(new UserStatus(user,
         userStatusCreateRequest.type(), Instant.now()));
-    return UserStatusDto.from(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
   public UserStatusDto find(UUID userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
-    return UserStatusDto.from(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
   public List<UserStatusDto> findAll() {
     return userStatusRepository.findAll().stream()
-        .map(UserStatusDto::from)
+        .map(userStatusMapper::toDto)
         .toList();
   }
 
@@ -58,7 +61,7 @@ public class UserStatusServiceImpl implements UserStatusService {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with id:" + userStatusId + " not found"));
-    return UserStatusDto.from(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
@@ -72,7 +75,7 @@ public class UserStatusServiceImpl implements UserStatusService {
         .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
     userStatusRepository.updateById(userStatus.getId(), userStatusUpdateRequest.newLastActiveAt());
     userStatus.update(userStatusUpdateRequest.newLastActiveAt());
-    return UserStatusDto.from(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override

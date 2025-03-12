@@ -3,6 +3,7 @@ package com.spirnt.mission.discodeit.service.implement;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.enity.BinaryContent;
+import com.spirnt.mission.discodeit.mapper.BinaryContentMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.storage.BinaryContentStorage;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BinaryContentServiceImpl implements BinaryContentService {
 
+  private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
 
@@ -36,7 +38,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     binaryContentRepository.save(binaryContent);
     // 로컬 스토리지에 저장
     binaryContentStorage.put(binaryContent.getId(), bytes);
-    return BinaryContentDto.from(binaryContent);
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override
@@ -44,7 +46,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     BinaryContent binaryContent = binaryContentRepository.findById(id)
         .orElseThrow(
             () -> new NoSuchElementException("BinaryContent with id " + id + " not found"));
-    return BinaryContentDto.from(binaryContent);
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override

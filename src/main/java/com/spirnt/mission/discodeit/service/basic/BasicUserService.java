@@ -9,6 +9,7 @@ import com.spirnt.mission.discodeit.enity.BinaryContent;
 import com.spirnt.mission.discodeit.enity.User;
 import com.spirnt.mission.discodeit.enity.UserStatus;
 import com.spirnt.mission.discodeit.enity.UserStatusType;
+import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.repository.UserStatusRepository;
@@ -26,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
+
+  private final UserMapper userMapper;
 
   private final UserRepository userRepository;
 
@@ -62,14 +65,14 @@ public class BasicUserService implements UserService {
           .orElseThrow(() -> new RuntimeException());
     }
     user.setProfileAndStatus(binaryContent, userStatus);
-    return UserDto.from(user);
+    return userMapper.toDto(user);
   }
 
   @Override
   public UserDto find(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id" + userId + " not found"));
-    return UserDto.from(user);
+    return userMapper.toDto(user);
   }
 
   @Override
@@ -77,7 +80,7 @@ public class BasicUserService implements UserService {
     List<User> users = userRepository.findAll();
     return users.stream()
         .sorted(Comparator.comparing(user -> user.getCreatedAt()))
-        .map(UserDto::from)
+        .map(userMapper::toDto)
         .toList();
   }
 
@@ -110,7 +113,7 @@ public class BasicUserService implements UserService {
             : binaryContentRepository.findById(binaryContentDto.getId())
                 .orElse(null);
     user.update(username, email, password, binaryContent);
-    return UserDto.from(user);
+    return userMapper.toDto(user);
   }
 
   @Override

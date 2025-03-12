@@ -6,6 +6,7 @@ import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ReadStatus;
 import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.mapper.ReadStatusMapper;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReadStatusServiceImpl implements ReadStatusService {
 
+  private final ReadStatusMapper readStatusMapper;
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
@@ -32,7 +34,6 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     UUID userId = readStatusCreateRequest.userId();
     UUID channelId = readStatusCreateRequest.channelId();
     Instant lastReadAt = readStatusCreateRequest.lastReadAt();
-    System.out.println("입력받은 lastReadAt: " + lastReadAt);
     // User와 Channel 존재하지 않으면 예외 발생
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
@@ -47,8 +48,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
               + channelId + " already exists");
     }
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel, lastReadAt));
-    System.out.println("생성된 ReadStauts lastReadAt: " + readStatus.getLastReadAt());
-    return ReadStatusDto.from(readStatus);
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
@@ -56,14 +56,14 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("Read Status with id " + readStatusId + " not found"));
-    return ReadStatusDto.from(readStatus);
+    return readStatusMapper.toDto(readStatus);
   }
 
 
   @Override
   public List<ReadStatusDto> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream()
-        .map(ReadStatusDto::from)
+        .map(readStatusMapper::toDto)
         .collect(Collectors.toList());
   }
 
@@ -73,7 +73,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("Read Status with id " + readStatusId + " not found"));
-    return ReadStatusDto.from(readStatus);
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
