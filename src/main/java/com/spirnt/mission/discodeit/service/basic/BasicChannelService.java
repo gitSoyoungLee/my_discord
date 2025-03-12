@@ -5,20 +5,26 @@ import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
+import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.enity.ChannelType;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.mapper.ChannelMapper;
+import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +33,7 @@ import org.springframework.stereotype.Service;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelMapper channelMapper;
+  private final UserMapper userMapper;
 
   private final ChannelRepository channelRepository;
   private final MessageRepository messageRepository;
@@ -39,7 +46,9 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto createChannelPublic(PublicChannelCreateRequest publicChannelCreateRequest) {
     Channel channel = channelRepository.save(new Channel(publicChannelCreateRequest.name(),
         publicChannelCreateRequest.description(), ChannelType.PUBLIC));
-    return channelMapper.toDto(channel);
+    return channelMapper.toDto(channel,
+        getParticipants(channel),
+        getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
   }
 
   @Override
@@ -51,14 +60,18 @@ public class BasicChannelService implements ChannelService {
       readStatusService.create(
           new ReadStatusCreateRequest(userId, channel.getId(), channel.getCreatedAt()));
     }
-    return channelMapper.toDto(channel);
+    return channelMapper.toDto(channel,
+        getParticipants(channel),
+        getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
   }
 
   @Override
   public ChannelDto find(UUID userId, UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("Channel ID: " + channelId + " Not Found"));
-    return channelMapper.toDto(channel);
+    return channelMapper.toDto(channel,
+        getParticipants(channel),
+        getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
   }
 
   @Override
@@ -76,7 +89,9 @@ public class BasicChannelService implements ChannelService {
                 && readStatusRepository.existsByUserIdAndChannelId(
                 userId, channel.getId())))
         .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
-        .map(channelMapper::toDto)
+        .map(channel -> channelMapper.toDto(channel,
+            getParticipants(channel),
+            getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt())))
         .toList();
   }
 
@@ -96,7 +111,9 @@ public class BasicChannelService implements ChannelService {
       channel.update(publicChannelUpdateRequest.newName(),
           publicChannelUpdateRequest.newDescription());
     }
-    return channelMapper.toDto(channel);
+    return channelMapper.toDto(channel,
+        getParticipants(channel),
+        getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
   }
 
   @Override
@@ -120,6 +137,22 @@ public class BasicChannelService implements ChannelService {
     channelRepository.deleteById(channelId);
   }
 
+  // 해당 채널 메세지를 정렬하여 가장 최근 메세지 시간 찾기
+  public Optional<Instant> getLastMessageAt(UUID channelId) {
+    Optional<Instant> lastSeenAt = messageRepository.findAllByChannelId(channelId).stream()
+        .map(Message::getCreatedAt)
+        .findFirst();
+    return lastSeenAt;
+  }
+
+  public List<UserDto> getParticipants(Channel channel) {
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
+      return readStatusRepository.findAllByChannelId(channel.getId()).stream()
+          .map(readStatus -> userMapper.toDto(readStatus.getUser()))
+          .collect(Collectors.toList());
+    }
+    return new ArrayList<>();
+  }
 
 }
 

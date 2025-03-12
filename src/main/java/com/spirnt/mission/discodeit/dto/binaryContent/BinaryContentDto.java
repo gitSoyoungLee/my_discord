@@ -22,6 +22,9 @@ public class BinaryContentDto {
   }
 
   public static BinaryContentDto from(BinaryContent binaryContent) {
+    if (binaryContent == null) {
+      return null;
+    }
     return BinaryContentDto.builder()
         .id(binaryContent.getId())
         .fileName(binaryContent.getFileName())

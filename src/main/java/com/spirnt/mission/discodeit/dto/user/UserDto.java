@@ -39,7 +39,7 @@ public class UserDto {
         .username(user.getUsername())
         .email(user.getEmail())
         .online(user.getStatus().isOnline())
-        .profile(BinaryContentDto.from(user.getProfile()))
+        .profile((user.getProfile() != null) ? BinaryContentDto.from(user.getProfile()) : null)
         .build();
   }
 }
