@@ -1,7 +1,7 @@
-package com.spirnt.mission.discodeit.swagger;
+package com.spirnt.mission.discodeit.controller.swagger;
 
 import com.spirnt.mission.discodeit.dto.auth.LoginRequest;
-import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.dto.user.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -19,11 +19,11 @@ public interface AuthApiDocs {
   @Operation(summary = "로그인", operationId = "login")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "로그인 성공",
-          content = @Content(schema = @Schema(implementation = User.class))),
+          content = @Content(schema = @Schema(implementation = UserDto.class))),
       @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "User with username {username} not found"))),
       @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않음",
           content = @Content(examples = @ExampleObject(value = "Wrong password")))
   })
-  ResponseEntity<User> login(@RequestBody LoginRequest loginRequest);
+  ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest);
 }

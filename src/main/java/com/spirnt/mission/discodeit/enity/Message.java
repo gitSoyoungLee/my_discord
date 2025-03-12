@@ -1,6 +1,7 @@
 package com.spirnt.mission.discodeit.enity;
 
 import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "messages")
@@ -21,11 +24,12 @@ public class Message extends BaseUpdatableEntity {
   private String content;
   @ManyToOne
   @JoinColumn(name = "author_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
   private User author;
   @ManyToOne
   @JoinColumn(name = "channel_id")
   private Channel channel;
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),

@@ -1,9 +1,9 @@
 package com.spirnt.mission.discodeit.dto.user;
 
 import com.spirnt.mission.discodeit.enity.User;
-import com.spirnt.mission.discodeit.enity.UserStatus;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -18,13 +18,27 @@ public class UserDto {
   private Boolean online;
   private UUID profileId;
 
-  public UserDto(User user, UserStatus userStatus) {
-    this.username = user.getUsername();
-    this.email = user.getEmail();
-    this.id = user.getId();
-    this.createdAt = user.getCreatedAt();
-    this.updatedAt = user.getUpdatedAt();
-    this.profileId = user.getProfileId();
-    this.online = userStatus.isOnline() ? true : false;
+  @Builder
+  public UserDto(UUID id, Instant createdAt, Instant updatedAt, String username, String email,
+      Boolean online, UUID profileId) {
+    this.id = id;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.username = username;
+    this.email = email;
+    this.online = online;
+    this.profileId = profileId;
+  }
+
+  public static UserDto from(User user) {
+    return UserDto.builder()
+        .id(user.getId())
+        .createdAt(user.getCreatedAt())
+        .updatedAt(user.getUpdatedAt())
+        .username(user.getUsername())
+        .email(user.getEmail())
+        .online(user.getStatus().isOnline())
+        .profileId((user.getProfile() != null) ? user.getProfile().getId() : null)
+        .build();
   }
 }

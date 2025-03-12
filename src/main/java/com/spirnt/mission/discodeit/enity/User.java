@@ -2,6 +2,7 @@ package com.spirnt.mission.discodeit.enity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -9,6 +10,8 @@ import jakarta.persistence.Table;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "users")
@@ -23,22 +26,38 @@ public class User extends BaseUpdatableEntity {
   @JsonIgnore // 비밀번호 노출 방지
   private String password;
 
-  @OneToOne
+  // on delete set null 설정
+  @OneToOne(orphanRemoval = true)
   @JoinColumn(name = "profile_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
   private BinaryContent profile;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "status_id")
   private UserStatus status;
 
 
-  public User(String username, String email, String password, BinaryContent profile,
-      UserStatus status) {
+  public User(String username, String email, String password) {
     super();
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profile = profile;
+  }
+
+  public void setProfileAndStatus(BinaryContent binaryContent, UserStatus userStatus) {
+    if (binaryContent != null) {
+      this.profile = binaryContent;
+    }
+    if (userStatus != null) {
+      this.status = userStatus;
+    }
+  }
+
+  public void setProfile(BinaryContent binaryContent) {
+    this.profile = binaryContent;
+  }
+
+  public void setStatus(UserStatus userStatus) {
     this.status = status;
   }
 

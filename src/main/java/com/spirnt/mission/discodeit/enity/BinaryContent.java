@@ -1,9 +1,9 @@
 package com.spirnt.mission.discodeit.enity;
 
 import com.spirnt.mission.discodeit.enity.base.BaseEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,19 +14,33 @@ import lombok.NoArgsConstructor;
 @Getter
 public class BinaryContent extends BaseEntity {
 
-  @Column(name = "file_name")
   private String fileName;
   private Long size;
-  @Column(name = "content_type")
   private String contentType;
-  private byte[] bytes;
 
-  public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+  public BinaryContent(String fileName, Long size, String contentType) {
     super();
     this.fileName = fileName;
     this.size = size;
     this.contentType = contentType;
-    this.bytes = bytes;
+  }
+
+  // UUID만으로 객체를 비교하기 위해 추가
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    BinaryContent binaryContent = (BinaryContent) obj;
+    return Objects.equals(this.getId(), binaryContent.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.getId());
   }
 
 }

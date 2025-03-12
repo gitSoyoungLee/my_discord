@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -18,27 +19,25 @@ public class ChannelDto {
   private List<UUID> participantIds;
   private Instant lastMessageAt;
 
-  public ChannelDto(Channel channel, List<UUID> participantIds, Instant lastMessageAt) {
-    this.name = channel.getName();
-    this.description = channel.getDescription();
-    this.id = channel.getId();
-    this.type = channel.getType();
+  @Builder
+  public ChannelDto(UUID id, String name, String description, ChannelType type,
+      List<UUID> participantIds, Instant lastMessageAt) {
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.type = type;
     this.participantIds = (participantIds == null) ? new ArrayList<>() : participantIds;
     this.lastMessageAt = lastMessageAt;
   }
 
-  @Override
-  public String toString() {
-    if (this.type == ChannelType.PUBLIC) {
-      return "PUBLIC Channel[Name: " + this.getName() +
-          " Description: " + this.getDescription() +
-          " ID: " + this.id + " ]";
-    } else if (this.type == ChannelType.PRIVATE) {
-      return "PRIVATE Channel[" +
-          " ID: " + this.id + "]" +
-          "\nParticipants: " + participantIds;
-    } else {
-      return "";
-    }
+  public static ChannelDto of(Channel channel, List<UUID> participantIds, Instant lastMessageAt) {
+    return ChannelDto.builder()
+        .id(channel.getId())
+        .name(channel.getName())
+        .description(channel.getDescription())
+        .type(channel.getType())
+        .participantIds(participantIds)
+        .lastMessageAt(lastMessageAt)
+        .build();
   }
 }

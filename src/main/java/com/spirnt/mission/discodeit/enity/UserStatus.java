@@ -8,6 +8,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,6 +44,24 @@ public class UserStatus extends BaseUpdatableEntity {
         && this.lastActiveAt.isBefore(lastActiveAt)) {
       this.lastActiveAt = lastActiveAt;
     }
+  }
+
+  // UUID만으로 객체를 비교하기 위해 추가
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    UserStatus userStatus = (UserStatus) obj;
+    return Objects.equals(this.getId(), userStatus.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.getId());
   }
 
 }

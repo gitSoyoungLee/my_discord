@@ -2,6 +2,8 @@ package com.spirnt.mission.discodeit.enity.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import java.time.Instant;
@@ -16,6 +18,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public abstract class BaseEntity {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(updatable = false)
   private UUID id;
   @CreatedDate
@@ -23,7 +26,6 @@ public abstract class BaseEntity {
   private Instant createdAt;
 
   public BaseEntity() {
-    this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
   }
 

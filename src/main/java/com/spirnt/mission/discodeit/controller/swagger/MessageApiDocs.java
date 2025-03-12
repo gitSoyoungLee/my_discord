@@ -1,8 +1,8 @@
-package com.spirnt.mission.discodeit.swagger;
+package com.spirnt.mission.discodeit.controller.swagger;
 
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
+import com.spirnt.mission.discodeit.dto.message.MessageDto;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.spirnt.mission.discodeit.enity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -28,11 +28,11 @@ public interface MessageApiDocs {
   @Operation(summary = "Message 생성", operationId = "create_2")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "Message가 성공적으로 생성됨",
-          content = @Content(schema = @Schema(implementation = Message.class))),
+          content = @Content(schema = @Schema(implementation = MessageDto.class))),
       @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "Channel | Author with id {channelId | authorId} not found")))
   })
-  ResponseEntity<Message> createMessage(
+  ResponseEntity<MessageDto> createMessage(
       @RequestPart MessageCreateRequest messageCreateRequest,
       @Parameter(description = "Message 첨부 파일들")
       @RequestPart(required = false) List<MultipartFile> attachments);
@@ -41,11 +41,11 @@ public interface MessageApiDocs {
   @Operation(summary = "Message 내용 수정", operationId = "update_2")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Message가 성공적으로 수정됨",
-          content = @Content(schema = @Schema(implementation = Message.class))),
+          content = @Content(schema = @Schema(implementation = MessageDto.class))),
       @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "Message with id {messageId} not found")))
   })
-  ResponseEntity<Message> updateMessage(
+  ResponseEntity<MessageDto> updateMessage(
       @Parameter(name = "messageId", description = "수정할 Message ID") @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest);
 
@@ -64,8 +64,8 @@ public interface MessageApiDocs {
   @Operation(summary = "Channel의 Message 목록 조회", operationId = "findAllByChannelId")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Message 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = Message.class))))
+          content = @Content(array = @ArraySchema(schema = @Schema(implementation = MessageDto.class))))
   })
-  ResponseEntity<List<Message>> getAllMessagesByChannel(
+  ResponseEntity<List<MessageDto>> getAllMessagesByChannel(
       @Parameter(name = "channelId", description = "조회할 Channel ID") @RequestParam UUID channelId);
 }

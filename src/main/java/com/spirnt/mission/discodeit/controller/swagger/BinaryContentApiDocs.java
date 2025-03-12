@@ -1,6 +1,6 @@
-package com.spirnt.mission.discodeit.swagger;
+package com.spirnt.mission.discodeit.controller.swagger;
 
-import com.spirnt.mission.discodeit.enity.BinaryContent;
+import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -23,19 +23,27 @@ public interface BinaryContentApiDocs {
   @Operation(summary = "첨부 파일 조회", operationId = "find")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "첨부 파일 조회 성공",
-          content = @Content(schema = @Schema(implementation = BinaryContent.class))),
+          content = @Content(schema = @Schema(implementation = BinaryContentDto.class))),
       @ApiResponse(responseCode = "404", description = "첨부 파일을 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "BinaryContent with id {binaryContentId} not found")))
   })
-  ResponseEntity<BinaryContent> getFile(
+  ResponseEntity<BinaryContentDto> getFile(
       @Parameter(name = "binaryContentId", description = "조회할 첨부 파일 ID") @PathVariable UUID binaryContentId);
 
   // 다건 조회
   @Operation(summary = "여러 첨부 파일 조회", operationId = "findAllByIdIn")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "첨부 파일 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))))
+          content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContentDto.class))))
   })
-  ResponseEntity<List<BinaryContent>> getFiles(
+  ResponseEntity<List<BinaryContentDto>> getFiles(
       @Parameter(name = "binaryContentIds", description = "조회할 첨부 파일 ID 목록") @RequestParam List<UUID> binaryContentIds);
+
+  @Operation(summary = "파일 다운로드", operationId = "download")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "파일 다운로드 성공",
+          content = @Content(schema = @Schema(type = "string", format = "binary")))
+  })
+  ResponseEntity<?> downloadFile(
+      @Parameter(name = "binaryContentId", description = "다운로드할 파일 ID") @PathVariable UUID binaryContentId);
 }

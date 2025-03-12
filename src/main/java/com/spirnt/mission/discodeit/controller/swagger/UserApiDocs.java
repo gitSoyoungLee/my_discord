@@ -1,11 +1,10 @@
-package com.spirnt.mission.discodeit.swagger;
+package com.spirnt.mission.discodeit.controller.swagger;
 
 import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
+import com.spirnt.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
-import com.spirnt.mission.discodeit.enity.User;
-import com.spirnt.mission.discodeit.enity.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -39,24 +38,24 @@ public interface UserApiDocs {
   @Operation(summary = "User 등록", operationId = "create")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "User가 성공적으로 생성됨",
-          content = @Content(schema = @Schema(implementation = User.class))),
+          content = @Content(schema = @Schema(implementation = UserDto.class))),
       @ApiResponse(responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
           content = @Content(examples = @ExampleObject(value = "User with email {email} already exists")))
   })
-  ResponseEntity<User> createUser(@RequestPart UserCreateRequest userCreateRequest,
+  ResponseEntity<UserDto> createUser(@RequestPart UserCreateRequest userCreateRequest,
       @Parameter(description = "User 프로필 이미지") @RequestPart(required = false) MultipartFile profile);
 
   // 사용자 정보 수정
   @Operation(summary = "User 정보 수정", operationId = "update")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨",
-          content = @Content(schema = @Schema(implementation = User.class))),
+          content = @Content(schema = @Schema(implementation = UserDto.class))),
       @ApiResponse(responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
           content = @Content(examples = @ExampleObject(value = "user with email {newEmail} already exists"))),
       @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "User with id {userId} not found")))
   })
-  ResponseEntity<User> updateUser(
+  ResponseEntity<UserDto> updateUser(
       @Parameter(name = "userId",
           in = ParameterIn.PATH,
           description = "수정할 User ID",
@@ -79,11 +78,11 @@ public interface UserApiDocs {
   @Operation(summary = "User 온라인 상태 업데이트", operationId = "updateUserStatusByUserId")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User 온라인 상태가 성공적으로 업데이트됨",
-          content = @Content(schema = @Schema(implementation = UserStatus.class))),
+          content = @Content(schema = @Schema(implementation = UserStatusDto.class))),
       @ApiResponse(responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음",
           content = @Content(examples = @ExampleObject(value = "UserStatus with userId {usreId} not found")))
   })
-  ResponseEntity<UserStatus> updateUserStatus(
+  ResponseEntity<UserStatusDto> updateUserStatus(
       @Parameter(name = "userId", description = "상태를 변경할 User ID") @PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest userStatusUpdateRequest);
 }
