@@ -75,9 +75,10 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<UserDto> findAll() {
-    List<User> users = userRepository.findAll();
+    List<User> users = userRepository.findAllFetchJoin();
     return users.stream()
         .sorted(Comparator.comparing(user -> user.getCreatedAt()))
         .map(userMapper::toDto)

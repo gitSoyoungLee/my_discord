@@ -30,16 +30,15 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   // 저장된 모든 데이터 가져오기
   List<User> findAll();
 
+  @Query("SELECT u FROM User u JOIN FETCH u.profile")
+  List<User> findAllFetchJoin();
+
   // 존재 검증
   @Transactional(readOnly = true)
   boolean existsById(UUID userId);
 
-  //  @Transactional(readOnly = true)
-//  @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = :email")
   boolean existsByEmail(String email);
 
-  //  @Transactional(readOnly = true)
-//  @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username")
   boolean existsByUsername(String username);
 
   @Transactional

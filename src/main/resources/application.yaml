@@ -7,8 +7,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
-
+    open-in-view: false # OSIV 비활성화
 discodeit:
   storage:
     type: local
