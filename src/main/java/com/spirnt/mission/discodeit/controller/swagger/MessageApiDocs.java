@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -70,6 +71,7 @@ public interface MessageApiDocs {
           content = @Content(mediaType = MediaType.ALL_VALUE, schema = @Schema(implementation = PageResponse.class)))
   })
   ResponseEntity<PageResponse<Message>> getAllMessagesByChannel(
-      @Parameter(name = "channelId", description = "조회할 Channel ID") @RequestParam UUID channelId,
-      @Parameter(name = "pageable", description = "페이징 정보") Pageable pageable);
+      @Parameter(name = "channelId", description = "조회할 Channel ID", required = true) @RequestParam UUID channelId,
+      @Parameter(name = "cursor", description = "페이징 커서 정보", required = false) @RequestParam Instant cursor,
+      @Parameter(name = "pageable", description = "페이징 정보", required = true) Pageable pageable);
 }

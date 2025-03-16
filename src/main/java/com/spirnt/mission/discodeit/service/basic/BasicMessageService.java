@@ -84,13 +84,35 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
+  @Transactional(readOnly = true)
   @Override
-  public PageResponse findAllByChannelId(UUID channelId, Pageable pageable) {
+  public PageResponse findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
-    Page<Message> messages = messageRepository.findAllByChannelId(pageable, channelId);
-    return pageResponseMapper.fromPage(messages);
+    Page<Message> messagePage;
+    // 첫 요청이면 가장 최신 메시지부터 가져오기
+    if (cursor == null) {
+      messagePage = messageRepository.findByChannelId(channelId, pageable);
+    } else {
+      // 커서(가장 마지막으로 조회한 메시지 작성 시간) 이전에 작성된 메시지 메시지 가져오기
+      messagePage = messageRepository.findByChannelIdAndCreatedAtLessThan(
+          channelId, cursor, pageable);
+    }
+    List<Message> messages = messagePage.getContent();
+    // 지연 로딩 문제 -> dto로 변환해서 넣기
+    List<MessageDto> messageDtos = messages.stream()
+        .map(messageMapper::toDto)
+        .toList();
+    boolean hasNext = messagePage.hasNext();
+    int size = messages.size();
+    Object nextCursor =
+        (hasNext && !messages.isEmpty()) ? messages.get(messages.size() - 1).getCreatedAt() : null;
+    return new PageResponse<>(messageDtos,
+        nextCursor,
+        size,
+        hasNext,
+        0);
   }
 
 
