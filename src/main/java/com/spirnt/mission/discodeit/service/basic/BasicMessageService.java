@@ -115,13 +115,13 @@ public class BasicMessageService implements MessageService {
         0);
   }
 
-
+  @Transactional
   @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest dto) {
-    messageRepository.updateById(messageId, dto.newContent());
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    message.update(dto.newContent());
     return messageMapper.toDto(message);
   }
 

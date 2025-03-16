@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -95,6 +96,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
+  @Transactional
   @Override
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest publicChannelUpdateRequest) {
     Channel channel = channelRepository.findById(channelId)
@@ -104,13 +106,9 @@ public class BasicChannelService implements ChannelService {
     if (channel.getType() == ChannelType.PRIVATE) {
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
-    int count = channelRepository.updateById(channelId, publicChannelUpdateRequest.newName(),
+    channel.update(publicChannelUpdateRequest.newName(),
         publicChannelUpdateRequest.newDescription());
     // 새롭게 업데이트 된 채널로 dto 반환
-    if (count > 0) {
-      channel.update(publicChannelUpdateRequest.newName(),
-          publicChannelUpdateRequest.newDescription());
-    }
     return channelMapper.toDto(channel,
         getParticipants(channel),
         getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
