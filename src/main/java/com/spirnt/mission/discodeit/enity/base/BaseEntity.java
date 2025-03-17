@@ -22,7 +22,7 @@ public abstract class BaseEntity {
   @Column(updatable = false)
   private UUID id;
   @CreatedDate
-  @Column(updatable = false, name = "create_at")
+  @Column(updatable = false, name = "created_at")
   private Instant createdAt;
 
   public BaseEntity() {

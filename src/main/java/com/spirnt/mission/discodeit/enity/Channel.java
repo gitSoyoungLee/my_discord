@@ -2,6 +2,8 @@ package com.spirnt.mission.discodeit.enity;
 
 import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.util.Objects;
 import lombok.Getter;
@@ -15,6 +17,7 @@ public class Channel extends BaseUpdatableEntity {
 
   String name;
   String description;
+  @Enumerated(EnumType.STRING)
   ChannelType type;
 
   public Channel(String name, String description, ChannelType type) {
