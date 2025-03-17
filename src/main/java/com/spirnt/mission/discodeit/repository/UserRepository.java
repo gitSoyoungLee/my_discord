@@ -30,7 +30,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   // 저장된 모든 데이터 가져오기
   List<User> findAll();
 
-  @Query("SELECT u FROM User u JOIN FETCH u.profile")
+  @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile")
   List<User> findAllFetchJoin();
 
   // 존재 검증

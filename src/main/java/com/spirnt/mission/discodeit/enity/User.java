@@ -32,7 +32,7 @@ public class User extends BaseUpdatableEntity {
   @OnDelete(action = OnDeleteAction.SET_NULL)
   private BinaryContent profile;
 
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "status_id")
   private UserStatus status;
 

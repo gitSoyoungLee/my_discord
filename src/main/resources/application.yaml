@@ -5,7 +5,7 @@ spring:
     password: discodeit1234
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     open-in-view: false # OSIV 비활성화
 discodeit:

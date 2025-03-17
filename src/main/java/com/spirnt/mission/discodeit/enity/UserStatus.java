@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class UserStatus extends BaseUpdatableEntity {
 
-  @OneToOne(mappedBy = "status")
+  @OneToOne
   @JoinColumn(name = "user_id")
   @JsonIgnoreProperties("status")
   private User user;
