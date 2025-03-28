@@ -1,21 +1,6 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    open-in-view: false # OSIV 비활성화
-    properties:
-      hibernate:
-      #format_sql: true
-      #default_batch_fetch_size: 100
 discodeit:
   storage:
     type: local
-
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    root: info
