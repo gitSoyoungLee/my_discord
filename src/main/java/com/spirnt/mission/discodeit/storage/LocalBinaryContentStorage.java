@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.NoSuchElementException;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -75,8 +77,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     Resource resource = new FileSystemResource(path);
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_TYPE, binaryContentDto.getContentType())
-        .header(HttpHeaders.CONTENT_DISPOSITION,
-            "attachment;filename=\"" + binaryContentDto.getFileName() + "\"")
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment() // (6)
+            .filename(binaryContentDto.getFileName(), StandardCharsets.UTF_8)
+            .build()
+            .toString())
         .body(resource);
   }
 }
