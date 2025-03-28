@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -26,9 +27,12 @@ public class Message extends BaseUpdatableEntity {
   @JoinColumn(name = "author_id")
   @OnDelete(action = OnDeleteAction.SET_NULL)
   private User author;
+
   @ManyToOne
   @JoinColumn(name = "channel_id")
   private Channel channel;
+
+  @BatchSize(size = 5)
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinTable(
       name = "message_attachments",

@@ -28,8 +28,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,21 +90,21 @@ public class BasicMessageService implements MessageService {
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
-    Page<Message> messagePage;
+    Slice<Message> messageSlice;
     // 첫 요청이면 가장 최신 메시지부터 가져오기
     if (cursor == null) {
-      messagePage = messageRepository.findByChannelId(channelId, pageable);
+      messageSlice = messageRepository.findByChannelId(channelId, pageable);
     } else {
       // 커서(가장 마지막으로 조회한 메시지 작성 시간) 이전에 작성된 메시지 메시지 가져오기
-      messagePage = messageRepository.findByChannelIdAndCreatedAtLessThan(
+      messageSlice = messageRepository.findByChannelIdAndCreatedAtLessThan(
           channelId, cursor, pageable);
     }
-    List<Message> messages = messagePage.getContent();
+    List<Message> messages = messageSlice.getContent();
     // 지연 로딩 문제 -> dto로 변환해서 넣기
     List<MessageDto> messageDtos = messages.stream()
         .map(messageMapper::toDto)
         .toList();
-    boolean hasNext = messagePage.hasNext();
+    boolean hasNext = messageSlice.hasNext();
     int size = messages.size();
     Object nextCursor =
         (hasNext && !messages.isEmpty()) ? messages.get(messages.size() - 1).getCreatedAt() : null;

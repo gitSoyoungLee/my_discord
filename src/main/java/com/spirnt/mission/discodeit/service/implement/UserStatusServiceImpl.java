@@ -57,10 +57,10 @@ public class UserStatusServiceImpl implements UserStatusService {
   @Override
   public UserStatusDto update(UUID userStatusId, UserStatusUpdateRequest userStatusUpdateRequest,
       Instant serverTime) {
-    userStatusRepository.updateById(userStatusId, userStatusUpdateRequest.newLastActiveAt());
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with id:" + userStatusId + " not found"));
+    userStatus.update(userStatusUpdateRequest.newLastActiveAt());
     return userStatusMapper.toDto(userStatus);
   }
 
@@ -73,7 +73,6 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NoSuchElementException("UserStatus ID Not Found"));
-    userStatusRepository.updateById(userStatus.getId(), userStatusUpdateRequest.newLastActiveAt());
     userStatus.update(userStatusUpdateRequest.newLastActiveAt());
     return userStatusMapper.toDto(userStatus);
   }

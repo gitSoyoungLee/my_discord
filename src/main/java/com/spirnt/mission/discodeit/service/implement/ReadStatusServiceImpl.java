@@ -69,7 +69,6 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
   @Override
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
-    readStatusRepository.updateById(readStatusId, readStatusUpdateRequest.newLastReadAt());
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("Read Status with id " + readStatusId + " not found"));
