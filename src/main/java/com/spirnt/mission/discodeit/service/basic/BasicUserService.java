@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserService implements UserService {
 
   private final UserMapper userMapper;
@@ -43,12 +45,13 @@ public class BasicUserService implements UserService {
     String email = userCreateRequest.email();
     String username = userCreateRequest.username();
     String password = userCreateRequest.password();
-    // 파라미터 검증
     if (userRepository.existsByEmail(email)) {
+      log.warn("[Creating User Failed: Email {} already exists]", email);
       throw new IllegalArgumentException(
           "User with email " + email + " already exists");
     }
     if (userRepository.existsByUsername(username)) {
+      log.warn("[Creating User Failed: Username {} already exists]", username);
       throw new IllegalArgumentException(
           "User with name " + username + " already exists");
     }
@@ -89,18 +92,22 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       BinaryContentCreateRequest binaryContentCreateRequest) {
+    User user = userRepository.findById(userId).orElse(null);
+    if (user == null) {
+      log.warn("Updating User Failed: User with id: {} not found", userId);
+      throw new NoSuchElementException("User with id: " + userId + " not found");
+    }
+
     String email = userUpdateRequest.newEmail();
     String username = userUpdateRequest.newUsername();
     String password = userUpdateRequest.newPassword();
-    // 영속성 컨텍스트에서 관리하게 됨
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id: " + userId + " not found"));
-    // 파라미터 검증
     if (userRepository.existsByEmail(email)) {
+      log.warn("[Creating User Failed: Email {} already exists]", email);
       throw new IllegalArgumentException(
           "User with email " + email + " already exists");
     }
     if (userRepository.existsByUsername(username)) {
+      log.warn("[Creating User Failed: Username {} already exists]", username);
       throw new IllegalArgumentException(
           "User with name " + username + " already exists");
     }
@@ -119,8 +126,11 @@ public class BasicUserService implements UserService {
 
   @Override
   public void delete(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id" + userId + " not found"));
+    User user = userRepository.findById(userId).orElse(null);
+    if (user == null) {
+      log.warn("Deleting User Failed: User with id: {} not found", userId);
+      throw new NoSuchElementException("User with id: " + userId + " not found");
+    }
     userRepository.delete(user);
   }
 

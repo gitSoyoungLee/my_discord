@@ -9,6 +9,7 @@ import com.spirnt.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
+@Slf4j
 public class ChannelController implements ChannelApiDocs {
 
   private final ChannelService channelService;
@@ -32,7 +34,9 @@ public class ChannelController implements ChannelApiDocs {
   @PostMapping("/public")
   public ResponseEntity<ChannelDto> creatChannelPublic(
       @RequestBody PublicChannelCreateRequest request) {
+    log.info("[Creating Public Chanel started]");
     ChannelDto channelDto = channelService.createChannelPublic(request);
+    log.info("[Public Channel Created / id: {}]", channelDto.getId());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelDto);
   }
@@ -41,7 +45,9 @@ public class ChannelController implements ChannelApiDocs {
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> createChannelPrivate(
       @RequestBody PrivateChannelCreateRequest request) {
+    log.info("[Creating Private Channel started]");
     ChannelDto channelDto = channelService.createChannelPrivate(request);
+    log.info("[Private Channel Created / id: {}]", channelDto.getId());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelDto);
   }
@@ -50,14 +56,18 @@ public class ChannelController implements ChannelApiDocs {
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
+    log.info("[Updating Public Channel started / id: {}]", channelId);
     ChannelDto channelDto = channelService.update(channelId, request);
+    log.info("[Channel Updated / id: {}]", channelId);
     return ResponseEntity.ok(channelDto);
   }
 
   // 채널 삭제
   @DeleteMapping("/{channelId}")
   public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
+    log.info("[Deleting Channel started / id: {}]", channelId);
     channelService.delete(channelId);
+    log.info("[Channel Deleted / id: {}]", channelId);
     return ResponseEntity.noContent().build();
   }
 

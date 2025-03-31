@@ -12,6 +12,7 @@ import com.spirnt.mission.discodeit.service.UserStatusService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController implements UserApiDocs {
 
 
@@ -46,9 +48,11 @@ public class UserController implements UserApiDocs {
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> createUser(@RequestPart UserCreateRequest userCreateRequest,
       @RequestPart(required = false) MultipartFile profile) {
+    log.info("[Creating User started]");
     BinaryContentCreateRequest binaryContentCreateRequest =
         (profile == null || profile.isEmpty()) ? null : new BinaryContentCreateRequest(profile);
     UserDto userDto = userService.create(userCreateRequest, binaryContentCreateRequest);
+    log.info("[User Created / id: {}]", userDto.getId());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(userDto);
   }
@@ -58,16 +62,20 @@ public class UserController implements UserApiDocs {
   public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
       @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile) {
+    log.info("[Updating User started / id: {}]", userId);
     BinaryContentCreateRequest binaryContentCreateRequest =
         (profile == null || profile.isEmpty()) ? null : new BinaryContentCreateRequest(profile);
     UserDto userDto = userService.update(userId, userUpdateRequest, binaryContentCreateRequest);
+    log.info("[User Updated / id: {}]", userId);
     return ResponseEntity.ok(userDto);
   }
 
   // 사용자 삭제
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+    log.info("[Deleting User started / id: {}]", userId);
     userService.delete(userId);
+    log.info("[User Deleted / id: {}]", userId);
     return ResponseEntity.noContent().build();
   }
 

@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@Slf4j
 public class MessageController implements MessageApiDocs {
 
   private final MessageService messageService;
@@ -41,7 +43,9 @@ public class MessageController implements MessageApiDocs {
   public ResponseEntity<MessageDto> createMessage(
       @RequestPart MessageCreateRequest messageCreateRequest,
       @RequestPart(required = false) List<MultipartFile> attachments) {
+    log.info("[Creating Message started]");
     MessageDto message = messageService.create(messageCreateRequest, attachments);
+    log.info("[Message Created / id:{}]", message.getId());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(message);
   }
@@ -50,14 +54,18 @@ public class MessageController implements MessageApiDocs {
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
+    log.info("[Updating message / id: {}]", messageId);
     MessageDto message = messageService.update(messageId, messageUpdateRequest);
+    log.info("[Message Updated / id: {}]", messageId);
     return ResponseEntity.ok(message);
   }
 
   // 메시지 삭제
   @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
   public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+    log.info("[Deleting Message / id: {}]", messageId);
     messageService.delete(messageId);
+    log.info("[Message Deleted / id:{}]", messageId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT)
         .build();
   }

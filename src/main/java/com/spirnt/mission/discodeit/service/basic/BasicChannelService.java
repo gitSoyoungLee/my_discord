@@ -26,11 +26,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicChannelService implements ChannelService {
 
   private final ChannelMapper channelMapper;
@@ -81,6 +83,7 @@ public class BasicChannelService implements ChannelService {
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException("User ID: " + userId + " Not Found");
     }
+    
     List<Channel> channels = channelRepository.findAll();
     return channels.stream()
         //PUBLIC이거나 User가 참여한 PRIVATE 채널이거나
