@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.controller;
+package com.spirnt.mission.discodeit.exception;
 
 import com.spirnt.mission.discodeit.dto.ErrorResponse;
 import java.util.NoSuchElementException;
