@@ -9,6 +9,7 @@ import com.spirnt.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.service.UserService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class UserController implements UserApiDocs {
 
   // 사용자 등록
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserDto> createUser(@RequestPart UserCreateRequest userCreateRequest,
+  public ResponseEntity<UserDto> createUser(@Valid @RequestPart UserCreateRequest userCreateRequest,
       @RequestPart(required = false) MultipartFile profile) {
     log.info("[Creating User started]");
     BinaryContentCreateRequest binaryContentCreateRequest =
@@ -60,7 +61,7 @@ public class UserController implements UserApiDocs {
   // 사용자 정보 수정
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
-      @RequestPart UserUpdateRequest userUpdateRequest,
+      @Valid @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile) {
     log.info("[Updating User started / id: {}]", userId);
     BinaryContentCreateRequest binaryContentCreateRequest =
@@ -82,7 +83,7 @@ public class UserController implements UserApiDocs {
   // 사용자의 온라인 상태 업데이트
   @PatchMapping(value = "/{userId}/userStatus", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UserStatusDto> updateUserStatus(@PathVariable UUID userId,
-      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+      @Valid @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
     return ResponseEntity.ok(userStatusDto);
   }

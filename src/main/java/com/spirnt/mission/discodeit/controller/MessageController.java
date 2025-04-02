@@ -6,6 +6,7 @@ import com.spirnt.mission.discodeit.dto.message.MessageDto;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.response.PageResponse;
 import com.spirnt.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -40,7 +41,7 @@ public class MessageController implements MessageApiDocs {
   // 메시지 전송
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> createMessage(
-      @RequestPart MessageCreateRequest messageCreateRequest,
+      @Valid @RequestPart MessageCreateRequest messageCreateRequest,
       @RequestPart(required = false) List<MultipartFile> attachments) {
     log.info("[Creating Message started]");
     MessageDto message = messageService.create(messageCreateRequest, attachments);
@@ -52,7 +53,7 @@ public class MessageController implements MessageApiDocs {
   // 메시지 수정
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
-      @RequestBody MessageUpdateRequest messageUpdateRequest) {
+      @Valid @RequestBody MessageUpdateRequest messageUpdateRequest) {
     log.info("[Updating message / id: {}]", messageId);
     MessageDto message = messageService.update(messageId, messageUpdateRequest);
     log.info("[Message Updated / id: {}]", messageId);

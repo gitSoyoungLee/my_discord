@@ -6,6 +6,7 @@ import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.spirnt.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class ChannelController implements ChannelApiDocs {
   // 공개 채널 생성
   @PostMapping("/public")
   public ResponseEntity<ChannelDto> creatChannelPublic(
-      @RequestBody PublicChannelCreateRequest request) {
+      @Valid @RequestBody PublicChannelCreateRequest request) {
     log.info("[Creating Public Chanel started]");
     ChannelDto channelDto = channelService.createChannelPublic(request);
     log.info("[Public Channel Created / id: {}]", channelDto.getId());
@@ -44,7 +45,7 @@ public class ChannelController implements ChannelApiDocs {
   // 비공개 채널 생성
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> createChannelPrivate(
-      @RequestBody PrivateChannelCreateRequest request) {
+      @Valid @RequestBody PrivateChannelCreateRequest request) {
     log.info("[Creating Private Channel started]");
     ChannelDto channelDto = channelService.createChannelPrivate(request);
     log.info("[Private Channel Created / id: {}]", channelDto.getId());
@@ -55,7 +56,7 @@ public class ChannelController implements ChannelApiDocs {
   // 공개 채널 정보 수정
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable UUID channelId,
-      @RequestBody PublicChannelUpdateRequest request) {
+      @Valid @RequestBody PublicChannelUpdateRequest request) {
     log.info("[Updating Public Channel started / id: {}]", channelId);
     ChannelDto channelDto = channelService.update(channelId, request);
     log.info("[Channel Updated / id: {}]", channelId);
