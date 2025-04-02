@@ -1,7 +1,9 @@
 package com.spirnt.mission.discodeit.exception;
 
 import com.spirnt.mission.discodeit.dto.ErrorResponse;
-import java.util.NoSuchElementException;
+import java.time.Instant;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,33 +11,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@Slf4j
+@Order(2)
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidationError(MethodArgumentNotValidException e) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(new ErrorResponse("Validation failed"));
-  }
-
-  // 400
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(new ErrorResponse(e.getMessage()));
-  }
-
-  // 404
-  @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<ErrorResponse> handleNoSuchElement(NoSuchElementException e) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(new com.spirnt.mission.discodeit.dto.ErrorResponse(e.getMessage()));
+        .body(new ErrorResponse(Instant.now(), "InvalidMethodArgument", "Invalid Method Argument",
+            null, e.getClass().getSimpleName(), 400));
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleException(Exception e) {
-    e.printStackTrace();
-    return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(e.getMessage());
+  public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(new ErrorResponse(Instant.now(), "Exception", e.getMessage(),
+            null, e.getClass().getSimpleName(), 500));
   }
 }

@@ -4,9 +4,9 @@ import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.Map;
 
-public class UserStatusAlreadyExistsException extends UserStatusException {
+public class UserStatusAlreadyExistException extends UserStatusException {
 
-  public UserStatusAlreadyExistsException(Instant timestamp, Map<String, Object> details) {
+  public UserStatusAlreadyExistException(Instant timestamp, Map<String, Object> details) {
     super(timestamp, ErrorCode.USERSTATUS_ALREADY_EXISTS, details);
   }
 }

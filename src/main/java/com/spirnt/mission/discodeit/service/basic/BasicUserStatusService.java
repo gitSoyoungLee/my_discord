@@ -7,7 +7,7 @@ import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.entity.UserStatus;
 import com.spirnt.mission.discodeit.exception.Message.MessageNotFoundException;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
-import com.spirnt.mission.discodeit.exception.UserStatus.UserStatusAlreadyExistsException;
+import com.spirnt.mission.discodeit.exception.UserStatus.UserStatusAlreadyExistException;
 import com.spirnt.mission.discodeit.exception.UserStatus.UserStatusNotFoundException;
 import com.spirnt.mission.discodeit.mapper.UserStatusMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
@@ -45,7 +45,7 @@ public class BasicUserStatusService implements UserStatusService {
       log.warn(
           "[Creating UserStatus Failed: UserStatus with userId {} already exists]",
           userId);
-      throw new UserStatusAlreadyExistsException(Instant.now(),
+      throw new UserStatusAlreadyExistException(Instant.now(),
           Map.of("userID", userId));
     }
     UserStatus userStatus = userStatusRepository.save(new UserStatus(user,
