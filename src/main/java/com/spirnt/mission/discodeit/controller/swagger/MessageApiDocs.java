@@ -4,7 +4,6 @@ import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageDto;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.response.PageResponse;
-import com.spirnt.mission.discodeit.enity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -70,7 +69,7 @@ public interface MessageApiDocs {
       @ApiResponse(responseCode = "200", description = "Message 목록 조회 성공",
           content = @Content(mediaType = MediaType.ALL_VALUE, schema = @Schema(implementation = PageResponse.class)))
   })
-  ResponseEntity<PageResponse<Message>> getAllMessagesByChannel(
+  ResponseEntity<PageResponse<MessageDto>> getAllMessagesByChannel(
       @Parameter(name = "channelId", description = "조회할 Channel ID", required = true) @RequestParam UUID channelId,
       @Parameter(name = "cursor", description = "페이징 커서 정보", required = false) @RequestParam Instant cursor,
       @Parameter(name = "pageable", description = "페이징 정보", required = true) Pageable pageable);

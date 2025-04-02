@@ -1,7 +1,7 @@
 package com.spirnt.mission.discodeit.mapper;
 
 import com.spirnt.mission.discodeit.dto.userStatus.UserStatusDto;
-import com.spirnt.mission.discodeit.enity.UserStatus;
+import com.spirnt.mission.discodeit.entity.UserStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

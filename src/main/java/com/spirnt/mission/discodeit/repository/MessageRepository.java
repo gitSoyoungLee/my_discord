@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.repository;
 
-import com.spirnt.mission.discodeit.enity.Message;
+import com.spirnt.mission.discodeit.entity.Message;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

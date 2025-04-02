@@ -1,6 +1,7 @@
 package com.spirnt.mission.discodeit.storage;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.spirnt.mission.discodeit.exception.BinaryContent.FileException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,8 +11,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.NoSuchElementException;
+import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -21,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
@@ -54,7 +58,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try (FileOutputStream fos = new FileOutputStream(file)) {
       fos.write(bytes);
     } catch (IOException e) {
-      return null;
+      log.warn("[스토리지에 파일 저장 중 오류가 발생했습니다.]");
+      throw new FileException(Instant.now(), Map.of("binaryContentId", binaryContentId));
     }
     return binaryContentId;
   }
@@ -66,7 +71,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       return new FileInputStream(String.valueOf(path));
     } catch (FileNotFoundException e) {
-      throw new NoSuchElementException("File with: " + binaryContentId + " not found");
+      log.warn("[스토리지에 파일이 없습니다.]");
+      throw new FileException(Instant.now(), Map.of("binaryContentId", binaryContentId));
     }
   }
 

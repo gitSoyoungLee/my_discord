@@ -5,7 +5,6 @@ import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageDto;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.response.PageResponse;
-import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.List;
@@ -72,11 +71,13 @@ public class MessageController implements MessageApiDocs {
 
   // 특정 채널의 메시지 목록 조회
   @GetMapping("")
-  public ResponseEntity<PageResponse<Message>> getAllMessagesByChannel(@RequestParam UUID channelId,
+  public ResponseEntity<PageResponse<MessageDto>> getAllMessagesByChannel(
+      @RequestParam UUID channelId,
       @RequestParam(required = false) Instant cursor,
       @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
       Pageable pageable) {
-    PageResponse<Message> messages = messageService.findAllByChannelId(channelId, cursor, pageable);
+    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
+        pageable);
     return ResponseEntity.ok(messages);
   }
 }

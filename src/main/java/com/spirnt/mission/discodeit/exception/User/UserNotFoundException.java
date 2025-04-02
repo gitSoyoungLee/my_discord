@@ -3,7 +3,6 @@ package com.spirnt.mission.discodeit.exception.User;
 import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * ID로 User를 조회했으나 User가 데이터베이스에 조회하지 않을 때 발생하는 예외
@@ -11,8 +10,7 @@ import java.util.UUID;
 public class UserNotFoundException extends UserException {
 
 
-  public UserNotFoundException(Instant timestamp,
-      UUID userId) {
-    super(timestamp, ErrorCode.USER_NOT_FOUND, Map.of("id", userId));
+  public UserNotFoundException(Instant timestamp, Map<String, Object> details) {
+    super(timestamp, ErrorCode.USER_NOT_FOUND, details);
   }
 }

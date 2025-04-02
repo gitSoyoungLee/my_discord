@@ -39,3 +39,4 @@ out/
 
 *.ser
 localStorage/*
+logs/*

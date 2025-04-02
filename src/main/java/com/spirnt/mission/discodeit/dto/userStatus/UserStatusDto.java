@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.dto.userStatus;
 
-import com.spirnt.mission.discodeit.enity.UserStatus;
+import com.spirnt.mission.discodeit.entity.UserStatus;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;

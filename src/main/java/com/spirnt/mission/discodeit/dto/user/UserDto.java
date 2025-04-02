@@ -1,7 +1,7 @@
 package com.spirnt.mission.discodeit.dto.user;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
-import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.entity.User;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;

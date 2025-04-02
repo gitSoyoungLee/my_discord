@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.repository;
 
-import com.spirnt.mission.discodeit.enity.UserStatus;
+import com.spirnt.mission.discodeit.entity.UserStatus;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.repository;
 
-import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

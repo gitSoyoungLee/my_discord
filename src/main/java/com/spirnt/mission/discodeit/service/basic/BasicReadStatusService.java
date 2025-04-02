@@ -1,11 +1,15 @@
-package com.spirnt.mission.discodeit.service.implement;
+package com.spirnt.mission.discodeit.service.basic;
 
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
-import com.spirnt.mission.discodeit.enity.Channel;
-import com.spirnt.mission.discodeit.enity.ReadStatus;
-import com.spirnt.mission.discodeit.enity.User;
+import com.spirnt.mission.discodeit.entity.Channel;
+import com.spirnt.mission.discodeit.entity.ReadStatus;
+import com.spirnt.mission.discodeit.entity.User;
+import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
+import com.spirnt.mission.discodeit.exception.ReadStatus.ReadStatusAlreadyExistException;
+import com.spirnt.mission.discodeit.exception.ReadStatus.ReadStatusNotFoundException;
+import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.ReadStatusMapper;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
@@ -13,7 +17,7 @@ import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ReadStatusServiceImpl implements ReadStatusService {
+public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusMapper readStatusMapper;
   private final ReadStatusRepository readStatusRepository;
@@ -36,18 +40,28 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     UUID userId = readStatusCreateRequest.userId();
     UUID channelId = readStatusCreateRequest.channelId();
     Instant lastReadAt = readStatusCreateRequest.lastReadAt();
+
     // User와 Channel 존재하지 않으면 예외 발생
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("[Creating ReadStatus Failed: Channel with id {} not found]", channelId);
+          return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
+        });
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> {
+          log.warn("[Creating ReadStatus Failed: User with id {} not found]", userId);
+          return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+        });
+
     //이미 해당 채널-유저를 가진 ReadStatus가 있으면 예외 발생
     if (readStatusRepository.existsByUserIdAndChannelId(userId,
         channelId)) {
-      throw new IllegalArgumentException(
-          "ReadStatus with userId " + userId + " and channelId "
-              + channelId + " already exists");
+      log.warn(
+          "[Creating ReadStatus Failed: ReadStatus with userId {} and channelId {} already exists]",
+          userId, channelId);
+      throw new ReadStatusAlreadyExistException(Instant.now(),
+          Map.of("userID", userId, "channelId", channelId));
+
     }
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel, lastReadAt));
     return readStatusMapper.toDto(readStatus);
@@ -57,7 +71,8 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   public ReadStatusDto find(UUID readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(
-            () -> new NoSuchElementException("Read Status with id " + readStatusId + " not found"));
+            () -> new ReadStatusNotFoundException(Instant.now(),
+                Map.of("readStatusId", readStatusId)));
     return readStatusMapper.toDto(readStatus);
   }
 
@@ -72,8 +87,12 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   @Override
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Read Status with id " + readStatusId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("[Updaing ReadStatud Failed: ReadStatus with id {} not found]",
+              readStatusId);
+          return new ReadStatusNotFoundException(Instant.now(),
+              Map.of("readStatusId", readStatusId));
+        });
     return readStatusMapper.toDto(readStatus);
   }
 

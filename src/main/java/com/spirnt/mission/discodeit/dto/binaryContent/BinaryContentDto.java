@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.dto.binaryContent;
 
-import com.spirnt.mission.discodeit.enity.BinaryContent;
+import com.spirnt.mission.discodeit.entity.BinaryContent;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;

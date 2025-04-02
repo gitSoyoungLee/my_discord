@@ -1,15 +1,17 @@
-package com.spirnt.mission.discodeit.service.implement;
+package com.spirnt.mission.discodeit.service.basic;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
-import com.spirnt.mission.discodeit.enity.BinaryContent;
+import com.spirnt.mission.discodeit.entity.BinaryContent;
+import com.spirnt.mission.discodeit.exception.BinaryContent.BinaryContentNotFoundException;
 import com.spirnt.mission.discodeit.mapper.BinaryContentMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.storage.BinaryContentStorage;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BinaryContentServiceImpl implements BinaryContentService {
+public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentRepository binaryContentRepository;
@@ -46,8 +48,11 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public BinaryContentDto find(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id)
-        .orElseThrow(
-            () -> new NoSuchElementException("BinaryContent with id " + id + " not found"));
+        .orElseThrow(() -> {
+          log.warn("[Finding BinaryContent Failed: BinaryContent with id {} not found]", id);
+          return new BinaryContentNotFoundException(Instant.now(),
+              Map.of("binaryContentId", id));
+        });
     return binaryContentMapper.toDto(binaryContent);
   }
 
@@ -60,9 +65,5 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     return list;
   }
 
-  @Override
-  public void delete(UUID id) {
-    binaryContentRepository.deleteById(id);
-  }
 
 }

@@ -1,7 +1,7 @@
 package com.spirnt.mission.discodeit.mapper;
 
 import com.spirnt.mission.discodeit.dto.message.MessageDto;
-import com.spirnt.mission.discodeit.enity.Message;
+import com.spirnt.mission.discodeit.entity.Message;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

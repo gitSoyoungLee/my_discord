@@ -7,9 +7,7 @@ import java.util.Map;
 
 public class ReadStatusException extends DiscodeitException {
 
-  public ReadStatusException(Instant timestamp,
-      ErrorCode errorCode,
-      Map<String, Object> details) {
+  public ReadStatusException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
     super(timestamp, errorCode, details);
   }
 }

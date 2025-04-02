@@ -7,9 +7,7 @@ import java.util.Map;
 
 public class MessageException extends DiscodeitException {
 
-  public MessageException(Instant timestamp,
-      ErrorCode errorCode,
-      Map<String, Object> details) {
+  public MessageException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
     super(timestamp, errorCode, details);
   }
 }

@@ -9,9 +9,7 @@ import java.util.Map;
  */
 public class UserStatusNotFoundException extends UserStatusException {
 
-  public UserStatusNotFoundException(Instant timestamp,
-      ErrorCode errorCode,
-      Map<String, Object> details) {
-    super(timestamp, errorCode, details);
+  public UserStatusNotFoundException(Instant timestamp, Map<String, Object> details) {
+    super(timestamp, ErrorCode.USERSTATUS_NOT_FOUND, details);
   }
 }

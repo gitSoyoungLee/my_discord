@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod
+    default: prod
 discodeit:
   storage:
     type: local

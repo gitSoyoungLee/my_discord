@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.dto.readStatus;
 
-import com.spirnt.mission.discodeit.enity.ReadStatus;
+import com.spirnt.mission.discodeit.entity.ReadStatus;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;

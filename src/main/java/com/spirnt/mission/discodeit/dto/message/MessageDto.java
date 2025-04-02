@@ -3,7 +3,7 @@ package com.spirnt.mission.discodeit.dto.message;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
-import com.spirnt.mission.discodeit.enity.Message;
+import com.spirnt.mission.discodeit.entity.Message;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

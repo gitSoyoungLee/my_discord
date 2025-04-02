@@ -1,7 +1,7 @@
 package com.spirnt.mission.discodeit.mapper;
 
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
-import com.spirnt.mission.discodeit.enity.ReadStatus;
+import com.spirnt.mission.discodeit.entity.ReadStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

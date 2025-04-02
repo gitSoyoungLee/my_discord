@@ -7,8 +7,7 @@ import java.util.Map;
 
 public class BinaryContentException extends DiscodeitException {
 
-  public BinaryContentException(Instant timestamp,
-      ErrorCode errorCode,
+  public BinaryContentException(Instant timestamp, ErrorCode errorCode,
       Map<String, Object> details) {
     super(timestamp, errorCode, details);
   }

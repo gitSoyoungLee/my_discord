@@ -1,6 +1,6 @@
 package com.spirnt.mission.discodeit.dto.userStatus;
 
-import com.spirnt.mission.discodeit.enity.UserStatusType;
+import com.spirnt.mission.discodeit.entity.UserStatusType;
 import java.time.Instant;
 import java.util.UUID;
 
