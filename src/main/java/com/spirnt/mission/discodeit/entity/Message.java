@@ -1,6 +1,6 @@
-package com.spirnt.mission.discodeit.enity;
+package com.spirnt.mission.discodeit.entity;
 
-import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import com.spirnt.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -30,6 +30,7 @@ public class Message extends BaseUpdatableEntity {
 
   @ManyToOne
   @JoinColumn(name = "channel_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Channel channel;
 
   @BatchSize(size = 5)

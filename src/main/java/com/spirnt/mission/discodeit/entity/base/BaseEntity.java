@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.enity.base;
+package com.spirnt.mission.discodeit.entity.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

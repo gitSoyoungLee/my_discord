@@ -1,6 +1,6 @@
-package com.spirnt.mission.discodeit.enity;
+package com.spirnt.mission.discodeit.entity;
 
-import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import com.spirnt.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -10,6 +10,8 @@ import java.time.Instant;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 // 사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현하는 도메인
 // '유저'가 '채널'에서 마지막으로 읽은 '메세지' 기록
@@ -21,10 +23,14 @@ public class ReadStatus extends BaseUpdatableEntity {
 
   @ManyToOne
   @JoinColumn(name = "user_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;
+
   @ManyToOne
   @JoinColumn(name = "channel_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Channel channel;
+
   @Column(name = "last_read_at")
   private Instant lastReadAt;
 

@@ -1,7 +1,7 @@
-package com.spirnt.mission.discodeit.enity;
+package com.spirnt.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import com.spirnt.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -12,6 +12,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "user_statuses")
@@ -21,8 +23,10 @@ public class UserStatus extends BaseUpdatableEntity {
 
   @OneToOne
   @JoinColumn(name = "user_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JsonIgnoreProperties("status")
   private User user;
+
   @Column(name = "last_active_at")
   private Instant lastActiveAt; // 마지막으로 확인된 접속 시간
 

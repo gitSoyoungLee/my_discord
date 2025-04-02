@@ -1,6 +1,6 @@
-package com.spirnt.mission.discodeit.enity;
+package com.spirnt.mission.discodeit.entity;
 
-import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import com.spirnt.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

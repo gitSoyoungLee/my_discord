@@ -1,6 +1,6 @@
-package com.spirnt.mission.discodeit.enity;
+package com.spirnt.mission.discodeit.entity;
 
-import com.spirnt.mission.discodeit.enity.base.BaseEntity;
+import com.spirnt.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.util.Objects;
