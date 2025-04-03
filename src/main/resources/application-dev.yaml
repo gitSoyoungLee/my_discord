@@ -22,3 +22,9 @@ logging:
     root: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+info:
+  datasource:
+    url: ${spring.datasource.url}
+    driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
