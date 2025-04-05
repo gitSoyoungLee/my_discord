@@ -59,15 +59,15 @@ public class BasicMessageService implements MessageService {
     UUID authorId = messageCreateRequest.authorId();
     UUID channelId = messageCreateRequest.channelId();
 
-    Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> {
-          log.warn("[Creating Message Failed: Channel with id {} not found]", channelId);
-          return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
-        });
     User user = userRepository.findById(authorId)
         .orElseThrow(() -> {
           log.warn("[Creating Message Failed: User with id {} not found]", authorId);
           return new UserNotFoundException(Instant.now(), Map.of("userId", authorId));
+        });
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> {
+          log.warn("[Creating Message Failed: Channel with id {} not found]", channelId);
+          return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
         });
 
     // 첨부 파일 업로드

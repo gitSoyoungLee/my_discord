@@ -1,9 +1,10 @@
-package com.spirnt.mission.discodeit;
+package com.spirnt.mission.discodeit.serviceUnitTests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,17 +49,19 @@ public class UserServiceTest {
     UserCreateRequest userCreateRequest = new UserCreateRequest("Anna", "Anna@mail.com",
         "password");
     User user = new User("Anna", "Anna@mail.com", "password");
-    UserDto userDto = new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
-        user.getUsername(), user.getEmail(), true, null);
 
     // 중복 검사 통과하도록 설정
     when(userRepository.existsByEmail(userCreateRequest.email())).thenReturn(false);
     when(userRepository.existsByUsername(userCreateRequest.username())).thenReturn(false);
     // mock 객체 반환값 설정
-    when(userRepository.save(any(User.class))).thenReturn(user);
+    when(userRepository.save(eq(user))).thenReturn(user);
     when(userStatusRepository.save(any(UserStatus.class))).thenReturn(
         new UserStatus(user, UserStatusType.ONLINE, Instant.now()));
-    when(userMapper.toDto(any(User.class))).thenReturn(userDto);
+    when(userMapper.toDto(any(User.class))).thenAnswer(invocation -> {
+      User userArg = invocation.getArgument(0);
+      return new UserDto(userArg.getId(), userArg.getCreatedAt(), userArg.getUpdatedAt(),
+          userArg.getUsername(), userArg.getEmail(), true, null);
+    });
 
     // when
     UserDto result = basicUserService.create(userCreateRequest, null);
@@ -97,13 +100,15 @@ public class UserServiceTest {
     User user = new User("Anna", "Anna@mail.com", "password");
     UserUpdateRequest userUpdateRequest = new UserUpdateRequest("Andy", "Andy@mail.com",
         "newPassword");
-    UserDto answer = new UserDto(userId, user.getCreatedAt(), user.getUpdatedAt(),
-        userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), true, null);
 
     when(userRepository.existsByEmail(userUpdateRequest.newEmail())).thenReturn(false);
     when(userRepository.existsByUsername(userUpdateRequest.newUsername())).thenReturn(false);
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(userMapper.toDto(user)).thenReturn(answer);
+    when(userMapper.toDto(any(User.class))).thenAnswer(invocation -> {
+      User userArg = invocation.getArgument(0);
+      return new UserDto(userArg.getId(), userArg.getCreatedAt(), userArg.getUpdatedAt(),
+          userArg.getUsername(), userArg.getEmail(), true, null);
+    });
 
     // when
     UserDto result = basicUserService.update(userId, userUpdateRequest, null);
@@ -153,7 +158,6 @@ public class UserServiceTest {
   void testDeleteUserFailDueToNotFound() {
     // given
     UUID userId = UUID.randomUUID();
-    User user = new User("Anna", "Anna@mail.com", "password");
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
     // when & then

@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit;
+package com.spirnt.mission.discodeit.serviceUnitTests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,21 +15,18 @@ import com.spirnt.mission.discodeit.dto.channel.ChannelDto;
 import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
-import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.ChannelType;
 import com.spirnt.mission.discodeit.entity.ReadStatus;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.ChannelMapper;
-import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import com.spirnt.mission.discodeit.service.basic.BasicChannelService;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,15 +46,13 @@ public class ChannelServiceTest {
   @Mock
   private ChannelMapper channelMapper;
   @Mock
-  private UserMapper userMapper;
+  private MessageRepository messageRepository;
+  @Mock
+  private ReadStatusService readStatusService;
   @Mock
   private ChannelRepository channelRepository;
   @Mock
-  private MessageRepository messageRepository;
-  @Mock
   private UserRepository userRepository;
-  @Mock
-  private ReadStatusService readStatusService;
   @Mock
   private ReadStatusRepository readStatusRepository;
 
@@ -71,10 +66,12 @@ public class ChannelServiceTest {
     PublicChannelCreateRequest publicChannelCreateRequest = new PublicChannelCreateRequest("Ch1",
         "Test Ch 1");
     Channel channel = new Channel("Ch1", "Test Ch 1", ChannelType.PUBLIC);
-    ChannelDto answer = new ChannelDto(channel.getId(), channel.getName(), channel.getDescription(),
-        ChannelType.PUBLIC, List.of(), channel.getCreatedAt());
-    when(channelRepository.save(any(Channel.class))).thenReturn(channel);
-    when(channelMapper.toDto(eq(channel), any(), any())).thenReturn(answer);
+    when(channelRepository.save(eq(channel))).thenReturn(channel);
+    when(channelMapper.toDto(any(Channel.class), any(), any())).thenAnswer(invocation -> {
+      Channel channelArg = invocation.getArgument(0);
+      return new ChannelDto(channelArg.getId(), channelArg.getName(), channelArg.getDescription(),
+          channelArg.getType(), null, null);
+    });
 
     // when
     ChannelDto result = basicChannelService.createChannelPublic(publicChannelCreateRequest);
@@ -116,14 +113,13 @@ public class ChannelServiceTest {
     UUID userId2 = UUID.randomUUID();
     PrivateChannelCreateRequest privateChannelCreateRequest = new PrivateChannelCreateRequest(
         List.of(userId1, userId2));
-    UserDto userDto1 = new UserDto(userId1, null, null, null, null, null, null);
-    UserDto userDto2 = new UserDto(userId2, null, null, null, null, null, null);
-
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
-    ChannelDto answer = new ChannelDto(channel.getId(), channel.getName(), channel.getDescription(),
-        ChannelType.PRIVATE, List.of(userDto1, userDto2), channel.getCreatedAt());
     when(channelRepository.save(any(Channel.class))).thenReturn(channel);
-    when(channelMapper.toDto(eq(channel), any(), any())).thenReturn(answer);
+    when(channelMapper.toDto(any(Channel.class), any(), any())).thenAnswer(invocation -> {
+      Channel channelArg = invocation.getArgument(0);
+      return new ChannelDto(channelArg.getId(), channelArg.getName(), channelArg.getDescription(),
+          channelArg.getType(), null, null);
+    });
 
     // when
     ChannelDto result = basicChannelService.createChannelPrivate(privateChannelCreateRequest);
@@ -172,8 +168,7 @@ public class ChannelServiceTest {
     when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
     when(channelMapper.toDto(any(Channel.class), any(), any()))
         .thenAnswer(invocation -> {
-          Channel channelArg = invocation.getArgument(0);  // 첫 번째 인자: Channel
-          Instant lastMessageAt = invocation.getArgument(2); // 세 번째 인자: 마지막 메시지 시간
+          Channel channelArg = invocation.getArgument(0);
 
           return new ChannelDto(
               channelArg.getId(),
@@ -181,7 +176,7 @@ public class ChannelServiceTest {
               channelArg.getDescription(),
               channelArg.getType(),
               null,
-              lastMessageAt
+              null
           );
         });
 
