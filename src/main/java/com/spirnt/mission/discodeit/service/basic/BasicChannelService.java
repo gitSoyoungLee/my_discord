@@ -89,15 +89,18 @@ public class BasicChannelService implements ChannelService {
       log.warn("[Finding All Channels By UserId Failed: User with id {} not found]", userId);
       throw new UserNotFoundException(Instant.now(), Map.of("userId", userId));
     }
+    // PUBLIC인 채널은 모두 가져옴
+    List<Channel> channels = channelRepository.findAllPublic();
+    // ReadStatusRepository에서 유저가 참여한 private 채널 모두 가져오기
+    List<Channel> privateChannels = readStatusRepository.findAllByUserId(userId).stream()
+        .map(readStatus -> readStatus.getChannel())
+        .filter(channel -> channel.getType().equals(ChannelType.PRIVATE))
+        .collect(Collectors.toList());
 
-    List<Channel> channels = channelRepository.findAll();
+    // PUBLIC + PRIVATE 채널을 하나의 리스트로 병합
+    channels.addAll(privateChannels);
+
     return channels.stream()
-        //PUBLIC이거나 User가 참여한 PRIVATE 채널이거나
-        //참여 여부는 ReadStatus 존재 여부로 확인
-        .filter(channel -> (channel.getType() == ChannelType.PUBLIC) ||
-            (channel.getType() == ChannelType.PRIVATE
-                && readStatusRepository.existsByUserIdAndChannelId(
-                userId, channel.getId())))
         .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
         .map(channel -> channelMapper.toDto(channel,
             getParticipants(channel),
@@ -128,11 +131,11 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public void delete(UUID channelId) {
-    if (!channelRepository.existsById(channelId)) {
+    Channel channel = channelRepository.findById(channelId).orElseThrow(() -> {
       log.warn("[Deleting Channel Failed: Channel with id {} not found]", channelId);
-      throw new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
-    }
-    channelRepository.deleteById(channelId);
+      return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
+    });
+    channelRepository.delete(channel);
   }
 
   // 해당 채널 메세지를 정렬하여 가장 최근 메세지 시간 찾기
@@ -150,6 +153,13 @@ public class BasicChannelService implements ChannelService {
           .collect(Collectors.toList());
     }
     return new ArrayList<>();
+  }
+
+  public List<Channel> findPrivateChannelsByUserId(UUID userId) {
+    return readStatusRepository.findAllByUserId(userId)
+        .stream().map(readStatus -> readStatus.getChannel())
+        .filter(channel -> channel.getType().equals(ChannelType.PRIVATE))
+        .collect(Collectors.toList());
   }
 
 }
