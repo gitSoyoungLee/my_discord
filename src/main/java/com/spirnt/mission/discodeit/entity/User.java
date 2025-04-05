@@ -3,6 +3,7 @@ package com.spirnt.mission.discodeit.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spirnt.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -19,10 +20,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 public class User extends BaseUpdatableEntity {
 
+  @Column(nullable = false)
   private String username;
-
+  @Column(nullable = false)
   private String email;
-
+  @Column(nullable = false)
   @JsonIgnore // 비밀번호 노출 방지
   private String password;
 
