@@ -7,5 +7,3 @@ INSERT INTO users (id, created_at, updated_at, username, email, password, profil
 -- 3. user_statuses에 사용자 상태 데이터 삽입 (user_id는 users의 id)
 INSERT INTO user_statuses (id, created_at, updated_at, user_id, last_active_at) VALUES ('00000000-0000-0000-0000-000000001001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,'00000000-0000-0000-0000-000000000101', CURRENT_TIMESTAMP),  ('00000000-0000-0000-0000-000000001002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '00000000-0000-0000-0000-000000000102', CURRENT_TIMESTAMP);
 
-
-
