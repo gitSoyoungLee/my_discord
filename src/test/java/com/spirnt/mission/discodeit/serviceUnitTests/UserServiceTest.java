@@ -77,13 +77,30 @@ public class UserServiceTest {
 
   @DisplayName("사용자 생성 테스트 - 실패: 이메일 중복")
   @Test
-  void testCreateUserFailDueToDuplicate() {
+  void testCreateUserFailDueToDuplicate1() {
     // given
-    UserCreateRequest userCreateRequest = new UserCreateRequest("Anna", "Anna@mail.com",
+    UserCreateRequest userCreateRequest = new UserCreateRequest("Anna1", "Anna@mail.com",
         "password");
 
     // 중복 검사 시 true로 설정
     when(userRepository.existsByEmail(userCreateRequest.email())).thenReturn(true);
+
+    // when & then
+    assertThrows(UserAlreadyExistException.class, () ->
+        basicUserService.create(userCreateRequest, null)
+    );
+  }
+
+  @DisplayName("사용자 생성 테스트 - 실패: 이름 중복")
+  @Test
+  void testCreateUserFailDueToDuplicate2() {
+    // given
+    UserCreateRequest userCreateRequest = new UserCreateRequest("Anna", "Anna1@mail.com",
+        "password");
+
+    // 중복 검사 시 true로 설정
+    when(userRepository.existsByEmail(userCreateRequest.email())).thenReturn(false);
+    when(userRepository.existsByUsername(userCreateRequest.username())).thenReturn(true);
 
     // when & then
     assertThrows(UserAlreadyExistException.class, () ->

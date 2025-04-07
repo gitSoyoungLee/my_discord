@@ -154,7 +154,6 @@ public class ChannelServiceTest {
 
   }
 
-
   @Test
   @DisplayName("채널 수정 테스트 - 성공")
   void testUpdateChannelSuccess() {
