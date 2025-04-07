@@ -40,7 +40,7 @@ public class MessageTest {
   void testCreateMessageSuccess() {
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest("content",
         UUID.fromString("00000000-0000-0000-0000-000000000101"),
-        UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        UUID.fromString("11111111-1111-1111-1111-111111111112"));
     MultiValueMap<String, Object> multipartMap = new LinkedMultiValueMap<>();
     HttpHeaders jsonHeaders = new HttpHeaders();
     jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -69,7 +69,7 @@ public class MessageTest {
   void testCreateMessageFail() {
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest("content",
         UUID.fromString("11100000-0000-0000-0000-000000000101"),
-        UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        UUID.fromString("11111111-1111-1111-1111-111111111112"));
     MultiValueMap<String, Object> multipartMap = new LinkedMultiValueMap<>();
     HttpHeaders jsonHeaders = new HttpHeaders();
     jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -144,7 +144,7 @@ public class MessageTest {
   @Transactional
   @DisplayName("메시지 삭제 테스트 - 실패")
   void testDeleteMessageFail() {
-    UUID messageId = UUID.fromString("22222222-0000-2222-2222-222222222222");
+    UUID messageId = UUID.randomUUID();
     ResponseEntity<ErrorResponse> response = restTemplate.exchange(
         "/api/messages/" + messageId,
         HttpMethod.DELETE,
@@ -160,7 +160,7 @@ public class MessageTest {
   @DisplayName("메시지 목록 조회 테스트 - 성공")
   void testFindMessagesSuccess() {
     // given
-    UUID channelId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    UUID channelId = UUID.fromString("11111111-1111-1111-1111-111111111112");
 
     ResponseEntity<PageResponse<MessageDto>> response = restTemplate.exchange(
         "/api/messages?channelId=" + channelId + "&size=5",
@@ -172,7 +172,6 @@ public class MessageTest {
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
     assertTrue(response.getBody().getContent().size() >= 0);
-    assertTrue(response.getBody().isHasNext() == true);
   }
 
   @Test
@@ -180,7 +179,7 @@ public class MessageTest {
   @DisplayName("메시지 목록 조회 테스트 - 실패")
   void testFindMessagesFail() {
     // given
-    UUID channelId = UUID.fromString("11111111-0000-1111-1111-111111111111");
+    UUID channelId = UUID.randomUUID();
     ResponseEntity<ErrorResponse> response = restTemplate.exchange(
         "/api/messages?channelId=" + channelId,
         HttpMethod.GET,

@@ -46,11 +46,11 @@ public class ChannelServiceTest {
   @Mock
   private ChannelMapper channelMapper;
   @Mock
+  private ChannelRepository channelRepository;
+  @Mock
   private MessageRepository messageRepository;
   @Mock
   private ReadStatusService readStatusService;
-  @Mock
-  private ChannelRepository channelRepository;
   @Mock
   private UserRepository userRepository;
   @Mock

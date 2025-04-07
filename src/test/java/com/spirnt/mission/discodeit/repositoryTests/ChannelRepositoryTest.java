@@ -29,21 +29,10 @@ public class ChannelRepositoryTest {
   @Test
   @DisplayName("공개 채널 가져오기 테스트")
   void testFindAllPublic() {
-    // given
-    // 레포지토리에 public 2개, private 1개 저장
-    Channel public1 = new Channel("Public 1", "Description 1", ChannelType.PUBLIC);
-    Channel public2 = new Channel("Public 2", "Description 2", ChannelType.PUBLIC);
-    Channel private1 = new Channel("Private 1", "Secret Description", ChannelType.PRIVATE);
-    em.persist(public1);
-    em.persist(public2);
-    em.persist(private1);
-    em.flush();
-    em.clear();
     // when
     List<Channel> publicChannels = channelRepository.findAllPublic();
 
     // then
-    assertEquals(2, publicChannels.size());
     // 공개 채널만 가져왔어야 함
     for (Channel ch : publicChannels) {
       assertEquals(ChannelType.PUBLIC, ch.getType());

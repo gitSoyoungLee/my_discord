@@ -63,12 +63,12 @@ public class ChannelTest {
   void testCreatePrivateChannel() {
     PrivateChannelCreateRequest privateChannelCreateRequest = new PrivateChannelCreateRequest(
         List.of(
-            UUID.fromString("00000000-0000-0000-0000-000000000101"), UUID.fromString(
-                "00000000-0000-0000-0000-000000000102")));
+            UUID.fromString("00000000-0000-0000-0000-000000000103"), UUID.fromString(
+                "00000000-0000-0000-0000-000000000104")));
     ResponseEntity<ChannelDto> response = restTemplate.postForEntity("/api/channels/private",
         privateChannelCreateRequest, ChannelDto.class);
-    assertEquals(response.getStatusCode(), HttpStatus.CREATED);
-    assertEquals(response.getBody().getType(), ChannelType.PRIVATE);
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    assertEquals(ChannelType.PRIVATE, response.getBody().getType());
     assertNotNull(response.getBody().getId());
   }
 
@@ -114,7 +114,7 @@ public class ChannelTest {
     PublicChannelUpdateRequest publicChannelUpdateRequest = new PublicChannelUpdateRequest(
         "new ch 1", "new description");
     // 존재하지 않는 id
-    UUID channelId = UUID.fromString("11111111-1111-1111-1111-111111111112");
+    UUID channelId = UUID.randomUUID();
 
     ResponseEntity<ErrorResponse> response = restTemplate.exchange(
         "/api/channels/" + channelId,

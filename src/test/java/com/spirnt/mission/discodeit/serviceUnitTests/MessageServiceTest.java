@@ -24,7 +24,6 @@ import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.UserStatusService;
 import com.spirnt.mission.discodeit.service.basic.BasicMessageService;
 import java.util.ArrayList;
@@ -53,15 +52,13 @@ public class MessageServiceTest {
   @Mock
   private MessageRepository messageRepository;
   @Mock
-  private UserRepository userRepository;
-  @Mock
-  private ChannelRepository channelRepository;
-  @Mock
-  private BinaryContentService binaryContentService;
-  @Mock
   private BinaryContentRepository binaryContentRepository;
   @Mock
   private UserStatusService userStatusService;
+  @Mock
+  private UserRepository userRepository;
+  @Mock
+  private ChannelRepository channelRepository;
 
   @Test
   @DisplayName("메시지 생성 테스트 - 성공")

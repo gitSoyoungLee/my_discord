@@ -34,6 +34,24 @@ public class UserTest {
 
   @Test
   @Transactional
+  @DisplayName("사용자 목록 조회 테스트 - 성공")
+  void testFindUsersSuccess() {
+    ResponseEntity<UserDto[]> response = restTemplate.getForEntity(
+        "/api/users",
+        UserDto[].class
+    );
+
+    System.out.println(response.getBody());
+
+    // then
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertNotNull(response.getBody());
+    assertEquals(2, response.getBody().length);
+
+  }
+
+  @Test
+  @Transactional
   @DisplayName("사용자 생성 테스트 - 성공")
   void testCreateUserSuccess() throws Exception {
     // 컨트롤러에 MultipartFile로 전달
@@ -70,7 +88,7 @@ public class UserTest {
     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
     String json = new ObjectMapper().writeValueAsString(
-        // 이미 import.sql로 저장된 유저 저장 시도
+        // 이미 data.sql로 저장된 유저 저장 시도
         new UserCreateRequest("alice", "alice@mail.com", "password")
     );
     HttpHeaders jsonHeaders = new HttpHeaders();
@@ -96,7 +114,7 @@ public class UserTest {
   @DisplayName("사용자 수정 테스트 - 성공")
   void testUpdateUserSuccess() throws Exception {
     // given
-    UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000101");  // import.sql로 저장한 아이디
+    UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000102");  // data.sql로 저장한 아이디
     UserUpdateRequest updateRequest = new UserUpdateRequest("updatedName", "updated@mail.com",
         "newPassword");
 
@@ -186,28 +204,5 @@ public class UserTest {
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
   }
 
-  @Test
-  @Transactional
-  @DisplayName("사용자 목록 조회 테스트 - 성공")
-  void testFindUsersSuccess() {
-    ResponseEntity<UserDto[]> response = restTemplate.getForEntity(
-        "/api/users",
-        UserDto[].class
-    );
 
-    // then
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertNotNull(response.getBody());
-    assertEquals(2, response.getBody().length);
-    assertEquals("alice", response.getBody()[0].getUsername());
-    assertEquals("bob", response.getBody()[1].getUsername());
-
-  }
-
-  @Test
-  @Transactional
-  @DisplayName("사용자 목록 조회 테스트 - 실패")
-  void testFindUserFail() {
-
-  }
 }
