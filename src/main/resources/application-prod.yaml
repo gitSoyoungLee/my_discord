@@ -1,6 +1,8 @@
 server:
   port: 8080
 spring:
+  application:
+    name: discodeit
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -8,6 +10,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  boot:
+    admin:
+      client:
+        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
 logging:
   level:
     root: info
