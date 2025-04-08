@@ -40,7 +40,7 @@ public class MessageTest {
   void testCreateMessageSuccess() {
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest("content",
         UUID.fromString("00000000-0000-0000-0000-000000000101"),
-        UUID.fromString("11111111-1111-1111-1111-111111111112"));
+        UUID.fromString("11111111-1111-1111-1111-111111111112git "));
     MultiValueMap<String, Object> multipartMap = new LinkedMultiValueMap<>();
     HttpHeaders jsonHeaders = new HttpHeaders();
     jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
