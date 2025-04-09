@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: discodeit
+  profiles:
+    default: prod
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
+discodeit:
+  storage:
+    type: local
+logging:
+  level:
+    root: info
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers # Actuator 엔드포인트 설정
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  info:
+    env:
+      enabled: true
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring:
+    boot:
+      version: 3.4.0
+  storage:
+    type: ${discodeit.storage.type}
+    path: /localStorage
+  multipart:
+    max-file-size: ${spring.servlet.multipart.max-file-size}
+    max-request-size: ${spring.servlet.multipart.max-request-size}
