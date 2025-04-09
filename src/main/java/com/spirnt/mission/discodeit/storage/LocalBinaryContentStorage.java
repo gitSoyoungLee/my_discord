@@ -2,6 +2,7 @@ package com.spirnt.mission.discodeit.storage;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.exception.BinaryContent.FileException;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,8 +33,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
 
   // Bean 생성 시 자동 호출하여 루트 디렉토리 초기화
-  // 테스트를 위해 잠시 꺼둠
-//  @PostConstruct
+  @PostConstruct
   void init() {
     File[] files = root.toFile().listFiles();
     if (files != null) {

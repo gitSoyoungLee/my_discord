@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.integrationTests;
+package com.spirnt.mission.discodeit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
