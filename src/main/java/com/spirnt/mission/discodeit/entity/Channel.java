@@ -1,6 +1,7 @@
 package com.spirnt.mission.discodeit.entity;
 
 import com.spirnt.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,6 +19,7 @@ public class Channel extends BaseUpdatableEntity {
   String name;
   String description;
   @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "channel_type")
   ChannelType type;
 
   public Channel(String name, String description, ChannelType type) {

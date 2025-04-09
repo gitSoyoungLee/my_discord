@@ -13,6 +13,8 @@ spring:
       client:
         instance:
           name: discodeit
+  config:
+    import: optional:file:.env[.properties]
 discodeit:
   storage:
     type: local

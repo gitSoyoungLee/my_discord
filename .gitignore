@@ -40,3 +40,4 @@ out/
 *.ser
 localStorage/*
 logs/*
+*.env
