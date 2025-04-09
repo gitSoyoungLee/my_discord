@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-  private Path root = Paths.get(System.getProperty("user.dir"), "localStorage");
+  private Path root = Paths.get("/app/binaryContentStorage");
 
 
   // Bean 생성 시 자동 호출하여 루트 디렉토리 초기화

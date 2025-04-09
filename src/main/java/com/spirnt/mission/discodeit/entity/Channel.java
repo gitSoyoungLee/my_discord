@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.entity;
 
 import com.spirnt.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,6 +8,8 @@ import jakarta.persistence.Table;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "channels")
@@ -19,7 +20,7 @@ public class Channel extends BaseUpdatableEntity {
   String name;
   String description;
   @Enumerated(EnumType.STRING)
-  @Column(columnDefinition = "channel_type")
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   ChannelType type;
 
   public Channel(String name, String description, ChannelType type) {
