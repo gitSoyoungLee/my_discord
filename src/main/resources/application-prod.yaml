@@ -28,3 +28,4 @@ info:
     driver-class-name: ${spring.datasource.driver-class-name}
     jpa:
       ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+
