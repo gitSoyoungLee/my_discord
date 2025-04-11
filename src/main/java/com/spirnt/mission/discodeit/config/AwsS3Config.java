@@ -11,11 +11,11 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Configuration
 public class AwsS3Config {
 
-  @Value("${discodeit-se-access-key}")
+  @Value("${discodeit.s3.access-key}")
   private String accessKey;
-  @Value("${discodeit-se-secret-key}")
+  @Value("${discodeit.s3.secret-key}")
   private String secretKey;
-  @Value("${discodeit-se-region}")
+  @Value("${discodeit.s3.region}")
   private String region;
 
   @Bean
