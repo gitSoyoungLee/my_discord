@@ -5,8 +5,8 @@ import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.awscore.presigner.PresignRequest;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -19,39 +19,58 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-@Component
+
 @Slf4j
 @RequiredArgsConstructor
 public class AWSS3Test {
 
-  @Value("${discodeit.s3.bucket}")
-  private String bucketName;
+  String accessKey;
+  String secretKey;
+  String region;
+  String bucket;
 
-  @Value("${discodeit.s3.region}")
-  private String region;
+  String presignedUrlExpiration;
 
-  private final S3Client s3Client;
+  public AWSS3Test(String accessKey, String secretKey, String region, String bucket,
+      String presignedUrlExpiration) {
+    this.accessKey = accessKey;
+    this.secretKey = secretKey;
+    this.region = region;
+    this.bucket = bucket;
+    this.presignedUrlExpiration = presignedUrlExpiration;
+  }
+
+  public S3Client getS3Client() {
+    return S3Client.builder()
+        .region(Region.of(region))
+        .credentialsProvider(
+            StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(accessKey, secretKey)
+            )
+        )
+        .build();
+  }
 
   public void upload(UUID binaryContentId, byte[] bytes) {
     // 파일 이름 생성
     String fileName = String.valueOf(binaryContentId);
     // PutObjectRequest 생성
     PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-        .bucket(bucketName)
+        .bucket(bucket)
         .key(fileName)
         .build();
     // 업로드
-    s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
+    getS3Client().putObject(putObjectRequest, RequestBody.fromBytes(bytes));
   }
 
   public byte[] download(UUID binaryContentId) {
     String fileKey = String.valueOf(binaryContentId);
     GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-        .bucket(bucketName)
+        .bucket(bucket)
         .key(fileKey)
         .build();
 
-    ResponseInputStream<GetObjectResponse> objectData = s3Client.getObject(getObjectRequest);
+    ResponseInputStream<GetObjectResponse> objectData = getS3Client().getObject(getObjectRequest);
 
     try {
       return objectData.readAllBytes();
@@ -78,7 +97,7 @@ public class AWSS3Test {
 
     // 2) 다운로드 요청(GetObjectRequest) 생성
     GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-        .bucket(bucketName)
+        .bucket(bucket)
         .key(key)
         .build();
 

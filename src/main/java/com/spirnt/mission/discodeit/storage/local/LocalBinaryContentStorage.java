@@ -1,7 +1,8 @@
-package com.spirnt.mission.discodeit.storage;
+package com.spirnt.mission.discodeit.storage.local;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.exception.BinaryContent.FileException;
+import com.spirnt.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;

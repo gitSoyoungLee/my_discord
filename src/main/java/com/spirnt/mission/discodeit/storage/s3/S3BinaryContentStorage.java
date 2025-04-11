@@ -1,17 +1,16 @@
-package com.spirnt.mission.discodeit.storage;
+package com.spirnt.mission.discodeit.storage.s3;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.spirnt.mission.discodeit.storage.BinaryContentStorage;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.awscore.presigner.PresignRequest;
@@ -24,9 +23,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-@Component
 @Slf4j
-@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
 public class S3BinaryContentStorage implements BinaryContentStorage {
 
   @Value("${discodeit.s3.access-key}")
@@ -37,20 +34,18 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   String region;
   @Value("${discodeit.s3.bucket}")
   String bucket;
-
   @Value("${discodeit.s3.presigned-url-expiration}")
   String presignedUrlExpiration;
 
-//  public S3BinaryContentStorage() {
-//
-//  }
-//
-//  public S3BinaryContentStorage(String accessKey, String secretKey, String region, String bucket) {
-//    this.accessKey = accessKey;
-//    this.secretKey = secretKey;
-//    this.region = region;
-//    this.bucket = bucket;
-//  }
+
+  public S3BinaryContentStorage(String accessKey, String secretKey, String region, String bucket,
+      String presignedUrlExpiration) {
+    this.accessKey = accessKey;
+    this.secretKey = secretKey;
+    this.region = region;
+    this.bucket = bucket;
+    this.presignedUrlExpiration = presignedUrlExpiration;
+  }
 
   @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
@@ -84,7 +79,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   public ResponseEntity<Void> download(BinaryContentDto binaryContentDto) {
     String url = generatePresignedUrl(String.valueOf(binaryContentDto.getId()),
         binaryContentDto.getContentType());
-    
+
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(URI.create(url));   //presignedUrl로 리다이렉트
 
