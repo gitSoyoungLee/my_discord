@@ -3253,3 +3253,111 @@ Caused by: java.lang.NullPointerException: Cannot invoke "com.spirnt.mission.dis
          ] - HikariPool-1 - Shutdown initiated...
 17:50:49.896 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [  |  |
          ] - HikariPool-1 - Shutdown completed.
+17:59:35.671 INFO  [background-preinit] o.h.validator.internal.util.Version [  |  |
+         ] - HV000001: Hibernate Validator 8.0.1.Final
+17:59:35.787 INFO  [main] c.s.m.discodeit.DiscodeitApplication [  |  |
+         ] - Starting DiscodeitApplication using Java 17.0.10 with PID 1056 (C:\Users\soo71\github\1-sprint-mission\build\classes\java\main started by soo71 in C:\Users\soo71\github\1-sprint-mission)
+17:59:35.789 INFO  [main] c.s.m.discodeit.DiscodeitApplication [  |  |
+         ] - No active profile set, falling back to 1 default profile: "prod"
+17:59:38.084 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate [  |  |
+         ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+17:59:38.345 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate [  |  |
+         ] - Finished Spring Data repository scanning in 238 ms. Found 6 JPA repository interfaces.
+17:59:39.917 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer [  |  |
+         ] - Tomcat initialized with port 8080 (http)
+17:59:39.948 INFO  [main] o.a.coyote.http11.Http11NioProtocol [  |  |
+         ] - Initializing ProtocolHandler ["http-nio-8080"]
+17:59:39.955 INFO  [main] o.a.catalina.core.StandardService [  |  |
+         ] - Starting service [Tomcat]
+17:59:39.955 INFO  [main] o.a.catalina.core.StandardEngine [  |  |
+         ] - Starting Servlet engine: [Apache Tomcat/10.1.33]
+17:59:40.205 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] [  |  |
+         ] - Initializing Spring embedded WebApplicationContext
+17:59:40.207 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext [  |  |
+         ] - Root WebApplicationContext: initialization completed in 4327 ms
+17:59:40.719 INFO  [main] com.zaxxer.hikari.HikariDataSource [  |  |
+         ] - HikariPool-1 - Starting...
+17:59:41.204 INFO  [main] com.zaxxer.hikari.pool.HikariPool [  |  |
+         ] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4cef0747
+17:59:41.207 INFO  [main] com.zaxxer.hikari.HikariDataSource [  |  |
+         ] - HikariPool-1 - Start completed.
+17:59:41.422 INFO  [main] o.h.jpa.internal.util.LogHelper [  |  |
+         ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+17:59:41.584 INFO  [main] org.hibernate.Version [  |  |
+         ] - HHH000412: Hibernate ORM core version 6.6.2.Final
+17:59:41.698 INFO  [main] o.h.c.i.RegionFactoryInitiator [  |  |
+         ] - HHH000026: Second-level cache disabled
+17:59:42.443 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo [  |  |
+         ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+17:59:42.653 WARN  [main] org.hibernate.orm.deprecation [  |  |
+         ] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+17:59:42.695 INFO  [main] o.hibernate.orm.connections.pooling [  |  |
+         ] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+17:59:45.407 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator [  |  |
+         ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+17:59:45.525 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [  |  |
+         ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+17:59:45.577 WARN  [main] o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext [  |  |
+         ] - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'awsS3Config' defined in file [C:\Users\soo71\github\1-sprint-mission\build\classes\java\main\com\spirnt\mission\discodeit\config\AwsS3Config.class]: Failed to instantiate [com.spirnt.mission.discodeit.config.AwsS3Config$$SpringCGLIB$$0]: Constructor threw exception
+17:59:45.577 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [  |  |
+         ] - Closing JPA EntityManagerFactory for persistence unit 'default'
+17:59:45.584 INFO  [main] com.zaxxer.hikari.HikariDataSource [  |  |
+         ] - HikariPool-1 - Shutdown initiated...
+17:59:45.591 INFO  [main] com.zaxxer.hikari.HikariDataSource [  |  |
+         ] - HikariPool-1 - Shutdown completed.
+17:59:45.599 INFO  [main] o.a.catalina.core.StandardService [  |  |
+         ] - Stopping service [Tomcat]
+17:59:45.642 INFO  [main] o.s.b.a.l.ConditionEvaluationReportLogger [  |  |
+         ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+17:59:45.696 ERROR [main] o.s.boot.SpringApplication [  |  |
+         ] - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'awsS3Config' defined in file [C:\Users\soo71\github\1-sprint-mission\build\classes\java\main\com\spirnt\mission\discodeit\config\AwsS3Config.class]: Failed to instantiate [com.spirnt.mission.discodeit.config.AwsS3Config$$SpringCGLIB$$0]: Constructor threw exception
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:321)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:309)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1371)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1208)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:288)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1122)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1093)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1030)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.spirnt.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:11)
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.spirnt.mission.discodeit.config.AwsS3Config$$SpringCGLIB$$0]: Constructor threw exception
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:222)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:145)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:318)
+	... 21 common frames omitted
+Caused by: java.lang.NumberFormatException: For input string: "${AWS_S3_PRESIGNED_URL_EXPIRATION:600}"
+	at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)
+	at java.base/java.lang.Integer.parseInt(Integer.java:654)
+	at java.base/java.lang.Integer.parseInt(Integer.java:786)
+	at com.spirnt.mission.discodeit.config.AwsS3Config.<init>(AwsS3Config.java:26)
+	at com.spirnt.mission.discodeit.config.AwsS3Config$$SpringCGLIB$$0.<init>(<generated>)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:209)
+	... 23 common frames omitted

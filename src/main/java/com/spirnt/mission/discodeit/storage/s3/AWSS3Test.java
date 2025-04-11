@@ -24,12 +24,11 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 @RequiredArgsConstructor
 public class AWSS3Test {
 
-  String accessKey;
-  String secretKey;
-  String region;
-  String bucket;
-
-  String presignedUrlExpiration;
+  private String accessKey;
+  private String secretKey;
+  private String region;
+  private String bucket;
+  private String presignedUrlExpiration;
 
   public AWSS3Test(String accessKey, String secretKey, String region, String bucket,
       String presignedUrlExpiration) {

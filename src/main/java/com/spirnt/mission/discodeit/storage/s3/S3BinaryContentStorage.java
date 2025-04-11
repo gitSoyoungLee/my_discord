@@ -101,7 +101,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
   // S3에 잠시 접근할 수 있는 임시 서명된 URL
   public String generatePresignedUrl(String key, String contentType) {
-    int presignedUrlExpiration_int = Integer.parseInt(presignedUrlExpiration);
     S3Presigner presigner = S3Presigner.builder()
         .region(Region.of(region))
         .build();
@@ -113,7 +112,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .build();
 
     PresignRequest presignRequest = GetObjectPresignRequest.builder()
-        .signatureDuration(Duration.ofSeconds(presignedUrlExpiration_int))
+        .signatureDuration(Duration.ofSeconds(Long.parseLong(presignedUrlExpiration)))
         .getObjectRequest(getObjectRequest)
         .build();
 
