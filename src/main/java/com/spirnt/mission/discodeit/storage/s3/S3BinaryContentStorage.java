@@ -7,7 +7,6 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +25,10 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 @Slf4j
 public class S3BinaryContentStorage implements BinaryContentStorage {
 
-  @Value("${discodeit.s3.access-key}")
   String accessKey;
-  @Value("${discodeit.s3.secret-key}")
   String secretKey;
-  @Value("${discodeit.s3.region}")
   String region;
-  @Value("${discodeit.s3.bucket}")
   String bucket;
-  @Value("${discodeit.s3.presigned-url-expiration}")
   String presignedUrlExpiration;
 
 

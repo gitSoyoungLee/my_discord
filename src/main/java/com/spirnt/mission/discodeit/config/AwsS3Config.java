@@ -2,7 +2,7 @@ package com.spirnt.mission.discodeit.config;
 
 import com.spirnt.mission.discodeit.storage.s3.AWSS3Test;
 import com.spirnt.mission.discodeit.storage.s3.S3BinaryContentStorage;
-import com.spirnt.mission.discodeit.util.YamlPropertyManager;
+import com.spirnt.mission.discodeit.util.S3Properties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,22 +10,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AwsS3Config {
 
-  private final YamlPropertyManager yamlPropertyManager;
-
   private String accessKey;
   private String secretKey;
   private String region;
   private String bucket;
   private String presignedUrlExpiration;
 
-  public AwsS3Config(YamlPropertyManager yamlPropertyManager) {
-    this.accessKey = yamlPropertyManager.getValueByKey("discodeit.s3.access-key");
-    this.secretKey = yamlPropertyManager.getValueByKey("discodeit.s3.secret-key");
-    this.region = yamlPropertyManager.getValueByKey("discodeit.s3.region");
-    this.bucket = yamlPropertyManager.getValueByKey("discodeit.s3.bucket");
-    this.presignedUrlExpiration = yamlPropertyManager.getValueByKey(
-        "discodeit.s3.presigned-url-expiration");
-    this.yamlPropertyManager = yamlPropertyManager;
+  public AwsS3Config(S3Properties s3Properties) {
+    this.accessKey = s3Properties.getAccessKey();
+    this.secretKey = s3Properties.getSecretKey();
+    this.region = s3Properties.getRegion();
+    this.bucket = s3Properties.getBucket();
+    this.presignedUrlExpiration = s3Properties.getPresignedUrlExpiration();
   }
 
   @Bean
