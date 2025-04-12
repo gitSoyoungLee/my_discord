@@ -6,7 +6,6 @@
 //import static org.junit.jupiter.api.Assertions.assertTrue;
 //
 //import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
-//import com.spirnt.mission.discodeit.service.basic.BasicBinaryContentService;
 //import com.spirnt.mission.discodeit.storage.s3.S3BinaryContentStorage;
 //import java.io.IOException;
 //import java.io.InputStream;
@@ -28,8 +27,6 @@
 //
 //  @Autowired
 //  private S3BinaryContentStorage storage;
-//  @Autowired
-//  private BasicBinaryContentService basicBinaryContentService;
 //
 //  @Test
 //  @Transactional
