@@ -2233,3 +2233,80 @@ Update your application's configuration
          ] - HikariPool-1 - Shutdown initiated...
 16:59:19.043 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [  |  |
          ] - HikariPool-1 - Shutdown completed.
+17:16:59.909 INFO  [background-preinit] o.h.validator.internal.util.Version [  |  |
+         ] - HV000001: Hibernate Validator 8.0.1.Final
+17:17:00.176 INFO  [Test worker] c.s.m.d.S3BinaryContentStorageTest [  |  |
+         ] - Starting S3BinaryContentStorageTest using Java 17.0.10 with PID 19452 (started by soo71 in C:\Users\soo71\github\1-sprint-mission)
+17:17:00.178 INFO  [Test worker] c.s.m.d.S3BinaryContentStorageTest [  |  |
+         ] - The following 1 profile is active: "test"
+17:17:06.420 INFO  [Test worker] o.s.d.r.c.RepositoryConfigurationDelegate [  |  |
+         ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+17:17:06.799 INFO  [Test worker] o.s.d.r.c.RepositoryConfigurationDelegate [  |  |
+         ] - Finished Spring Data repository scanning in 344 ms. Found 6 JPA repository interfaces.
+17:17:10.270 INFO  [Test worker] o.s.b.w.e.tomcat.TomcatWebServer [  |  |
+         ] - Tomcat initialized with port 0 (http)
+17:17:10.336 INFO  [Test worker] o.a.coyote.http11.Http11NioProtocol [  |  |
+         ] - Initializing ProtocolHandler ["http-nio-auto-1"]
+17:17:10.345 INFO  [Test worker] o.a.catalina.core.StandardService [  |  |
+         ] - Starting service [Tomcat]
+17:17:10.347 INFO  [Test worker] o.a.catalina.core.StandardEngine [  |  |
+         ] - Starting Servlet engine: [Apache Tomcat/10.1.33]
+17:17:10.839 INFO  [Test worker] o.a.c.c.C.[Tomcat].[localhost].[/] [  |  |
+         ] - Initializing Spring embedded WebApplicationContext
+17:17:10.843 INFO  [Test worker] o.s.b.w.s.c.ServletWebServerApplicationContext [  |  |
+         ] - Root WebApplicationContext: initialization completed in 10576 ms
+17:17:11.370 INFO  [Test worker] com.zaxxer.hikari.HikariDataSource [  |  |
+         ] - HikariPool-1 - Starting...
+17:17:12.665 INFO  [Test worker] com.zaxxer.hikari.pool.HikariPool [  |  |
+         ] - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+17:17:12.675 INFO  [Test worker] com.zaxxer.hikari.HikariDataSource [  |  |
+         ] - HikariPool-1 - Start completed.
+17:17:12.721 INFO  [Test worker] o.s.b.a.h.H2ConsoleAutoConfiguration [  |  |
+         ] - H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+17:17:13.477 INFO  [Test worker] o.h.jpa.internal.util.LogHelper [  |  |
+         ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+17:17:13.774 INFO  [Test worker] org.hibernate.Version [  |  |
+         ] - HHH000412: Hibernate ORM core version 6.6.2.Final
+17:17:13.948 INFO  [Test worker] o.h.c.i.RegionFactoryInitiator [  |  |
+         ] - HHH000026: Second-level cache disabled
+17:17:15.275 INFO  [Test worker] o.s.o.j.p.SpringPersistenceUnitInfo [  |  |
+         ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+17:17:15.461 WARN  [Test worker] org.hibernate.dialect.Dialect [  |  |
+         ] - HHH000511: The 2.3.232 version for [org.hibernate.dialect.PostgreSQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 12.0.0. Check the community dialects project for available legacy versions.
+17:17:15.480 WARN  [Test worker] org.hibernate.orm.deprecation [  |  |
+         ] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+17:17:15.542 INFO  [Test worker] o.hibernate.orm.connections.pooling [  |  |
+         ] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+17:17:20.082 INFO  [Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator [  |  |
+         ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+17:17:20.096 INFO  [Test worker] o.s.o.j.LocalContainerEntityManagerFactoryBean [  |  |
+         ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+17:17:21.341 INFO  [Test worker] o.s.d.j.r.query.QueryEnhancerFactory [  |  |
+         ] - Hibernate is in classpath; If applicable, HQL parser will be used.
+17:17:24.949 INFO  [Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping [  |  |
+         ] - Adding welcome page: class path resource [static/index.html]
+17:17:27.807 INFO  [Test worker] o.s.b.a.e.web.EndpointLinksResolver [  |  |
+         ] - Exposing 4 endpoints beneath base path '/actuator'
+17:17:28.307 INFO  [Test worker] o.a.coyote.http11.Http11NioProtocol [  |  |
+         ] - Starting ProtocolHandler ["http-nio-auto-1"]
+17:17:28.335 INFO  [Test worker] o.s.b.w.e.tomcat.TomcatWebServer [  |  |
+         ] - Tomcat started on port 7417 (http) with context path '/'
+17:17:28.355 INFO  [Test worker] c.s.m.d.S3BinaryContentStorageTest [  |  |
+         ] - Started S3BinaryContentStorageTest in 31.027 seconds (process running for 37.635)
+17:17:29.378 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown [  |  |
+         ] - Commencing graceful shutdown. Waiting for active requests to complete
+17:17:31.240 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown [  |  |
+         ] - Graceful shutdown complete
+17:17:31.245 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean [  |  |
+         ] - Closing JPA EntityManagerFactory for persistence unit 'default'
+17:17:31.249 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [  |  |
+         ] - HikariPool-1 - Shutdown initiated...
+17:17:31.254 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource [  |  |
+         ] - HikariPool-1 - Shutdown completed.
