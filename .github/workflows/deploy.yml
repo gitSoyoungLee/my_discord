@@ -78,9 +78,10 @@ jobs:
 
       # ECS 배포 실행
       - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ vars.ECS_TASK_DEFINITION }}  
-          service: ${{ vars.ECS_SERVICE }}  # 업데이트할 ECS 서비스 이름
-          cluster: ${{ vars.ECS_CLUSTER }}  # ECS 클러스터 이름
-          wait-for-service-stability: true  # 배포 안정화 확인 (헬스체크 통과 시까지 대기)
+        run: |
+          aws ecs update-service \
+          --cluster ${{ vars.ECS_CLUSTER }} \
+          --service ${{ vars.ECS_SERVICE }} \
+          --force-new-deployment \
+          --region ${{ vars.AWS_REGION }}
+
