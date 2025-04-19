@@ -40,16 +40,14 @@ jobs:
           docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:${{ github.sha }} .
           docker push $IMAGE_NAME:latest
           docker push $IMAGE_NAME:${{ github.sha }}
-        env:
-          ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com
 
       # ECS 태스크 정의 렌더링
       - name: Render ECS Task Definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ecs/task-definition.json
-          container-name: my_app-container
-          image: ${{ env.ECR_REGISTRY }}/myapp:${{ github.sha }}
+          task-definition: ${{ vars.ECS_TASK_DEFINITION }}
+          container-name: discodeit-app
+          image: ${{ env.ECR_REGISTRY }}/discodeit-app:${{ github.sha }}
 
       # 기존 서비스 중단(프리티어 리소스 아끼기)
       - name: Stop old ECS service (for free tier)
@@ -64,7 +62,7 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: task-definition.json  # 앞 단계에서 생성된 Task Definition
-          service: myapp-service  # 업데이트할 ECS 서비스 이름
-          cluster: myapp-cluster  # ECS 클러스터 이름
+          task-definition: ${{ vars.ECS_TASK_DEFINITION }}  # 앞 단계에서 생성된 Task Definition
+          service: ${{ vars.ECS_SERVICE }}  # 업데이트할 ECS 서비스 이름
+          cluster: ${{ vars.ECS_CLUSTER }}  # ECS 클러스터 이름
           wait-for-service-stability: true  # 배포 안정화 확인 (헬스체크 통과 시까지 대기)
