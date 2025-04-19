@@ -65,9 +65,9 @@ jobs:
         with:
           task-definition: ${{ vars.ECS_TASK_DEFINITION }}
           container-name: discodeit-app
-          image: ${{ env.ECR_REGISTRY }}/discodeit-app:${{ github.sha }}
+          image: ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
         env:
-          AWS_REGION: ap-northeast-2
+          AWS_REGION: ${{ vars.AWS_REGION }}
 
       # 기존 서비스 중단(프리티어 리소스 아끼기)
       - name: Stop old ECS service (for free tier)
