@@ -1,0 +1,68 @@
+name: CD workflow
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      # 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+        # AWS CLI 설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1 # Public ECR에 배포해야 하므로 us-east-1
+
+      # ECR 로그인
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 도커 이미지 빌드 푸시
+      # 현재 커밋 해시를 태그로 사용
+      # 도커 이미지 빌드
+      # ECR에 이미지 푸시
+      - name: Build & Push Docker Image
+        run: |
+          IMAGE_NAME=${{ vars.ECR_REPOSITORY_URI }}
+          docker build -f ./Dockerfile -t $IMAGE_NAME:latest -t $IMAGE_NAME:${{ github.sha }} .
+          docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:${{ github.sha }}
+        env:
+          ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com
+
+      # ECS 태스크 정의 렌더링
+      - name: Render ECS Task Definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs/task-definition.json
+          container-name: my_app-container
+          image: ${{ env.ECR_REGISTRY }}/myapp:${{ github.sha }}
+
+      # 기존 서비스 중단(프리티어 리소스 아끼기)
+      - name: Stop old ECS service (for free tier)
+        run: |
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --desired-count 0 \
+            --region ${{ vars.AWS_REGION }}
+
+      # ECS 배포 실행
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json  # 앞 단계에서 생성된 Task Definition
+          service: myapp-service  # 업데이트할 ECS 서비스 이름
+          cluster: myapp-cluster  # ECS 클러스터 이름
+          wait-for-service-stability: true  # 배포 안정화 확인 (헬스체크 통과 시까지 대기)
