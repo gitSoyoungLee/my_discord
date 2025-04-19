@@ -59,13 +59,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
-      # ECS 태스크 정의 렌더링
-      - name: Render ECS Task Definition
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: ${{ vars.ECS_TASK_DEFINITION }}
-          container-name: discodeit-app
-          image: ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
+      # # ECS 태스크 정의 렌더링
+      # - name: Render ECS Task Definition
+      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+      #   with:
+      #     task-definition: ${{ vars.ECS_TASK_DEFINITION }}
+      #     container-name: discodeit-app
+      #     image: ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
 
       # 기존 서비스 중단(프리티어 리소스 아끼기)
       - name: Stop old ECS service (for free tier)
@@ -80,7 +80,7 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ vars.ECS_TASK_DEFINITION }}  # 앞 단계에서 생성된 Task Definition
+          task-definition: ${{ vars.ECS_TASK_DEFINITION }}  
           service: ${{ vars.ECS_SERVICE }}  # 업데이트할 ECS 서비스 이름
           cluster: ${{ vars.ECS_CLUSTER }}  # ECS 클러스터 이름
           wait-for-service-stability: true  # 배포 안정화 확인 (헬스체크 통과 시까지 대기)
