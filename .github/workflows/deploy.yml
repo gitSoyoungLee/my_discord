@@ -27,6 +27,8 @@ jobs:
       # ECR 로그인
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
 
       # 도커 이미지 빌드 푸시
       # 현재 커밋 해시를 태그로 사용
@@ -35,7 +37,7 @@ jobs:
       - name: Build & Push Docker Image
         run: |
           IMAGE_NAME=${{ vars.ECR_REPOSITORY_URI }}
-          docker build -f ./Dockerfile -t $IMAGE_NAME:latest -t $IMAGE_NAME:${{ github.sha }} .
+          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:${{ github.sha }} .
           docker push $IMAGE_NAME:latest
           docker push $IMAGE_NAME:${{ github.sha }}
         env:
