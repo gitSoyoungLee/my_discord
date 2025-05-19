@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.customException;
+package com.spirnt.mission.discodeit.exception.Channel;
 
 import com.spirnt.mission.discodeit.exception.DiscodeitException;
 import com.spirnt.mission.discodeit.exception.ErrorCode;

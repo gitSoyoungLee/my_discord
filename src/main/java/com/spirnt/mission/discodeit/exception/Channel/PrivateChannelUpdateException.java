@@ -1,5 +1,6 @@
-package com.spirnt.mission.discodeit.exception.customException;
+package com.spirnt.mission.discodeit.exception.Channel;
 
+import com.spirnt.mission.discodeit.exception.Channel.ChannelException;
 import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.Map;

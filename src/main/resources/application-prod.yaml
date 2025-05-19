@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8090
 spring:
   application:
     name: discodeit
@@ -29,3 +29,7 @@ info:
     jpa:
       ddl-auto: ${spring.jpa.hibernate.ddl-auto}
 
+management:
+  info:
+    env:
+      enabled: false

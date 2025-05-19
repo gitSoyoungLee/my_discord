@@ -33,106 +33,107 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class BasicUserService implements UserService {
 
-  private final UserMapper userMapper;
+    private final UserMapper userMapper;
 
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-  private final BinaryContentService binaryContentService;
-  private final BinaryContentRepository binaryContentRepository;
-  private final UserStatusRepository userStatusRepository;
+    private final BinaryContentService binaryContentService;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
-  @Transactional
-  @Override
-  public UserDto create(UserCreateRequest userCreateRequest,
-      BinaryContentCreateRequest binaryContentCreateRequest) {
-    String email = userCreateRequest.email();
-    String username = userCreateRequest.username();
-    String password = userCreateRequest.password();
+    @Transactional
+    @Override
+    public UserDto create(UserCreateRequest userCreateRequest,
+        BinaryContentCreateRequest binaryContentCreateRequest) {
+        String email = userCreateRequest.email();
+        String username = userCreateRequest.username();
+        String password = userCreateRequest.password();
 
-    if (userRepository.existsByEmail(email)) {
-      log.warn("[Creating User Failed: Email {} already exists]", email);
-      throw new UserAlreadyExistException(Instant.now(), Map.of("email", email));
+        if (userRepository.existsByEmail(email)) {
+            log.warn("[Creating User Failed: Email {} already exists]", email);
+            throw new UserAlreadyExistException(Instant.now(), Map.of("email", email));
+        }
+        if (userRepository.existsByUsername(username)) {
+            log.warn("[Creating User Failed: Username {} already exists]", username);
+            throw new UserAlreadyExistException(Instant.now(), Map.of("username", username));
+        }
+        // User 생성, 저장
+        User user = userRepository.save(new User(username, email, password));
+        // 관련 도메인
+        UserStatus userStatus = userStatusRepository.save(
+            new UserStatus(user, UserStatusType.ONLINE, Instant.now()));
+        // 프로필 이미지 저장
+        BinaryContent binaryContent = null;
+        if (binaryContentCreateRequest != null) {
+            BinaryContentDto binaryContentDto = binaryContentService.create(
+                binaryContentCreateRequest);
+            binaryContent = binaryContentRepository.findById(binaryContentDto.getId())
+                .orElseThrow(
+                    () -> new BinaryContentNotFoundException(Instant.now(),
+                        Map.of("binaryContentId", binaryContentDto.getId())));
+        }
+        user.setProfileAndStatus(binaryContent, userStatus);
+        return userMapper.toDto(user);
     }
-    if (userRepository.existsByUsername(username)) {
-      log.warn("[Creating User Failed: Username {} already exists]", username);
-      throw new UserAlreadyExistException(Instant.now(), Map.of("username", username));
+
+    @Override
+    public UserDto find(UUID userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(Instant.now(), Map.of("userId", userId)));
+        return userMapper.toDto(user);
     }
-    // User 생성, 저장
-    User user = userRepository.save(new User(username, email, password));
-    // 관련 도메인
-    UserStatus userStatus = userStatusRepository.save(
-        new UserStatus(user, UserStatusType.ONLINE, Instant.now()));
-    // 프로필 이미지 저장
-    BinaryContent binaryContent = null;
-    if (binaryContentCreateRequest != null) {
-      BinaryContentDto binaryContentDto = binaryContentService.create(binaryContentCreateRequest);
-      binaryContent = binaryContentRepository.findById(binaryContentDto.getId())
-          .orElseThrow(
-              () -> new BinaryContentNotFoundException(Instant.now(),
-                  Map.of("binaryContentId", binaryContentDto.getId())));
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<UserDto> findAll() {
+        List<User> users = userRepository.findAllFetchJoin();
+        return users.stream()
+            .sorted(Comparator.comparing(user -> user.getCreatedAt()))
+            .map(userMapper::toDto)
+            .toList();
     }
-    user.setProfileAndStatus(binaryContent, userStatus);
-    return userMapper.toDto(user);
-  }
 
-  @Override
-  public UserDto find(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(Instant.now(), Map.of("userId", userId)));
-    return userMapper.toDto(user);
-  }
+    @Transactional
+    @Override
+    public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+        BinaryContentCreateRequest binaryContentCreateRequest) {
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            log.warn("[Updating User Failed: User with id {} not found]", userId);
+            return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+        });
 
-  @Transactional(readOnly = true)
-  @Override
-  public List<UserDto> findAll() {
-    List<User> users = userRepository.findAllFetchJoin();
-    return users.stream()
-        .sorted(Comparator.comparing(user -> user.getCreatedAt()))
-        .map(userMapper::toDto)
-        .toList();
-  }
+        String email = userUpdateRequest.newEmail();
+        String username = userUpdateRequest.newUsername();
+        String password = userUpdateRequest.newPassword();
 
-  @Transactional
-  @Override
-  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
-      BinaryContentCreateRequest binaryContentCreateRequest) {
-    User user = userRepository.findById(userId).orElseThrow(() -> {
-      log.warn("[Updating User Failed: User with id {} not found]", userId);
-      return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
-    });
-
-    String email = userUpdateRequest.newEmail();
-    String username = userUpdateRequest.newUsername();
-    String password = userUpdateRequest.newPassword();
-
-    if (userRepository.existsByEmail(email)) {
-      log.warn("[Updating User Failed: Email {} already exists]", email);
-      throw new UserAlreadyExistException(Instant.now(), Map.of("email", email));
+        if (userRepository.existsByEmail(email)) {
+            log.warn("[Updating User Failed: Email {} already exists]", email);
+            throw new UserAlreadyExistException(Instant.now(), Map.of("email", email));
+        }
+        if (userRepository.existsByUsername(username)) {
+            log.warn("[Updating User Failed: Username {} already exists]", username);
+            throw new UserAlreadyExistException(Instant.now(), Map.of("username", username));
+        }
+        // 프로필 이미지 저장
+        // 기존 프로필은 cascade로 자동 삭제
+        BinaryContentDto binaryContentDto =
+            (binaryContentCreateRequest != null) ? binaryContentService.create(
+                binaryContentCreateRequest) : null;
+        BinaryContent binaryContent =
+            (binaryContentDto == null) ? null
+                : binaryContentRepository.findById(binaryContentDto.getId())
+                    .orElse(null);
+        user.update(username, email, password, binaryContent);
+        return userMapper.toDto(user);
     }
-    if (userRepository.existsByUsername(username)) {
-      log.warn("[Updating User Failed: Username {} already exists]", username);
-      throw new UserAlreadyExistException(Instant.now(), Map.of("username", username));
-    }
-    // 프로필 이미지 저장
-    // 기존 프로필은 cascade로 자동 삭제
-    BinaryContentDto binaryContentDto =
-        (binaryContentCreateRequest != null) ? binaryContentService.create(
-            binaryContentCreateRequest) : null;
-    BinaryContent binaryContent =
-        (binaryContentDto == null) ? null
-            : binaryContentRepository.findById(binaryContentDto.getId())
-                .orElse(null);
-    user.update(username, email, password, binaryContent);
-    return userMapper.toDto(user);
-  }
 
-  @Override
-  public void delete(UUID userId) {
-    User user = userRepository.findById(userId).orElseThrow(() -> {
-      log.warn("[Updating User Failed: User with id {} not found]", userId);
-      return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
-    });
-    userRepository.delete(user);
-  }
+    @Override
+    public void delete(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            log.warn("[Updating User Failed: User with id {} not found]", userId);
+            return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+        });
+        userRepository.delete(user);
+    }
 
 }

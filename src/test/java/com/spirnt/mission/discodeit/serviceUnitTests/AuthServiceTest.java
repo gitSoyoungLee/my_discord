@@ -28,59 +28,59 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
 
-  @Mock
-  private UserMapper userMapper;
-  @Mock
-  private UserRepository userRepository;
-  @Mock
+    @Mock
+    private UserMapper userMapper;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
 
-  private UserStatusService userStatusService;
+    private UserStatusService userStatusService;
 
-  @InjectMocks
-  private BasicAuthService basicAuthService;
+    @InjectMocks
+    private BasicAuthService basicAuthService;
 
-  @Test
-  @DisplayName("로그인 테스트 - 성공")
-  void loginSuccess() {
-    // given
-    LoginRequest loginRequest = new LoginRequest("alice", "password");
-    User user = new User("alice", "alice@mail.com", "password");
-    when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
-    when(userMapper.toDto(any(User.class))).thenAnswer(invocation -> {
-      User userArg = invocation.getArgument(0);
-      return new UserDto(userArg.getId(), userArg.getCreatedAt(), userArg.getUpdatedAt(),
-          userArg.getUsername(), userArg.getEmail(), true, null);
-    });
-    // when
-    UserDto result = basicAuthService.login(loginRequest);
+    @Test
+    @DisplayName("로그인 테스트 - 성공")
+    void loginSuccess() {
+        // given
+        LoginRequest loginRequest = new LoginRequest("alice", "password");
+        User user = new User("alice", "alice@mail.com", "password");
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
+        when(userMapper.toDto(any(User.class))).thenAnswer(invocation -> {
+            User userArg = invocation.getArgument(0);
+            return new UserDto(userArg.getId(), userArg.getCreatedAt(), userArg.getUpdatedAt(),
+                userArg.getUsername(), userArg.getEmail(), true, null);
+        });
+        // when
+        UserDto result = basicAuthService.login(loginRequest);
 
-    // then
-    assertNotNull(result);
-    assertEquals("alice", result.getUsername());
-    assertEquals("alice@mail.com", result.getEmail());
-  }
+        // then
+        assertNotNull(result);
+        assertEquals("alice", result.getUsername());
+        assertEquals("alice@mail.com", result.getEmail());
+    }
 
-  @Test
-  @DisplayName("로그인 테스트 - 실패: 존재하지 않는 유저")
-  void loginFailDueToNotFound() {
-    // given
-    LoginRequest loginRequest = new LoginRequest("alice", "password");
-    User user = new User("alice", "alice@mail.com", "password");
-    when(userRepository.findByUsername("alice")).thenReturn(Optional.empty());
-    // when & then
-    assertThrows(UserNotFoundException.class, () -> basicAuthService.login(loginRequest));
-  }
+    @Test
+    @DisplayName("로그인 테스트 - 실패: 존재하지 않는 유저")
+    void loginFailDueToNotFound() {
+        // given
+        LoginRequest loginRequest = new LoginRequest("alice", "password");
+        User user = new User("alice", "alice@mail.com", "password");
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.empty());
+        // when & then
+        assertThrows(UserNotFoundException.class, () -> basicAuthService.login(loginRequest));
+    }
 
-  @Test
-  @DisplayName("로그인 테스트 - 실패: 잘못된 비밀번호")
-  void loginFailDueToWrongPw() {
-    // given
-    LoginRequest loginRequest = new LoginRequest("alice", "wrong");
-    User user = new User("alice", "alice@mail.com", "password");
-    ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
-    when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
-    // when & then
-    assertThrows(InvalidPasswordException.class, () -> basicAuthService.login(loginRequest));
-  }
+    @Test
+    @DisplayName("로그인 테스트 - 실패: 잘못된 비밀번호")
+    void loginFailDueToWrongPw() {
+        // given
+        LoginRequest loginRequest = new LoginRequest("alice", "wrong");
+        User user = new User("alice", "alice@mail.com", "password");
+        ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user));
+        // when & then
+        assertThrows(InvalidPasswordException.class, () -> basicAuthService.login(loginRequest));
+    }
 
 }

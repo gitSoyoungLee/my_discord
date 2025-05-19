@@ -23,9 +23,7 @@ management:
   endpoint:
     health:
       show-details: "ALWAYS"
-  info:
-    env:
-      enabled: true
+
 info:
   app:
     name: Discodeit

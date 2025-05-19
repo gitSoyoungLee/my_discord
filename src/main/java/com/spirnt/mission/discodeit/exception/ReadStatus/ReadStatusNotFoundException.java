@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.customException;
+package com.spirnt.mission.discodeit.exception.ReadStatus;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
