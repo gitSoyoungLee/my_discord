@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.exception;
 
 import com.spirnt.mission.discodeit.dto.ErrorResponse;
-import java.time.Instant;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ public class DiscodeitExceptionHandler {
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.getStatus())
             .body(
-                new ErrorResponse(Instant.now(), errorCode.getCode(),
+                new ErrorResponse(errorCode.getCode(),
                     errorCode.getMessage(),
                     e.getDetails(), e.getClass().getSimpleName(), errorCode.getStatus().value()));
     }
