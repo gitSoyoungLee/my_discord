@@ -2,7 +2,7 @@ spring:
   application:
     name: discodeit
   profiles:
-    default: prod
+    default: dev
   servlet:
     multipart:
       enabled: true
