@@ -12,6 +12,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain chain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+            .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
             .authorizeHttpRequests(auth -> auth
                 // 정적 리소스 요청 허용
                 .requestMatchers("/assets/**", "/favicon.ico", "/index.html").permitAll()
