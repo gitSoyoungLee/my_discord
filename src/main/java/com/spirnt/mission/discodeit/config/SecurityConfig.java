@@ -22,6 +22,8 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 // 그 외 인증 필요
                 .anyRequest().authenticated())
+            // LogoutFilter 제외
+            .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.disable())
             .httpBasic(Customizer.withDefaults());
         return httpSecurity.build();
     }
