@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.serviceUnitTests;
+package com.spirnt.mission.discodeit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,7 +13,6 @@ import com.spirnt.mission.discodeit.exception.User.InvalidPasswordException;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.service.UserStatusService;
 import com.spirnt.mission.discodeit.service.basic.BasicAuthService;
 import java.util.Optional;
 import java.util.UUID;

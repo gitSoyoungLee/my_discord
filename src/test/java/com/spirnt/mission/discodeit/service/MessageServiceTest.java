@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.serviceUnitTests;
+package com.spirnt.mission.discodeit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,15 +16,14 @@ import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.ChannelType;
 import com.spirnt.mission.discodeit.entity.Message;
 import com.spirnt.mission.discodeit.entity.User;
-import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.Message.MessageNotFoundException;
+import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.MessageMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.service.UserStatusService;
 import com.spirnt.mission.discodeit.service.basic.BasicMessageService;
 import java.util.ArrayList;
 import java.util.List;

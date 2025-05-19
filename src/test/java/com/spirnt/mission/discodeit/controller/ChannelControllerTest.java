@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.controllerTests;
+package com.spirnt.mission.discodeit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,14 +14,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spirnt.mission.discodeit.controller.ChannelController;
 import com.spirnt.mission.discodeit.dto.channel.ChannelDto;
 import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.spirnt.mission.discodeit.entity.ChannelType;
-import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
+import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import java.time.Instant;
 import java.util.List;

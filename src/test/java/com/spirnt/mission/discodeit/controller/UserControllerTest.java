@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.controllerTests;
+package com.spirnt.mission.discodeit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spirnt.mission.discodeit.controller.UserController;
 import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
