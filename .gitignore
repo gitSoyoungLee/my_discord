@@ -42,3 +42,4 @@ localStorage/*
 logs/*
 *.env
 .env
+htmlReport/*

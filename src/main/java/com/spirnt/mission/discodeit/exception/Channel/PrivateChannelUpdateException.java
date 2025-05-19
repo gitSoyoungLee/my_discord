@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.Channel;
+package com.spirnt.mission.discodeit.exception.customException;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class PrivateChannelUpdateException extends ChannelException {
 
-  public PrivateChannelUpdateException(Instant timestamp, Map<String, Object> details) {
-    super(timestamp, ErrorCode.PRIVATE_CHANNEL_UPDATE, details);
-  }
+    public PrivateChannelUpdateException(Instant timestamp, Map<String, Object> details) {
+        super(timestamp, ErrorCode.PRIVATE_CHANNEL_UPDATE, details);
+    }
 }

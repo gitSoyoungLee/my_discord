@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.BinaryContent;
+package com.spirnt.mission.discodeit.exception.customException;
 
 import com.spirnt.mission.discodeit.exception.DiscodeitException;
 import com.spirnt.mission.discodeit.exception.ErrorCode;
@@ -7,8 +7,8 @@ import java.util.Map;
 
 public class BinaryContentException extends DiscodeitException {
 
-  public BinaryContentException(Instant timestamp, ErrorCode errorCode,
-      Map<String, Object> details) {
-    super(timestamp, errorCode, details);
-  }
+    public BinaryContentException(Instant timestamp, ErrorCode errorCode,
+        Map<String, Object> details) {
+        super(timestamp, errorCode, details);
+    }
 }

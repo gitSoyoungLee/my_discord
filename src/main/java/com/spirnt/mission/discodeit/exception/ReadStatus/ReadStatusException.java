@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.ReadStatus;
+package com.spirnt.mission.discodeit.exception.customException;
 
 import com.spirnt.mission.discodeit.exception.DiscodeitException;
 import com.spirnt.mission.discodeit.exception.ErrorCode;
@@ -7,7 +7,8 @@ import java.util.Map;
 
 public class ReadStatusException extends DiscodeitException {
 
-  public ReadStatusException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
-    super(timestamp, errorCode, details);
-  }
+    public ReadStatusException(Instant timestamp, ErrorCode errorCode,
+        Map<String, Object> details) {
+        super(timestamp, errorCode, details);
+    }
 }

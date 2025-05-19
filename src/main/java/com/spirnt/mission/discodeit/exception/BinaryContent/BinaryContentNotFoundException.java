@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.BinaryContent;
+package com.spirnt.mission.discodeit.exception.customException;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class BinaryContentNotFoundException extends BinaryContentException {
 
-  public BinaryContentNotFoundException(Instant timestamp, Map<String, Object> details) {
-    super(timestamp, ErrorCode.BINARYCONTENT_NOT_FOUND, details);
-  }
+    public BinaryContentNotFoundException(Instant timestamp, Map<String, Object> details) {
+        super(timestamp, ErrorCode.BINARYCONTENT_NOT_FOUND, details);
+    }
 }

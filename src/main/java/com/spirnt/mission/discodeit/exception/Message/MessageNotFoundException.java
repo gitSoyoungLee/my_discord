@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.Message;
+package com.spirnt.mission.discodeit.exception.customException;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class MessageNotFoundException extends MessageException {
 
-  public MessageNotFoundException(Instant timestamp, Map<String, Object> details) {
-    super(timestamp, ErrorCode.MESSAGE_NOT_FOUND, details);
-  }
+    public MessageNotFoundException(Instant timestamp, Map<String, Object> details) {
+        super(timestamp, ErrorCode.MESSAGE_NOT_FOUND, details);
+    }
 }

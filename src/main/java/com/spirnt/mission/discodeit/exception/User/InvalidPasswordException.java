@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.User;
+package com.spirnt.mission.discodeit.exception.customException;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
@@ -9,8 +9,8 @@ import java.util.Map;
  */
 public class InvalidPasswordException extends UserException {
 
-  public InvalidPasswordException(Instant timestamp,
-      Map<String, Object> details) {
-    super(timestamp, ErrorCode.INVALID_PASSWORD, details);
-  }
+    public InvalidPasswordException(Instant timestamp,
+        Map<String, Object> details) {
+        super(timestamp, ErrorCode.INVALID_PASSWORD, details);
+    }
 }

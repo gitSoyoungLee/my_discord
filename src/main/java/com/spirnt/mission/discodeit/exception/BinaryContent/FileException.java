@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.exception.BinaryContent;
+package com.spirnt.mission.discodeit.exception.customException;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class FileException extends BinaryContentException {
 
-  public FileException(Instant timestamp, Map<String, Object> details) {
-    super(timestamp, ErrorCode.FILE_ERROR, details);
-  }
+    public FileException(Instant timestamp, Map<String, Object> details) {
+        super(timestamp, ErrorCode.FILE_ERROR, details);
+    }
 }
