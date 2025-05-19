@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController implements AuthApiDocs {
 
-  private final AuthService authService;
+    private final AuthService authService;
 
-  @PostMapping("/login")
-  public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest loginRequest) {
-    log.info("[Login Request Started]");
-    UserDto user = authService.login(loginRequest);
-    log.info("[Login Request Completed]");
-    return ResponseEntity.ok(user);
-  }
+    @PostMapping("/login")
+    public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest loginRequest) {
+        log.info("[Login Request Started]");
+        UserDto user = authService.login(loginRequest);
+        log.info("[Login Request Completed]");
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/csrf-token")
+    public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+        return ResponseEntity.ok(csrfToken);
+    }
 }
