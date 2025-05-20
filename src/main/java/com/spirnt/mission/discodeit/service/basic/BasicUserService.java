@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,13 +42,15 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
         BinaryContentCreateRequest binaryContentCreateRequest) {
         String email = userCreateRequest.email();
         String username = userCreateRequest.username();
-        String password = userCreateRequest.password();
+        String password = passwordEncoder.encode(userCreateRequest.password());
 
         if (userRepository.existsByEmail(email)) {
             log.warn("[Creating User Failed: Email {} already exists]", email);
@@ -104,7 +107,7 @@ public class BasicUserService implements UserService {
 
         String email = userUpdateRequest.newEmail();
         String username = userUpdateRequest.newUsername();
-        String password = userUpdateRequest.newPassword();
+        String password = passwordEncoder.encode(userUpdateRequest.newPassword());
 
         if (userRepository.existsByEmail(email)) {
             log.warn("[Updating User Failed: Email {} already exists]", email);
