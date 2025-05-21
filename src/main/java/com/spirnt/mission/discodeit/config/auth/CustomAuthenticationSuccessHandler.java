@@ -1,0 +1,37 @@
+package com.spirnt.mission.discodeit.config.auth;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spirnt.mission.discodeit.dto.user.UserDto;
+import com.spirnt.mission.discodeit.entity.User;
+import com.spirnt.mission.discodeit.mapper.UserMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+@RequiredArgsConstructor
+public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
+    private final ObjectMapper objectMapper;
+    private final UserMapper userMapper;
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+        Authentication authentication) throws IOException, ServletException {
+
+        // 인증된 사용자 정보
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        // DTO 매핑
+        User user = userDetails.getUser();
+        UserDto userDto = userMapper.toDto(user);
+
+        // response
+        response.setStatus(HttpStatus.OK.value());
+        response.setContentType("application/json");
+        objectMapper.writeValue(response.getWriter(), userDto);
+    }
+}
