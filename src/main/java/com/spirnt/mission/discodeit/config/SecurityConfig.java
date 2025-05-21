@@ -10,6 +10,8 @@ import com.spirnt.mission.discodeit.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -106,6 +108,14 @@ public class SecurityConfig {
     @Bean
     public CustomAuthenticationFailureHandler failureHandler(ObjectMapper objectMapper) {
         return new CustomAuthenticationFailureHandler(objectMapper);
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.fromHierarchy("""
+            ROLE_ADMIN > ROLE_CHANNEL_MANAGER
+            ROLE_CHANNEL_MANAGER > ROLE_USER
+            """);
     }
 
 }
