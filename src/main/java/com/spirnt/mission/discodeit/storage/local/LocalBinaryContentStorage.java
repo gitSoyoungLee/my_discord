@@ -3,7 +3,6 @@ package com.spirnt.mission.discodeit.storage.local;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.exception.BinaryContent.FileException;
 import com.spirnt.mission.discodeit.storage.BinaryContentStorage;
-import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,6 +16,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -30,21 +30,26 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-    private Path root = Paths.get("/app/binaryContentStorage");
+    private final Path root;
 
-
-    // Bean 생성 시 자동 호출하여 루트 디렉토리 초기화
-    @PostConstruct
-    void init() {
-        File[] files = root.toFile().listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile()) {
-                    file.delete();
-                }
-            }
-        }
+    public LocalBinaryContentStorage(
+        @Value("${discodeit.storage.local.root-path}") Path root
+    ) {
+        this.root = root;
     }
+
+//    // Bean 생성 시 자동 호출하여 루트 디렉토리 초기화
+//    @PostConstruct
+//    void init() {
+//        File[] files = root.toFile().listFiles();
+//        if (files != null) {
+//            for (File file : files) {
+//                if (file.isFile()) {
+//                    file.delete();
+//                }
+//            }
+//        }
+//    }
 
     /// 파일 실제 저장 위치 정의
     Path resolvePath(UUID binaryContentId) {
