@@ -1,10 +1,13 @@
 package com.spirnt.mission.discodeit.controller;
 
+import com.spirnt.mission.discodeit.config.auth.CustomUserDetails;
 import com.spirnt.mission.discodeit.controller.swagger.AuthApiDocs;
+import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,4 +25,11 @@ public class AuthController implements AuthApiDocs {
     public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
         return ResponseEntity.ok(csrfToken);
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getMe(@AuthenticationPrincipal CustomUserDetails me) {
+        UserDto userDto = authService.getMe(me);
+        return ResponseEntity.ok(userDto);
+    }
+
 }
