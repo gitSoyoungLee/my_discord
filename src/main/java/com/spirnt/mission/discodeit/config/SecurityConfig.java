@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -46,12 +47,17 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 // 그 외 인증 필요
                 .anyRequest().authenticated())
-            // 회원가입과 로그인은 csrf 검증 제외
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/users", "/api/auth/login"))
+            .csrf(csrf ->
+                // csrf 검증 제외
+                csrf.ignoringRequestMatchers("/api/users", "/api/auth/login",
+                    "/api/auth/logout"))
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            // LogoutFilter 제외
-            .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.disable());
+            .logout(logout -> logout.logoutRequestMatcher(
+                    new AntPathRequestMatcher("/api/auth/logout"))  // POST /api/auth/logout으로 로그아웃
+                .logoutSuccessUrl("/") // 세션 무효화 후 홈으로
+                .deleteCookies("JSESSIONID")    // 쿠키 삭제
+                .invalidateHttpSession(true));  // 로그아웃 시 세션 삭제
         return httpSecurity.build();
     }
 
