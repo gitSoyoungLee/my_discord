@@ -6,10 +6,10 @@ import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.ReadStatus;
 import com.spirnt.mission.discodeit.entity.User;
-import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.ReadStatus.ReadStatusAlreadyExistException;
 import com.spirnt.mission.discodeit.exception.ReadStatus.ReadStatusNotFoundException;
+import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.ReadStatusMapper;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
@@ -45,12 +45,12 @@ public class BasicReadStatusService implements ReadStatusService {
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> {
                 log.warn("[Creating ReadStatus Failed: Channel with id {} not found]", channelId);
-                return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
+                return new ChannelNotFoundException(Map.of("channelId", channelId));
             });
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
                 log.warn("[Creating ReadStatus Failed: User with id {} not found]", userId);
-                return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+                return new UserNotFoundException(Map.of("userId", userId));
             });
 
         //이미 해당 채널-유저를 가진 ReadStatus가 있으면 예외 발생
@@ -59,7 +59,7 @@ public class BasicReadStatusService implements ReadStatusService {
             log.warn(
                 "[Creating ReadStatus Failed: ReadStatus with userId {} and channelId {} already exists]",
                 userId, channelId);
-            throw new ReadStatusAlreadyExistException(Instant.now(),
+            throw new ReadStatusAlreadyExistException(
                 Map.of("userID", userId, "channelId", channelId));
 
         }
@@ -72,8 +72,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusDto find(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(
-                () -> new ReadStatusNotFoundException(Instant.now(),
-                    Map.of("readStatusId", readStatusId)));
+                () -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId)));
         return readStatusMapper.toDto(readStatus);
     }
 
@@ -92,8 +91,7 @@ public class BasicReadStatusService implements ReadStatusService {
             .orElseThrow(() -> {
                 log.warn("[Updaing ReadStatud Failed: ReadStatus with id {} not found]",
                     readStatusId);
-                return new ReadStatusNotFoundException(Instant.now(),
-                    Map.of("readStatusId", readStatusId));
+                return new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId));
             });
         return readStatusMapper.toDto(readStatus);
     }

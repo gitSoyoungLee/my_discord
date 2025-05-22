@@ -54,11 +54,11 @@ public class BasicUserService implements UserService {
 
         if (userRepository.existsByEmail(email)) {
             log.warn("[Creating User Failed: Email {} already exists]", email);
-            throw new UserAlreadyExistException(Instant.now(), Map.of("email", email));
+            throw new UserAlreadyExistException(Map.of("email", email));
         }
         if (userRepository.existsByUsername(username)) {
             log.warn("[Creating User Failed: Username {} already exists]", username);
-            throw new UserAlreadyExistException(Instant.now(), Map.of("username", username));
+            throw new UserAlreadyExistException(Map.of("username", username));
         }
         // User 생성, 저장
         User user = userRepository.save(new User(username, email, password));
@@ -72,7 +72,7 @@ public class BasicUserService implements UserService {
                 binaryContentCreateRequest);
             binaryContent = binaryContentRepository.findById(binaryContentDto.getId())
                 .orElseThrow(
-                    () -> new BinaryContentNotFoundException(Instant.now(),
+                    () -> new BinaryContentNotFoundException(
                         Map.of("binaryContentId", binaryContentDto.getId())));
         }
         user.setProfileAndStatus(binaryContent, userStatus);
@@ -82,7 +82,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto find(UUID userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(Instant.now(), Map.of("userId", userId)));
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
         return userMapper.toDto(user);
     }
 
@@ -102,7 +102,7 @@ public class BasicUserService implements UserService {
         BinaryContentCreateRequest binaryContentCreateRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> {
             log.warn("[Updating User Failed: User with id {} not found]", userId);
-            return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+            return new UserNotFoundException(Map.of("userId", userId));
         });
 
         String email = userUpdateRequest.newEmail();
@@ -111,11 +111,11 @@ public class BasicUserService implements UserService {
 
         if (userRepository.existsByEmail(email)) {
             log.warn("[Updating User Failed: Email {} already exists]", email);
-            throw new UserAlreadyExistException(Instant.now(), Map.of("email", email));
+            throw new UserAlreadyExistException(Map.of("email", email));
         }
         if (userRepository.existsByUsername(username)) {
             log.warn("[Updating User Failed: Username {} already exists]", username);
-            throw new UserAlreadyExistException(Instant.now(), Map.of("username", username));
+            throw new UserAlreadyExistException(Map.of("username", username));
         }
         // 프로필 이미지 저장
         // 기존 프로필은 cascade로 자동 삭제
@@ -134,7 +134,7 @@ public class BasicUserService implements UserService {
     public void delete(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> {
             log.warn("[Updating User Failed: User with id {} not found]", userId);
-            return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+            return new UserNotFoundException(Map.of("userId", userId));
         });
         userRepository.delete(user);
     }

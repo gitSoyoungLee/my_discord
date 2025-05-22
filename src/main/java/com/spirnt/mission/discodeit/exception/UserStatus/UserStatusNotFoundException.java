@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.exception.UserStatus;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
-import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -9,7 +8,7 @@ import java.util.Map;
  */
 public class UserStatusNotFoundException extends UserStatusException {
 
-    public UserStatusNotFoundException(Instant timestamp, Map<String, Object> details) {
-        super(timestamp, ErrorCode.USERSTATUS_NOT_FOUND, details);
+    public UserStatusNotFoundException(Map<String, Object> details) {
+        super(ErrorCode.USERSTATUS_NOT_FOUND, details);
     }
 }

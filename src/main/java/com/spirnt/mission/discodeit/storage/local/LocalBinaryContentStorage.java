@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +64,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             fos.write(bytes);
         } catch (IOException e) {
             log.warn("[스토리지에 파일 저장 중 오류가 발생했습니다.]");
-            throw new FileException(Instant.now(), Map.of("binaryContentId", binaryContentId));
+            throw new FileException(Map.of("binaryContentId", binaryContentId));
         }
         return binaryContentId;
     }
@@ -78,7 +77,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             return new FileInputStream(String.valueOf(path));
         } catch (FileNotFoundException e) {
             log.warn("[스토리지에 파일이 없습니다.]");
-            throw new FileException(Instant.now(), Map.of("binaryContentId", binaryContentId));
+            throw new FileException(Map.of("binaryContentId", binaryContentId));
         }
     }
 

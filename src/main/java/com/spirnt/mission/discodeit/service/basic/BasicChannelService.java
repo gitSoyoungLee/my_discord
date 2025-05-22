@@ -9,9 +9,9 @@ import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.ChannelType;
 import com.spirnt.mission.discodeit.entity.Message;
-import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.PrivateChannelUpdateException;
+import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.ChannelMapper;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
@@ -77,7 +77,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelDto find(UUID userId, UUID channelId) {
         Channel channel = channelRepository.findById(channelId).orElseThrow(
-            () -> new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId)));
+            () -> new ChannelNotFoundException(Map.of("channelId", channelId)));
         return channelMapper.toDto(channel,
             getParticipants(channel),
             getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
@@ -88,7 +88,7 @@ public class BasicChannelService implements ChannelService {
         // User가 존재하지 않으면 예외 발생
         if (!userRepository.existsById(userId)) {
             log.warn("[Finding All Channels By UserId Failed: User with id {} not found]", userId);
-            throw new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+            throw new UserNotFoundException(Map.of("userId", userId));
         }
         // PUBLIC인 채널은 모두 가져옴
         List<Channel> channels = channelRepository.findAllPublic();
@@ -115,13 +115,13 @@ public class BasicChannelService implements ChannelService {
         PublicChannelUpdateRequest publicChannelUpdateRequest) {
         Channel channel = channelRepository.findById(channelId).orElseThrow(() -> {
             log.warn("[Updating Channel Failed: Channel with id {} not found]", channelId);
-            return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
+            return new ChannelNotFoundException(Map.of("channelId", channelId));
         });
         // PRIVATE 채널은 업데이트할 수 없음
         if (channel.getType() == ChannelType.PRIVATE) {
             log.warn("[Updating Channel Failed: Private Channel(id: {}) cannot be updated]",
                 channelId);
-            throw new PrivateChannelUpdateException(Instant.now(), Map.of("channelId", channelId));
+            throw new PrivateChannelUpdateException(Map.of("channelId", channelId));
         }
         channel.update(publicChannelUpdateRequest.newName(),
             publicChannelUpdateRequest.newDescription());
@@ -136,7 +136,7 @@ public class BasicChannelService implements ChannelService {
     public void delete(UUID channelId) {
         Channel channel = channelRepository.findById(channelId).orElseThrow(() -> {
             log.warn("[Deleting Channel Failed: Channel with id {} not found]", channelId);
-            return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
+            return new ChannelNotFoundException(Map.of("channelId", channelId));
         });
         channelRepository.delete(channel);
     }

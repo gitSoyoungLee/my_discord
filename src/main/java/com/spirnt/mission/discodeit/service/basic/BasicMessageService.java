@@ -11,9 +11,9 @@ import com.spirnt.mission.discodeit.entity.BinaryContent;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.Message;
 import com.spirnt.mission.discodeit.entity.User;
-import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.Message.MessageNotFoundException;
+import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.MessageMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
@@ -62,12 +62,12 @@ public class BasicMessageService implements MessageService {
         User user = userRepository.findById(authorId)
             .orElseThrow(() -> {
                 log.warn("[Creating Message Failed: User with id {} not found]", authorId);
-                return new UserNotFoundException(Instant.now(), Map.of("userId", authorId));
+                return new UserNotFoundException(Map.of("userId", authorId));
             });
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> {
                 log.warn("[Creating Message Failed: Channel with id {} not found]", channelId);
-                return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
+                return new ChannelNotFoundException(Map.of("channelId", channelId));
             });
 
         // 첨부 파일 업로드
@@ -95,7 +95,7 @@ public class BasicMessageService implements MessageService {
     public MessageDto find(UUID messageId) {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(
-                () -> new MessageNotFoundException(Instant.now(), Map.of("messageId", messageId)));
+                () -> new MessageNotFoundException(Map.of("messageId", messageId)));
         return messageMapper.toDto(message);
     }
 
@@ -104,7 +104,7 @@ public class BasicMessageService implements MessageService {
     public PageResponse findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
         if (!channelRepository.existsById(channelId)) {
             log.warn("[Finding Messages Failed: Channel with id {} not found]", channelId);
-            throw new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
+            throw new ChannelNotFoundException(Map.of("channelId", channelId));
         }
         Slice<Message> messageSlice;
         // 첫 요청이면 가장 최신 메시지부터 가져오기
@@ -137,7 +137,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> {
                 log.warn("[Updating Message Failed: Message with id {} not found]", messageId);
-                return new MessageNotFoundException(Instant.now(), Map.of("messageId", messageId));
+                return new MessageNotFoundException(Map.of("messageId", messageId));
             });
         message.update(dto.newContent());
         return messageMapper.toDto(message);
@@ -148,7 +148,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> {
                 log.warn("[Deleting Message Failed: Message with id {} not found]", messageId);
-                return new MessageNotFoundException(Instant.now(), Map.of("messageId", messageId));
+                return new MessageNotFoundException(Map.of("messageId", messageId));
             });
         messageRepository.delete(message);
     }

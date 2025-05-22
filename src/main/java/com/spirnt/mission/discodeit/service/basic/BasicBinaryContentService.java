@@ -8,7 +8,6 @@ import com.spirnt.mission.discodeit.mapper.BinaryContentMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.storage.BinaryContentStorage;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +49,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("[Finding BinaryContent Failed: BinaryContent with id {} not found]", id);
-                return new BinaryContentNotFoundException(Instant.now(),
-                    Map.of("binaryContentId", id));
+                return new BinaryContentNotFoundException(Map.of("binaryContentId", id));
             });
         return binaryContentMapper.toDto(binaryContent);
     }

@@ -38,15 +38,14 @@ public class BasicUserStatusService implements UserStatusService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
                 log.warn("[Creating UserStatus Failed: User with id {} not found]", userId);
-                return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+                return new UserNotFoundException(Map.of("userId", userId));
             });
         // 이미 User와 관련된 객체가 존재하면 예외 발생
         if (userStatusRepository.existsByUserId(userId)) {
             log.warn(
                 "[Creating UserStatus Failed: UserStatus with userId {} already exists]",
                 userId);
-            throw new UserStatusAlreadyExistException(Instant.now(),
-                Map.of("userID", userId));
+            throw new UserStatusAlreadyExistException(Map.of("userID", userId));
         }
         UserStatus userStatus = userStatusRepository.save(new UserStatus(user,
             userStatusCreateRequest.type(), Instant.now()));
@@ -56,8 +55,8 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto find(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
-            .orElseThrow(() -> new UserStatusNotFoundException(Instant.now(),
-                Map.of("userStatusId", userStatusId)));
+            .orElseThrow(
+                () -> new UserStatusNotFoundException(Map.of("userStatusId", userStatusId)));
         return userStatusMapper.toDto(userStatus);
     }
 
@@ -75,8 +74,7 @@ public class BasicUserStatusService implements UserStatusService {
             .orElseThrow(() -> {
                 log.warn("[Updating UserStatus Failed: UserStatus with id {} not found]",
                     userStatusId);
-                return new UserStatusNotFoundException(Instant.now(),
-                    Map.of("userStatusId", userStatusId));
+                return new UserStatusNotFoundException(Map.of("userStatusId", userStatusId));
             });
         userStatus.update(userStatusUpdateRequest.newLastActiveAt());
         return userStatusMapper.toDto(userStatus);
@@ -88,13 +86,13 @@ public class BasicUserStatusService implements UserStatusService {
         // User가 존재하지 않으면 예외 발생
         if (!userRepository.existsById(userId)) {
             log.warn("[Updating UserStatus Failed: User with id {} not found]", userId);
-            throw new UserNotFoundException(Instant.now(), Map.of("userId", userId));
+            throw new UserNotFoundException(Map.of("userId", userId));
         }
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
             .orElseThrow(() -> {
                 log.warn("[Updating UserStatus Failed: UserStatus with userId {} not found]",
                     userId);
-                return new UserStatusNotFoundException(Instant.now(),
+                return new UserStatusNotFoundException(
                     Map.of("userId", userId));
             });
         userStatus.update(userStatusUpdateRequest.newLastActiveAt());
@@ -107,8 +105,7 @@ public class BasicUserStatusService implements UserStatusService {
             .orElseThrow(() -> {
                 log.warn("[Deleting UserStatus Failed: UserStatus with id {} not found]",
                     userStatusId);
-                return new MessageNotFoundException(Instant.now(),
-                    Map.of("userStatusId", userStatusId));
+                return new MessageNotFoundException(Map.of("userStatusId", userStatusId));
             });
         userStatusRepository.delete(userStatus);
     }
