@@ -60,6 +60,8 @@ public class SecurityConfig {
                     "/api/auth/logout"))
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .sessionManagement(s -> s.maximumSessions(1)    // 동시 세션 제어: 동시 세션 최대 1개 허용
+                .maxSessionsPreventsLogin(false))   // 새로운 로그인 시 기존 세션을 무효화
             .logout(logout -> logout.logoutRequestMatcher(
                     new AntPathRequestMatcher("/api/auth/logout"))  // POST /api/auth/logout으로 로그아웃
                 .logoutSuccessUrl("/") // 세션 무효화 후 홈으로
