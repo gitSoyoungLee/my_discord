@@ -2,7 +2,6 @@ package com.spirnt.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spirnt.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,10 +37,6 @@ public class User extends BaseUpdatableEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private BinaryContent profile;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "status_id")
-    private UserStatus status;
-
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private Role role;
@@ -55,21 +50,8 @@ public class User extends BaseUpdatableEntity {
         this.role = Role.ROLE_USER;
     }
 
-    public void setProfileAndStatus(BinaryContent binaryContent, UserStatus userStatus) {
-        if (binaryContent != null) {
-            this.profile = binaryContent;
-        }
-        if (userStatus != null) {
-            this.status = userStatus;
-        }
-    }
-
     public void setProfile(BinaryContent binaryContent) {
         this.profile = binaryContent;
-    }
-
-    public void setStatus(UserStatus userStatus) {
-        this.status = status;
     }
 
     public void updateRole(Role role) {

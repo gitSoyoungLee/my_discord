@@ -17,10 +17,6 @@ public enum ErrorCode {
     READSTATUS_NOT_FOUND("READSTATUS_404", HttpStatus.NOT_FOUND, "ReadStatus를 찾을 수 없습니다."),
     READSTATUS_ALREADY_EXISTS("READSTATU_400", HttpStatus.BAD_REQUEST, "이미 동일한 ReadStatus가 존재합니다."),
 
-    USERSTATUS_NOT_FOUND("USERSTATUS_404", HttpStatus.NOT_FOUND, "UserStatus를 찾을 수 없습니다."),
-    USERSTATUS_ALREADY_EXISTS("USERSTATUS_400", HttpStatus.BAD_REQUEST,
-        "이미 동일한 UserStatus가 존재합니다."),
-
     BINARYCONTENT_NOT_FOUND("BINARYCONTENT_404", HttpStatus.NOT_FOUND, "BinaryContent를 찾을 수 없습니다."),
     FILE_ERROR("BINARYCONTENT_500", HttpStatus.INTERNAL_SERVER_ERROR, "파일을 읽거나 쓰는 중 오류가 발생했습니다.");
 

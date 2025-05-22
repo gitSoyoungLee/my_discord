@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import com.spirnt.mission.discodeit.service.UserService;
-import com.spirnt.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +32,6 @@ public class UserController implements UserApiDocs {
 
 
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
     // 모든 사용자 조회
     @GetMapping(value = "")

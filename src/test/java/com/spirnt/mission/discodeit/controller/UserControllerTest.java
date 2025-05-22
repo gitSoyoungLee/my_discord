@@ -18,7 +18,6 @@ import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.service.UserService;
-import com.spirnt.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;

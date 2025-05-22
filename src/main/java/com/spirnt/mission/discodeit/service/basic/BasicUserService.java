@@ -7,18 +7,14 @@ import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import com.spirnt.mission.discodeit.entity.BinaryContent;
 import com.spirnt.mission.discodeit.entity.User;
-import com.spirnt.mission.discodeit.entity.UserStatus;
-import com.spirnt.mission.discodeit.entity.UserStatusType;
 import com.spirnt.mission.discodeit.exception.BinaryContent.BinaryContentNotFoundException;
 import com.spirnt.mission.discodeit.exception.User.UserAlreadyExistException;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.repository.UserStatusRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.UserService;
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +38,6 @@ public class BasicUserService implements UserService {
 
     private final BinaryContentService binaryContentService;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusRepository userStatusRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final SessionRegistry sessionRegistry;
@@ -77,9 +72,6 @@ public class BasicUserService implements UserService {
         }
         // User 생성, 저장
         User user = userRepository.save(new User(username, email, password));
-        // 관련 도메인
-        UserStatus userStatus = userStatusRepository.save(
-            new UserStatus(user, UserStatusType.ONLINE, Instant.now()));
         // 프로필 이미지 저장
         BinaryContent binaryContent = null;
         if (binaryContentCreateRequest != null) {
@@ -90,7 +82,7 @@ public class BasicUserService implements UserService {
                     () -> new BinaryContentNotFoundException(
                         Map.of("binaryContentId", binaryContentDto.getId())));
         }
-        user.setProfileAndStatus(binaryContent, userStatus);
+        user.setProfile(binaryContent);
 
         return toDto(user);
     }

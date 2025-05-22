@@ -6,7 +6,6 @@ import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
 import com.spirnt.mission.discodeit.dto.message.MessageDto;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.response.PageResponse;
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.spirnt.mission.discodeit.entity.BinaryContent;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.Message;
@@ -21,7 +20,6 @@ import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.MessageService;
-import com.spirnt.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,7 +49,6 @@ public class BasicMessageService implements MessageService {
 
     private final BinaryContentService binaryContentService;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusService userStatusService;
     private final SessionRegistry sessionRegistry;
 
     private boolean isUserOnline(String username) {
@@ -100,8 +97,6 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.save(new Message(messageCreateRequest.content(),
             user, channel, attachedFiles));
 
-        // 메세지 작성자를 Online 상태로
-        userStatusService.updateByUserId(authorId, new UserStatusUpdateRequest(Instant.now()));
         return toMessageDto(message);
     }
 
