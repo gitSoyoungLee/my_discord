@@ -10,11 +10,14 @@ import com.spirnt.mission.discodeit.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,6 +29,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
 
@@ -42,11 +46,12 @@ public class SecurityConfig {
                     "/webjars/**").permitAll()
                 // Actuator 요청 허용
                 .requestMatchers("/actuator/**").permitAll()
-                // CSRF 토큰을 발급하는 API 요청 허용
+                // CSRF 토큰 발급, 회원가입, 로그인 API 요청 허용
                 .requestMatchers("/api/auth/csrf-token").permitAll()
-                // 회원가입, 로그인 API 요청 허용
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                // 그 외 API는 최소 ROLE_USER 권한 필요
+                .requestMatchers("/api/**").hasRole("USER")
                 // 그 외 인증 필요
                 .anyRequest().authenticated())
             .csrf(csrf ->
@@ -112,10 +117,18 @@ public class SecurityConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.fromHierarchy("""
-            ROLE_ADMIN > ROLE_CHANNEL_MANAGER
-            ROLE_CHANNEL_MANAGER > ROLE_USER
-            """);
+        return RoleHierarchyImpl.fromHierarchy(
+            "ROLE_ADMIN > ROLE_CHANNEL_MANAGER\n" +
+                "ROLE_CHANNEL_MANAGER > ROLE_USER"
+        );
+    }
+
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+        RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setRoleHierarchy(roleHierarchy);
+        return handler;
     }
 
 }

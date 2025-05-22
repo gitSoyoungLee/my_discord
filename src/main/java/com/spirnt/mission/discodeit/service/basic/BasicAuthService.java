@@ -13,6 +13,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +29,13 @@ public class BasicAuthService implements AuthService {
         return userMapper.toDto(user);
     }
 
+    @Transactional
     @Override
     public UserDto updateRole(UserRoleUpdateRequest userRoleUpdateRequest) {
         UUID userId = userRoleUpdateRequest.userId();
-        log.info("[userId]: {}", userId);
         User user = userRepository.findById(userRoleUpdateRequest.userId())
             .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
+
         user.updateRole(userRoleUpdateRequest.newRole());
         return userMapper.toDto(user);
     }

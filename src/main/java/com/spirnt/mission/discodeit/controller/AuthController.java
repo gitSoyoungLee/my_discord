@@ -8,6 +8,7 @@ import com.spirnt.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,7 @@ public class AuthController implements AuthApiDocs {
     }
 
     @PutMapping("/role")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")  // 최소 ROLE_ADMIN 권한 필요
     public ResponseEntity<UserDto> updateRole(
         @RequestBody UserRoleUpdateRequest userRoleUpdateRequest) {
         UserDto userDto = authService.updateRole(userRoleUpdateRequest);
