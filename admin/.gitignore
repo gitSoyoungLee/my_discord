@@ -35,12 +35,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-
-*.ser
-localStorage/*
-logs/*
-*.env
-.env
-htmlReport/
-

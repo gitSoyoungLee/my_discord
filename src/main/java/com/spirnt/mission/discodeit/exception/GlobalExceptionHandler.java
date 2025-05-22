@@ -27,4 +27,5 @@ public class GlobalExceptionHandler {
             .body(new ErrorResponse("Exception", e.getMessage(),
                 null, e.getClass().getSimpleName(), 500));
     }
+
 }
