@@ -6,6 +6,12 @@ CREATE TABLE binary_contents(
   content_type VARCHAR(100) NOT NULL
 );
 
+CREATE TYPE role AS ENUM (
+  'ROLE_ADMIN',
+  'ROLE_CHANNEL_MANAGER',
+  'ROLE_USER'
+);
+
 CREATE TABLE users (
   id UUID PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -14,6 +20,7 @@ CREATE TABLE users (
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(60) NOT NULL,
   profile_id UUID,
+  role role NOT NULL,
   FOREIGN KEY (profile_id) REFERENCES binary_contents(id)
 	  ON DELETE SET NULL
 );
