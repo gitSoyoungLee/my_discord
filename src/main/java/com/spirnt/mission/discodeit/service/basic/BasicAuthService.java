@@ -8,10 +8,13 @@ import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.AuthService;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,8 @@ public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
+    private final SessionRegistry sessionRegistry;
 
     @Override
     public UserDto getMe(CustomUserDetails customUserDetails) {
@@ -37,6 +42,26 @@ public class BasicAuthService implements AuthService {
             .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
         user.updateRole(userRoleUpdateRequest.newRole());
+
+        // 유저가 로그인 중이라면 세션 무효화
+        expireUserSessions(user);
+
         return userMapper.toDto(user);
+    }
+
+    private void expireUserSessions(User user) {
+        List<Object> principals = sessionRegistry.getAllPrincipals();
+
+        for (Object principal : principals) {
+            if (principal instanceof CustomUserDetails customUserDetails) {
+                if (customUserDetails.getUser().equals(user)) {
+                    List<SessionInformation> sessions = sessionRegistry.getAllSessions(
+                        customUserDetails, false);
+                    for (SessionInformation session : sessions) {
+                        session.expireNow(); // 세션 무효화
+                    }
+                }
+            }
+        }
     }
 }
