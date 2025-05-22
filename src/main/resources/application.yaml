@@ -13,12 +13,17 @@ spring:
       client:
         instance:
           name: discodeit
+  config:
+    import: optional:file:.env[.properties]
+
 discodeit:
   storage:
     type: local
+
 logging:
   level:
     root: info
+
 management:
   endpoints:
     web:
@@ -45,3 +50,14 @@ info:
   multipart:
     max-file-size: ${spring.servlet.multipart.max-file-size}
     max-request-size: ${spring.servlet.multipart.max-request-size}
+
+discodeit:
+  storage:
+    type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
+  s3:
+    access-key: ${AWS_S3_ACCESS_KEY}
+    secret-key: ${AWS_S3_SECRET_KEY}
+    region: ${AWS_S3_REGION}
+    bucket: ${AWS_S3_BUCKET}
+    presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+
