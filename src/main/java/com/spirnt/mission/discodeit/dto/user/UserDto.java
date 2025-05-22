@@ -34,14 +34,14 @@ public class UserDto {
         this.role = role;
     }
 
-    public static UserDto from(User user) {
+    public static UserDto from(User user, boolean isOnline) {
         return UserDto.builder()
             .id(user.getId())
             .createdAt(user.getCreatedAt())
             .updatedAt(user.getUpdatedAt())
             .username(user.getUsername())
             .email(user.getEmail())
-            .online(user.getStatus().isOnline())
+            .online(isOnline)
             .profile((user.getProfile() != null) ? BinaryContentDto.from(user.getProfile()) : null)
             .role(user.getRole())
             .build();

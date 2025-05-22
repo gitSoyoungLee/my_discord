@@ -10,17 +10,22 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @RequiredArgsConstructor
+@Slf4j
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
+    private final SessionRegistry sessionRegistry;
     private final UserMapper userMapper;
 
     @Override
@@ -37,16 +42,29 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
             context);
 
+        // SessionRegistry에 세션 등록하기
+        sessionRegistry.registerNewSession(session.getId(), authentication.getPrincipal());
+
         // 인증된 사용자 정보
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         // DTO 매핑
         User user = userDetails.getUser();
-        UserDto userDto = userMapper.toDto(user);
+        UserDto userDto = UserDto.from(user, isUserOnline(user.getUsername()));
 
         // response
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         objectMapper.writeValue(response.getWriter(), userDto);
+
     }
+
+    // 세션에 username이 있는지 확인하기
+    private boolean isUserOnline(String username) {
+        return sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> principal instanceof UserDetails)
+            .map(principal -> (UserDetails) principal)
+            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
+    }
+
 }

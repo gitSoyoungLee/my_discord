@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +29,21 @@ public class BasicAuthService implements AuthService {
 
     private final SessionRegistry sessionRegistry;
 
+    private boolean isUserOnline(String username) {
+        return sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> principal instanceof UserDetails)
+            .map(principal -> (UserDetails) principal)
+            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
+    }
+
+    private UserDto toDto(User user) {
+        return userMapper.toDto(user, isUserOnline(user.getUsername()));
+    }
+
     @Override
     public UserDto getMe(CustomUserDetails customUserDetails) {
         User user = customUserDetails.getUser();
-        return userMapper.toDto(user);
+        return toDto(user);
     }
 
     @Transactional
@@ -46,7 +58,7 @@ public class BasicAuthService implements AuthService {
         // 유저가 로그인 중이라면 세션 무효화
         expireUserSessions(user);
 
-        return userMapper.toDto(user);
+        return toDto(user);
     }
 
     private void expireUserSessions(User user) {

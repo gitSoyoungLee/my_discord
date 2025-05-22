@@ -9,6 +9,7 @@ import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.ChannelType;
 import com.spirnt.mission.discodeit.entity.Message;
+import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.PrivateChannelUpdateException;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
@@ -30,6 +31,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +50,8 @@ public class BasicChannelService implements ChannelService {
 
     private final ReadStatusService readStatusService;
     private final ReadStatusRepository readStatusRepository;
+
+    private final SessionRegistry sessionRegistry;
 
     @Transactional
     @Override
@@ -152,7 +157,7 @@ public class BasicChannelService implements ChannelService {
     public List<UserDto> getParticipants(Channel channel) {
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             return readStatusRepository.findAllByChannelId(channel.getId()).stream()
-                .map(readStatus -> userMapper.toDto(readStatus.getUser()))
+                .map(readStatus -> toUserDto(readStatus.getUser()))
                 .collect(Collectors.toList());
         }
         return new ArrayList<>();
@@ -165,6 +170,16 @@ public class BasicChannelService implements ChannelService {
             .collect(Collectors.toList());
     }
 
+    public boolean isUserOnline(String username) {
+        return sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> principal instanceof UserDetails)
+            .map(principal -> (UserDetails) principal)
+            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
+    }
+
+    public UserDto toUserDto(User user) {
+        return userMapper.toDto(user, isUserOnline(user.getUsername()));
+    }
 }
 
 

@@ -118,9 +118,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CustomAuthenticationSuccessHandler successHandler(UserMapper userMapper,
-        ObjectMapper objectMapper) {
-        return new CustomAuthenticationSuccessHandler(objectMapper, userMapper);
+    public CustomAuthenticationSuccessHandler successHandler(SessionRegistry sessionRegistry,
+        ObjectMapper objectMapper, UserMapper userMapper) {
+        return new CustomAuthenticationSuccessHandler(objectMapper, sessionRegistry, userMapper);
     }
 
     @Bean

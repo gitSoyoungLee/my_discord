@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +45,19 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final SessionRegistry sessionRegistry;
+
+    private boolean isUserOnline(String username) {
+        return sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> principal instanceof UserDetails)
+            .map(principal -> (UserDetails) principal)
+            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
+    }
+
+    private UserDto toDto(User user) {
+        return userMapper.toDto(user, isUserOnline(user.getUsername()));
+    }
+
 
     @Transactional
     @Override
@@ -76,14 +91,16 @@ public class BasicUserService implements UserService {
                         Map.of("binaryContentId", binaryContentDto.getId())));
         }
         user.setProfileAndStatus(binaryContent, userStatus);
-        return userMapper.toDto(user);
+
+        return toDto(user);
     }
+
 
     @Override
     public UserDto find(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
-        return userMapper.toDto(user);
+        return toDto(user);
     }
 
     @Transactional(readOnly = true)
@@ -92,7 +109,7 @@ public class BasicUserService implements UserService {
         List<User> users = userRepository.findAllFetchJoin();
         return users.stream()
             .sorted(Comparator.comparing(user -> user.getCreatedAt()))
-            .map(userMapper::toDto)
+            .map(user -> toDto(user))
             .toList();
     }
 
@@ -127,7 +144,7 @@ public class BasicUserService implements UserService {
                 : binaryContentRepository.findById(binaryContentDto.getId())
                     .orElse(null);
         user.update(username, email, password, binaryContent);
-        return userMapper.toDto(user);
+        return toDto(user);
     }
 
     @Override

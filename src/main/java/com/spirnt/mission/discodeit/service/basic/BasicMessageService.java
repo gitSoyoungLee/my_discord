@@ -33,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,6 +52,18 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentService binaryContentService;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusService userStatusService;
+    private final SessionRegistry sessionRegistry;
+
+    private boolean isUserOnline(String username) {
+        return sessionRegistry.getAllPrincipals().stream()
+            .filter(p -> p instanceof UserDetails)
+            .map(p -> (UserDetails) p)
+            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
+    }
+
+    private MessageDto toMessageDto(Message message) {
+        return MessageDto.from(message, isUserOnline(message.getAuthor().getUsername()));
+    }
 
     @Transactional
     @Override
@@ -88,7 +102,7 @@ public class BasicMessageService implements MessageService {
 
         // 메세지 작성자를 Online 상태로
         userStatusService.updateByUserId(authorId, new UserStatusUpdateRequest(Instant.now()));
-        return messageMapper.toDto(message);
+        return toMessageDto(message);
     }
 
     @Override
@@ -96,7 +110,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(
                 () -> new MessageNotFoundException(Map.of("messageId", messageId)));
-        return messageMapper.toDto(message);
+        return toMessageDto(message);
     }
 
     @Transactional(readOnly = true)
@@ -117,7 +131,7 @@ public class BasicMessageService implements MessageService {
         }
         List<Message> messages = messageSlice.getContent();
         List<MessageDto> messageDtos = messages.stream()
-            .map(messageMapper::toDto)
+            .map(message -> toMessageDto(message))
             .toList();
         boolean hasNext = messageSlice.hasNext();
         int size = messages.size();
@@ -140,7 +154,7 @@ public class BasicMessageService implements MessageService {
                 return new MessageNotFoundException(Map.of("messageId", messageId));
             });
         message.update(dto.newContent());
-        return messageMapper.toDto(message);
+        return toMessageDto(message);
     }
 
     @Override
