@@ -62,9 +62,17 @@ public class SecurityConfig {
                     "/api/auth/logout"))
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .sessionManagement(s -> s.maximumSessions(1)    // 동시 세션 제어: 동시 세션 최대 1개 허용
+//            .rememberMe(rememberMe -> rememberMe
+//                .rememberMeParameter("remember-me") // 프론트에서 보내는 속성
+//                .tokenValiditySeconds(60 * 60 * 24 * 21)    // 쿠키 유효 시간 21일
+//                .key("mySecretKey123!") // 서명에 사용할 키
+//            )
+            .sessionManagement(session -> session
+                .sessionFixation(sf -> sf.changeSessionId())  // 세션 고정 공격 방어: 세션 ID만 변경
+                .maximumSessions(1)    // 동시 세션 제어: 동시 세션 최대 1개 허용
                 .maxSessionsPreventsLogin(false)    // 새로운 로그인 시 기존 세션을 무효화
-                .sessionRegistry(sessionRegistry()))    // 세션 관리 기능
+                .sessionRegistry(sessionRegistry())  // 세션 관리 기능
+            )
             .logout(logout -> logout.logoutRequestMatcher(
                     new AntPathRequestMatcher("/api/auth/logout"))  // POST /api/auth/logout으로 로그아웃
                 .logoutSuccessUrl("/") // 세션 무효화 후 홈으로
