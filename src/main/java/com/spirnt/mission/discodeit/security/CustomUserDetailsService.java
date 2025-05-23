@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.config.auth;
+package com.spirnt.mission.discodeit.security;
 
 import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.repository.UserRepository;

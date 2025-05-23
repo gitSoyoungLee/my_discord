@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -55,6 +56,8 @@ public class UserController implements UserApiDocs {
     }
 
     // 사용자 정보 수정
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.user.id")
+    // ROLE_ADMIN 권한 소유자 또는 본인만 가능
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
         @Valid @RequestPart UserUpdateRequest userUpdateRequest,
@@ -68,6 +71,8 @@ public class UserController implements UserApiDocs {
     }
 
     // 사용자 삭제
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.user.id")
+    // ROLE_ADMIN 권한 소유자 또는 본인만 가능
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         log.info("[Deleting User started / id: {}]", userId);

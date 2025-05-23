@@ -1,12 +1,12 @@
 package com.spirnt.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spirnt.mission.discodeit.config.auth.CustomAuthenticationFailureHandler;
-import com.spirnt.mission.discodeit.config.auth.CustomAuthenticationFilter;
-import com.spirnt.mission.discodeit.config.auth.CustomAuthenticationSuccessHandler;
-import com.spirnt.mission.discodeit.config.auth.CustomUserDetailsService;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.security.CustomAuthenticationFailureHandler;
+import com.spirnt.mission.discodeit.security.CustomAuthenticationFilter;
+import com.spirnt.mission.discodeit.security.CustomAuthenticationSuccessHandler;
+import com.spirnt.mission.discodeit.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

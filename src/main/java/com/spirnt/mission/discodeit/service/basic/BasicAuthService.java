@@ -1,12 +1,12 @@
 package com.spirnt.mission.discodeit.service.basic;
 
-import com.spirnt.mission.discodeit.config.auth.CustomUserDetails;
 import com.spirnt.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.security.CustomUserDetails;
 import com.spirnt.mission.discodeit.service.AuthService;
 import java.util.List;
 import java.util.Map;

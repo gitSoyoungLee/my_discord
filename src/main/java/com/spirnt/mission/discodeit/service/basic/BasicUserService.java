@@ -116,7 +116,8 @@ public class BasicUserService implements UserService {
 
         String email = userUpdateRequest.newEmail();
         String username = userUpdateRequest.newUsername();
-        String password = passwordEncoder.encode(userUpdateRequest.newPassword());
+        String password = (userUpdateRequest.newPassword() != null) ? passwordEncoder.encode(
+            userUpdateRequest.newPassword()) : null;
 
         if (userRepository.existsByEmail(email)) {
             log.warn("[Updating User Failed: Email {} already exists]", email);

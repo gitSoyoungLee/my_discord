@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.config.auth;
+package com.spirnt.mission.discodeit.security;
 
 import com.spirnt.mission.discodeit.entity.Role;
 import com.spirnt.mission.discodeit.entity.User;
@@ -18,6 +18,9 @@ public class AdminInitializer implements ApplicationRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 애플리케이션 실행 시 admin 계정 생성
+     */
     @Override
     public void run(ApplicationArguments args) throws Exception {
         String username = "admin";

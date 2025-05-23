@@ -1,9 +1,9 @@
 package com.spirnt.mission.discodeit.controller;
 
-import com.spirnt.mission.discodeit.config.auth.CustomUserDetails;
 import com.spirnt.mission.discodeit.controller.swagger.AuthApiDocs;
 import com.spirnt.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
+import com.spirnt.mission.discodeit.security.CustomUserDetails;
 import com.spirnt.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

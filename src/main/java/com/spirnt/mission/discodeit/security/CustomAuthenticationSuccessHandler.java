@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.config.auth;
+package com.spirnt.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
