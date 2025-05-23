@@ -1,12 +1,13 @@
 package com.spirnt.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationFailureHandler;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationFilter;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationSuccessHandler;
 import com.spirnt.mission.discodeit.security.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,7 +27,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -37,7 +42,8 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain chain(HttpSecurity httpSecurity,
-        CustomAuthenticationFilter customAuthenticationFilter) throws Exception {
+        CustomAuthenticationFilter customAuthenticationFilter,
+        PersistentTokenBasedRememberMeServices rememberMeServices) throws Exception {
         httpSecurity
             .authorizeHttpRequests(auth -> auth
                 // 정적 리소스 요청 허용
@@ -62,22 +68,31 @@ public class SecurityConfig {
                     "/api/auth/logout"))
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//            .rememberMe(rememberMe -> rememberMe
-//                .rememberMeParameter("remember-me") // 프론트에서 보내는 속성
-//                .tokenValiditySeconds(60 * 60 * 24 * 21)    // 쿠키 유효 시간 21일
-//                .key("mySecretKey123!") // 서명에 사용할 키
-//            )
+            .rememberMe(rememberMe -> rememberMe
+                .rememberMeServices(rememberMeServices)
+            )
             .sessionManagement(session -> session
                 .sessionFixation(sf -> sf.changeSessionId())  // 세션 고정 공격 방어: 세션 ID만 변경
                 .maximumSessions(1)    // 동시 세션 제어: 동시 세션 최대 1개 허용
                 .maxSessionsPreventsLogin(false)    // 새로운 로그인 시 기존 세션을 무효화
                 .sessionRegistry(sessionRegistry())  // 세션 관리 기능
+                .expiredSessionStrategy(event -> {
+                    // 세션이 명시적으로 만료(다른 기기에서 로그인)되었을 때 401 응답
+                    HttpServletResponse response = event.getResponse();
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session Expired");
+                })
             )
             .logout(logout -> logout.logoutRequestMatcher(
                     new AntPathRequestMatcher("/api/auth/logout"))  // POST /api/auth/logout으로 로그아웃
                 .logoutSuccessUrl("/") // 세션 무효화 후 홈으로
-                .deleteCookies("JSESSIONID")    // 쿠키 삭제
-                .invalidateHttpSession(true));  // 로그아웃 시 세션 삭제
+                .deleteCookies("JSESSIONID", "remember-me")    // 쿠키 삭제
+                .invalidateHttpSession(true)    // 로그아웃 시 세션 삭제
+                .logoutSuccessHandler(((request, response, authentication) -> {
+                    rememberMeServices.logout(request, response,
+                        authentication);   // rememberme 토큰 삭제
+                    response.setStatus(HttpServletResponse.SC_OK);
+                }))
+            );
         return httpSecurity.build();
     }
 
@@ -119,8 +134,9 @@ public class SecurityConfig {
 
     @Bean
     public CustomAuthenticationSuccessHandler successHandler(SessionRegistry sessionRegistry,
-        ObjectMapper objectMapper, UserMapper userMapper) {
-        return new CustomAuthenticationSuccessHandler(objectMapper, sessionRegistry, userMapper);
+        ObjectMapper objectMapper, RememberMeServices rememberMeServices) {
+        return new CustomAuthenticationSuccessHandler(objectMapper, sessionRegistry,
+            rememberMeServices);
     }
 
     @Bean
@@ -147,6 +163,28 @@ public class SecurityConfig {
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public PersistentTokenBasedRememberMeServices rememberMeServices(
+        UserDetailsService userDetailsService,
+        PersistentTokenRepository persistentTokenRepository) {
+        PersistentTokenBasedRememberMeServices services =
+            new PersistentTokenBasedRememberMeServices("mySecretKey123!", userDetailsService,
+                persistentTokenRepository);
+        services.setParameter("remember-me");  // 클라이언트에서 /auth/login?remember-me=true와 같이 보냄
+        services.setCookieName("remember-me");  // 쿠키 이름
+        services.setTokenValiditySeconds(60 * 60 * 24 * 21);   // 쿠키 유효 시간 21일
+        return services;
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository(DataSource dataSource) {
+        JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
+        repository.setDataSource(dataSource);
+        repository.setCreateTableOnStartup(false);
+
+        return repository;
     }
 
 }

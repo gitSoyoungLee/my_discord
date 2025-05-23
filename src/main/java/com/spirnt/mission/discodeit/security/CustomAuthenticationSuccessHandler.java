@@ -3,7 +3,6 @@ package com.spirnt.mission.discodeit.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.User;
-import com.spirnt.mission.discodeit.mapper.UserMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final ObjectMapper objectMapper;
     private final SessionRegistry sessionRegistry;
-    private final UserMapper userMapper;
+    private final RememberMeServices rememberMeServices;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -44,6 +44,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         // SessionRegistry에 세션 등록하기
         sessionRegistry.registerNewSession(session.getId(), authentication.getPrincipal());
+
+        // remember-me = true라면 쿠키 추가
+        rememberMeServices.loginSuccess(request, response, authentication);
 
         // 인증된 사용자 정보
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
