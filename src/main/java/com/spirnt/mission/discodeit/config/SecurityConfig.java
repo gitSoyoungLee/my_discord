@@ -32,6 +32,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -62,10 +63,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").hasRole("USER")
                 // 그 외 인증 필요
                 .anyRequest().authenticated())
-            .csrf(csrf ->
+            .csrf(csrf -> csrf
                 // csrf 검증 제외
-                csrf.ignoringRequestMatchers("/api/users", "/api/auth/login",
-                    "/api/auth/logout"))
+                .ignoringRequestMatchers("/api/users", "/api/auth/login",
+                    "/api/auth/logout")
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            )
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .rememberMe(rememberMe -> rememberMe
