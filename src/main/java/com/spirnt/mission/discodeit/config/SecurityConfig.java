@@ -82,7 +82,8 @@ public class SecurityConfig {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session Expired");
                 })
             )
-            .logout(logout -> logout.logoutRequestMatcher(
+            .logout(logout -> logout
+                .logoutRequestMatcher(
                     new AntPathRequestMatcher("/api/auth/logout"))  // POST /api/auth/logout으로 로그아웃
                 .logoutSuccessUrl("/") // 세션 무효화 후 홈으로
                 .deleteCookies("JSESSIONID", "remember-me")    // 쿠키 삭제
