@@ -67,8 +67,7 @@ public class JwtTokenProvider {
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiration))
             .claim("type", tokenType.name())
-            .claim("userId", userDto.getId())
-            .claim("username", userDto.getUsername())
+            .claim("userDto", userDto)
             .signWith(getSignKey(), SIG.HS256)
             .compact();
     }

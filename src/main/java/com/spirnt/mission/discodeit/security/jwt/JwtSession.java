@@ -1,9 +1,10 @@
 package com.spirnt.mission.discodeit.security.jwt;
 
+import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,22 +15,20 @@ import lombok.NoArgsConstructor;
 public class JwtSession extends BaseEntity {
 
     // 사용자 정보
-    private UUID userId;
+    @OneToOne
+    private User user;
     private String accessToken; // 액세스 토큰
     private String refreshToken;    // 리프레시 토큰
 
-    public JwtSession(UUID userId, String accessToken, String refreshToken) {
+    public JwtSession(User user, String accessToken, String refreshToken) {
         super();
-        this.userId = userId;
+        this.user = user;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
 
-    public void updateAccessToken(String accessToken) {
+    public void updateToken(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
-    }
-
-    public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 }
