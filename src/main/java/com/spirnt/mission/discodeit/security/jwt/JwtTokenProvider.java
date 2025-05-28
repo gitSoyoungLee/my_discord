@@ -1,6 +1,8 @@
 package com.spirnt.mission.discodeit.security.jwt;
 
 import com.spirnt.mission.discodeit.dto.user.UserDto;
+import com.spirnt.mission.discodeit.entity.Role;
+import com.spirnt.mission.discodeit.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,9 +12,15 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -65,11 +73,11 @@ public class JwtTokenProvider {
             .and()
             .issuer(jwtProperties.getIssuer())
             .issuedAt(Date.from(now))
+            .subject(userDto.getUsername())
             .expiration(Date.from(expiration))
             .claim("type", tokenType.name())
             .claim("userId", userDto.getId())
-            .claim("username", userDto.getUsername())
-            .claim("role", userDto.getRole())
+            .claim("role", userDto.getRole().name())
             .signWith(getSignKey(), SIG.HS256)
             .compact();
     }
@@ -88,5 +96,19 @@ public class JwtTokenProvider {
             .build()
             .parseSignedClaims(token) // 이때 서명, 만료시간 검증 + claim 추출
             .getPayload();
+    }
+
+    public Authentication getAuthentication(String token) {
+        // 클레임에 포함된 role에서 SimpleGrantedAuthority 리스트 생성
+        Claims claims = getClaims(token);
+        Role role = Role.valueOf(claims.get("role", String.class));
+        Collection<SimpleGrantedAuthority> authorities = Collections.emptyList();
+        if (role != null) {
+            authorities = List.of(new SimpleGrantedAuthority(role.name()));
+        }
+        User principal = new User(claims.getSubject(), "", "");
+        principal.updateRole(role);
+
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 }

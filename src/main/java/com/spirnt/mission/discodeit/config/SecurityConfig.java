@@ -6,6 +6,7 @@ import com.spirnt.mission.discodeit.security.CustomAuthenticationFailureHandler;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationFilter;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationSuccessHandler;
 import com.spirnt.mission.discodeit.security.CustomUserDetailsService;
+import com.spirnt.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.spirnt.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
@@ -41,15 +42,16 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-
     @Bean
     SecurityFilterChain chain(HttpSecurity httpSecurity,
         CustomAuthenticationFilter customAuthenticationFilter,
-        PersistentTokenBasedRememberMeServices rememberMeServices) throws Exception {
+        PersistentTokenBasedRememberMeServices rememberMeServices,
+        JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         httpSecurity
             .authorizeHttpRequests(auth -> auth
                 // 정적 리소스 요청 허용
-                .requestMatchers("/assets/**", "/favicon.ico", "/index.html").permitAll()
+                .requestMatchers("/static/**", "/assets/**", "/favicon.ico", "/index.html")
+                .permitAll()
                 .requestMatchers("/", "/error/**").permitAll()
                 // Swagger 요청 허용
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html",
@@ -71,6 +73,8 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//            .addFilterBefore(jwtExceptionHandlingFilter, JwtAuthenticationFilter.class)
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
