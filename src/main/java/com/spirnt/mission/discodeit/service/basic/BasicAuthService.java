@@ -7,6 +7,8 @@ import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.security.CustomUserDetails;
+import com.spirnt.mission.discodeit.security.jwt.JwtSession;
+import com.spirnt.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.spirnt.mission.discodeit.service.AuthService;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ public class BasicAuthService implements AuthService {
     private final UserMapper userMapper;
 
     private final SessionRegistry sessionRegistry;
+    private final JwtSessionRepository jwtSessionRepository;
 
     private boolean isUserOnline(String username) {
         return sessionRegistry.getAllPrincipals().stream()
@@ -41,9 +44,10 @@ public class BasicAuthService implements AuthService {
     }
 
     @Override
-    public UserDto getMe(CustomUserDetails customUserDetails) {
-        User user = customUserDetails.getUser();
-        return toDto(user);
+    public String getMe(String refreshToken) {
+        JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
+            .orElseThrow(() -> new IllegalArgumentException("JwtSession Not Found For This User"));
+        return jwtSession.getAccessToken();
     }
 
     @Transactional

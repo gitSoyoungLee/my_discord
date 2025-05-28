@@ -3,14 +3,14 @@ package com.spirnt.mission.discodeit.controller;
 import com.spirnt.mission.discodeit.controller.swagger.AuthApiDocs;
 import com.spirnt.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
-import com.spirnt.mission.discodeit.security.CustomUserDetails;
 import com.spirnt.mission.discodeit.service.AuthService;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,9 +31,9 @@ public class AuthController implements AuthApiDocs {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDto> getMe(@AuthenticationPrincipal CustomUserDetails me) {
-        UserDto userDto = authService.getMe(me);
-        return ResponseEntity.ok(userDto);
+    public ResponseEntity<String> getMe(@CookieValue(value = "REFRESH-TOKEN") Cookie refreshToken) {
+        String accessToken = authService.getMe(refreshToken.getValue());
+        return ResponseEntity.ok(accessToken);
     }
 
     @PutMapping("/role")
