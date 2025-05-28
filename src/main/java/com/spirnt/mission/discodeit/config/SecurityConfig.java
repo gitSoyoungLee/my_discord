@@ -6,6 +6,7 @@ import com.spirnt.mission.discodeit.security.CustomAuthenticationFailureHandler;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationFilter;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationSuccessHandler;
 import com.spirnt.mission.discodeit.security.CustomUserDetailsService;
+import com.spirnt.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
@@ -138,9 +139,9 @@ public class SecurityConfig {
 
     @Bean
     public CustomAuthenticationSuccessHandler successHandler(SessionRegistry sessionRegistry,
-        ObjectMapper objectMapper, RememberMeServices rememberMeServices) {
+        ObjectMapper objectMapper, RememberMeServices rememberMeServices, JwtService jwtService) {
         return new CustomAuthenticationSuccessHandler(objectMapper, sessionRegistry,
-            rememberMeServices);
+            rememberMeServices, jwtService);
     }
 
     @Bean

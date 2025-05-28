@@ -3,7 +3,10 @@ package com.spirnt.mission.discodeit.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.User;
+import com.spirnt.mission.discodeit.security.jwt.JwtService;
+import com.spirnt.mission.discodeit.security.jwt.JwtSession;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -27,6 +30,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     private final ObjectMapper objectMapper;
     private final SessionRegistry sessionRegistry;
     private final RememberMeServices rememberMeServices;
+    private final JwtService jwtService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -54,12 +58,21 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         User user = userDetails.getUser();
         UserDto userDto = UserDto.from(user, isUserOnline(user.getUsername()));
 
+        // 토큰 발급
+        JwtSession jwtSession = jwtService.createJwtSession(userDto);
+        String accessToken = jwtSession.getAccessToken();
+
         // response
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getWriter(), userDto);
-
+        // 쿠키에 refresh token 추가
+        Cookie refreshTokenCookie = new Cookie("REFRESH-TOKEN", jwtSession.getRefreshToken());
+        refreshTokenCookie.setHttpOnly(false);
+        refreshTokenCookie.setSecure(false);   // HTTPS 환경에서만 전송 (개발 중엔 false 가능)
+        refreshTokenCookie.setPath("/");      // 모든 경로에 대해 쿠키 전송
+        response.addCookie(refreshTokenCookie);
+        objectMapper.writeValue(response.getWriter(), accessToken);
     }
 
     // 세션에 username이 있는지 확인하기
