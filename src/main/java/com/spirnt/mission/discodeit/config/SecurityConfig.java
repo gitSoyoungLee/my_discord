@@ -7,6 +7,7 @@ import com.spirnt.mission.discodeit.security.CustomAuthenticationFilter;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationSuccessHandler;
 import com.spirnt.mission.discodeit.security.CustomUserDetailsService;
 import com.spirnt.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.spirnt.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.spirnt.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
@@ -46,7 +47,8 @@ public class SecurityConfig {
     SecurityFilterChain chain(HttpSecurity httpSecurity,
         CustomAuthenticationFilter customAuthenticationFilter,
         PersistentTokenBasedRememberMeServices rememberMeServices,
-        JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        JwtAuthenticationFilter jwtAuthenticationFilter, JwtLogoutHandler jwtLogoutHandler)
+        throws Exception {
         httpSecurity
             .authorizeHttpRequests(auth -> auth
                 // 정적 리소스 요청 허용
@@ -74,7 +76,6 @@ public class SecurityConfig {
             )
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//            .addFilterBefore(jwtExceptionHandlingFilter, JwtAuthenticationFilter.class)
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
@@ -94,13 +95,14 @@ public class SecurityConfig {
                 .logoutRequestMatcher(
                     new AntPathRequestMatcher("/api/auth/logout"))  // POST /api/auth/logout으로 로그아웃
                 .logoutSuccessUrl("/") // 세션 무효화 후 홈으로
-                .deleteCookies("JSESSIONID", "remember-me")    // 쿠키 삭제
+                .deleteCookies("JSESSIONID", "remember-me", "REFRESH-TOKEN")    // 쿠키 삭제
                 .invalidateHttpSession(true)    // 로그아웃 시 세션 삭제
                 .logoutSuccessHandler(((request, response, authentication) -> {
                     rememberMeServices.logout(request, response,
                         authentication);   // rememberme 토큰 삭제
                     response.setStatus(HttpServletResponse.SC_OK);
                 }))
+                .addLogoutHandler(jwtLogoutHandler) // 리프레시 토큰 무효화 핸들러
             );
         return httpSecurity.build();
     }

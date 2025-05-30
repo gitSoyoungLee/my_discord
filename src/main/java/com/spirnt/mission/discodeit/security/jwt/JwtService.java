@@ -5,7 +5,6 @@ import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import java.util.Map;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -56,8 +55,8 @@ public class JwtService {
     }
 
     @Transactional
-    public void invalidateRefreshToken(UUID jwtSessionId) {
-        JwtSession jwtSession = jwtSessionRepository.findById(jwtSessionId)
+    public void invalidateRefreshToken(String refreshToken) {
+        JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
             .orElseThrow(() -> new IllegalArgumentException("JwtSession Not Found"));
         jwtSessionRepository.delete(jwtSession);
     }
