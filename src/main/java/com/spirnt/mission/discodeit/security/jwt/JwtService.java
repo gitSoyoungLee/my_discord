@@ -59,7 +59,7 @@ public class JwtService {
     }
 
     @Transactional
-    public void invalidateRefreshToken(String refreshToken) {
+    public void invalidateToken(String refreshToken) {
         JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
             .orElseThrow(() -> new JwtSessionNotFoundException(Map.of()));
         jwtSessionRepository.delete(jwtSession);

@@ -62,6 +62,9 @@ public class BasicAuthService implements AuthService {
         // 유저가 로그인 중이라면 세션 무효화
         expireUserSessions(user);
 
+        // JwtSession 무효화(제거)로 로그아웃
+        jwtSessionRepository.deleteAllByUserId(user.getId());
+
         return toDto(user);
     }
 

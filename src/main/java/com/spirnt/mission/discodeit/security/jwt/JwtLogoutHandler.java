@@ -31,7 +31,7 @@ public class JwtLogoutHandler implements LogoutHandler {
 
         // 토큰 무효화
         if (refreshToken != null) {
-            jwtService.invalidateRefreshToken(refreshToken);
+            jwtService.invalidateToken(refreshToken);
         }
     }
 }
