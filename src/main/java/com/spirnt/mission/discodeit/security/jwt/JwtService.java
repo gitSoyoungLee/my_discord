@@ -3,6 +3,8 @@ package com.spirnt.mission.discodeit.security.jwt;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
+import com.spirnt.mission.discodeit.exception.auth.InvalidJwtTokenException;
+import com.spirnt.mission.discodeit.exception.auth.JwtSessionNotFoundException;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -36,16 +38,18 @@ public class JwtService {
     }
 
     @Transactional
-    public JwtSession rotateToken(UserDto userDto, String refreshToken) {
+    public JwtSession rotateToken(String refreshToken) {
         // 토큰 유효성 검증
-        if (!isValid(refreshToken)) {
-            throw new IllegalArgumentException("Invalid Token");
+        if (refreshToken == null || !isValid(refreshToken)) {
+            throw new InvalidJwtTokenException(Map.of());
         }
 
         JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
-            .orElseThrow(() -> new IllegalArgumentException("JwtSession Not Found"));
+            .orElseThrow(() -> new JwtSessionNotFoundException(Map.of()));
 
         // 토큰 재발급
+        User user = jwtSession.getUser();
+        UserDto userDto = UserDto.from(user, true);
         String newAccessToken = jwtTokenProvider.generateAccessToken(userDto);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(userDto);
         // Rotation 전략
@@ -57,7 +61,7 @@ public class JwtService {
     @Transactional
     public void invalidateRefreshToken(String refreshToken) {
         JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
-            .orElseThrow(() -> new IllegalArgumentException("JwtSession Not Found"));
+            .orElseThrow(() -> new JwtSessionNotFoundException(Map.of()));
         jwtSessionRepository.delete(jwtSession);
     }
 
