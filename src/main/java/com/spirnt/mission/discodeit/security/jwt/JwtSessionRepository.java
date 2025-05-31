@@ -16,4 +16,6 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
     @Modifying
     @Query("DELETE FROM JwtSession j WHERE j.user.id = :userId")
     void deleteAllByUserId(UUID userId);
+
+    boolean existsByUserId(UUID userId);
 }

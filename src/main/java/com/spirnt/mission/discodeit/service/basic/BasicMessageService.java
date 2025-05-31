@@ -18,6 +18,7 @@ import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import java.time.Instant;
@@ -31,8 +32,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,17 +48,12 @@ public class BasicMessageService implements MessageService {
 
     private final BinaryContentService binaryContentService;
     private final BinaryContentRepository binaryContentRepository;
-    private final SessionRegistry sessionRegistry;
+    private final JwtSessionRepository jwtSessionRepository;
 
-    private boolean isUserOnline(String username) {
-        return sessionRegistry.getAllPrincipals().stream()
-            .filter(p -> p instanceof UserDetails)
-            .map(p -> (UserDetails) p)
-            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
-    }
 
     private MessageDto toMessageDto(Message message) {
-        return MessageDto.from(message, isUserOnline(message.getAuthor().getUsername()));
+        boolean isUserOnline = jwtSessionRepository.existsByUserId(message.getAuthor().getId());
+        return MessageDto.from(message, isUserOnline);
     }
 
     @Transactional

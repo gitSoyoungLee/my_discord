@@ -13,6 +13,7 @@ import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.UserService;
 import java.util.Comparator;
@@ -21,8 +22,6 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,17 +39,11 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     private final PasswordEncoder passwordEncoder;
-    private final SessionRegistry sessionRegistry;
-
-    private boolean isUserOnline(String username) {
-        return sessionRegistry.getAllPrincipals().stream()
-            .filter(principal -> principal instanceof UserDetails)
-            .map(principal -> (UserDetails) principal)
-            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
-    }
+    private final JwtSessionRepository jwtSessionRepository;
 
     private UserDto toDto(User user) {
-        return userMapper.toDto(user, isUserOnline(user.getUsername()));
+        boolean isUserOnline = jwtSessionRepository.existsByUserId(user.getId());
+        return userMapper.toDto(user, isUserOnline);
     }
 
 

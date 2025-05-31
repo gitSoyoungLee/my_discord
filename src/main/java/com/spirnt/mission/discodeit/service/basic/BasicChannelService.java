@@ -19,6 +19,7 @@ import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
@@ -31,8 +32,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +50,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusService readStatusService;
     private final ReadStatusRepository readStatusRepository;
 
-    private final SessionRegistry sessionRegistry;
+    private final JwtSessionRepository jwtSessionRepository;
 
     @Transactional
     @Override
@@ -170,15 +169,9 @@ public class BasicChannelService implements ChannelService {
             .collect(Collectors.toList());
     }
 
-    public boolean isUserOnline(String username) {
-        return sessionRegistry.getAllPrincipals().stream()
-            .filter(principal -> principal instanceof UserDetails)
-            .map(principal -> (UserDetails) principal)
-            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
-    }
-
-    public UserDto toUserDto(User user) {
-        return userMapper.toDto(user, isUserOnline(user.getUsername()));
+    private UserDto toUserDto(User user) {
+        boolean isUserOnline = jwtSessionRepository.existsByUserId(user.getId());
+        return userMapper.toDto(user, isUserOnline);
     }
 }
 
