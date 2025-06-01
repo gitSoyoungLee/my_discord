@@ -23,9 +23,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final JwtTokenProvider jwtTokenProvider;
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final String JWT_EXCEPTION_ATTRIBUTE = "jwtException";
 
     private final ObjectMapper objectMapper;
 
@@ -38,11 +36,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtService.isValid(token)) {
             // 토큰 유효성 검증
             // 유효한 토큰이면 인증 정보 설정
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            Authentication authentication = jwtService.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("JWT Authentication Success: {}", authentication.getName());
+            log.info("JWT Authentication Success: {}", authentication.getName());
         } else {
-            log.debug("JWT Token Validation Failed");
+            log.info("JWT Token Validation Failed");
             handleResponse(response, new JwtException("Invalid Token"));
         }
         filterChain.doFilter(request, response);
