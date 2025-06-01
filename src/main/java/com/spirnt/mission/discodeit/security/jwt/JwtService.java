@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -109,6 +110,11 @@ public class JwtService {
         jwtBlacklist.addBlacklist(jwtSession.getAccessToken(), expirationTime);
 
         jwtSessionRepository.delete(jwtSession);
+    }
+
+    @Transactional
+    public void deleteJwtSession(UUID userId) {
+        jwtSessionRepository.deleteAllByUserId(userId);
     }
 
     public Authentication getAuthentication(String token) {

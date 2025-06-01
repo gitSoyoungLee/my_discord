@@ -41,6 +41,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         UserDto userDto = UserDto.from(user, true);
 
         // 토큰 발급
+        // 동시 로그인 제한: 이전 JwtSession을 제거
+        jwtService.deleteJwtSession(user.getId());
         JwtSession jwtSession = jwtService.createJwtSession(userDto);
         String accessToken = jwtSession.getAccessToken();
 
