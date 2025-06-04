@@ -78,7 +78,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/v3/api-docs") ||
                 (method.equals("POST") && (path.equals("/api/users") || path.equals(
                     "/api/auth/login"))) ||
-                path.equals("/api/auth/csrf-token")
+                path.equals("/api/auth/csrf-token") ||
+                (method.equals("GET") && path.startsWith("/api/binaryContents") && path.endsWith(
+                    "/download"))
         );
     }
 

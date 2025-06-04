@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,6 +23,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -56,8 +58,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     // 파일을 로컬에 저장
+    @Async("propagatingExecutor")
     @Override
-    public UUID put(UUID binaryContentId, byte[] bytes) {
+    public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
         Path path = resolvePath(binaryContentId);
         File file = new File(String.valueOf(path));
         try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -66,7 +69,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             log.warn("[스토리지에 파일 저장 중 오류가 발생했습니다.]");
             throw new FileException(Map.of("binaryContentId", binaryContentId));
         }
-        return binaryContentId;
+        return CompletableFuture.completedFuture(binaryContentId);
     }
 
     // 파일을 InputStream 데이터 타입으로 반환
@@ -88,7 +91,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         Resource resource = new FileSystemResource(path);
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_TYPE, binaryContentDto.getContentType())
-            .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment() // (6)
+            .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
                 .filename(binaryContentDto.getFileName(), StandardCharsets.UTF_8)
                 .build()
                 .toString())

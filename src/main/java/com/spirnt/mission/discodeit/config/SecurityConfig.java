@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/csrf-token").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers("/api/binaryContents/**").permitAll()
                 // 그 외 API는 최소 ROLE_USER 권한 필요
                 .requestMatchers("/api/**").hasRole("USER")
                 // 그 외 인증 필요
