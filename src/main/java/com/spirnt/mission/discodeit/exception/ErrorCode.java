@@ -21,7 +21,8 @@ public enum ErrorCode {
     FILE_ERROR("BINARYCONTENT_500", HttpStatus.INTERNAL_SERVER_ERROR, "파일을 읽거나 쓰는 중 오류가 발생했습니다."),
 
     JWT_SESSION_NOT_FOUND("AUTH_401_1", HttpStatus.UNAUTHORIZED, "Jwt 인증 정보가 없습니다."),
-    INVALID_JWT_TOKEN("AUTH_401_2", HttpStatus.UNAUTHORIZED, "JWT 토큰이 유효하지 않습니다.");
+    INVALID_JWT_TOKEN("AUTH_401_2", HttpStatus.UNAUTHORIZED, "JWT 토큰이 유효하지 않습니다."),
+    INVALID_TOKEN_SECRET("AUTH", HttpStatus.INTERNAL_SERVER_ERROR, "JWT 토큰 시크릿 키가 유효하지 않습니다. ");
 
     private final String code;
     private final HttpStatus status;

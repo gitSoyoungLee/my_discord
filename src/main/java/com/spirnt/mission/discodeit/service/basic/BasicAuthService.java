@@ -9,6 +9,7 @@ import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.security.jwt.JwtSession;
 import com.spirnt.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.spirnt.mission.discodeit.service.AuthService;
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,9 @@ public class BasicAuthService implements AuthService {
 
 
     private UserDto toDto(User user) {
-        boolean isUserOnline = jwtSessionRepository.existsByUserId(user.getId());
+        boolean isUserOnline = jwtSessionRepository.existsByUserIdAndExpirationTimeAfter(
+            user.getId(),
+            Instant.now());
         return userMapper.toDto(user, isUserOnline);
     }
 
@@ -47,9 +50,6 @@ public class BasicAuthService implements AuthService {
             .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
         user.updateRole(userRoleUpdateRequest.newRole());
-
-        // JwtSession 무효화(제거)로 로그아웃
-        jwtSessionRepository.deleteAllByUserId(user.getId());
 
         return toDto(user);
     }

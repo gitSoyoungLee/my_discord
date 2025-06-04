@@ -2,17 +2,22 @@ package com.spirnt.mission.discodeit.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spirnt.mission.discodeit.dto.ErrorResponse;
-import io.jsonwebtoken.JwtException;
+import com.spirnt.mission.discodeit.entity.User;
+import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
+import com.spirnt.mission.discodeit.exception.auth.InvalidJwtTokenException;
+import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.security.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,21 +32,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper;
 
+    private final UserRepository userRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
         // Authorization 헤더에서 access token 추출
         String token = extractTokenFromHeader(request);
 
+        // 토큰 유효성 검증
         if (token != null && jwtService.isValid(token)) {
-            // 토큰 유효성 검증
+            UUID userId = jwtService.parse(token).userDto().getId();
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                responseUnauthorized(response, new UserNotFoundException(Map.of("userId", userId)));
+            }
+
             // 유효한 토큰이면 인증 정보 설정
-            Authentication authentication = jwtService.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("JWT Authentication Success: {}", authentication.getName());
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            log.info("JWT Authentication Success: {}", userDetails.getUsername());
         } else {
             log.info("JWT Token Validation Failed");
-            handleResponse(response, new JwtException("Invalid Token"));
+            responseUnauthorized(response, new InvalidJwtTokenException(Map.of("token", token)));
         }
         filterChain.doFilter(request, response);
     }
@@ -67,7 +82,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
     }
 
-    private void handleResponse(HttpServletResponse response, Exception e) throws IOException {
+    private void responseUnauthorized(HttpServletResponse response, Exception e)
+        throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

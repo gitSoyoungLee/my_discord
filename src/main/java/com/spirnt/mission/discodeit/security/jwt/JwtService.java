@@ -1,45 +1,45 @@
 package com.spirnt.mission.discodeit.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
-import com.spirnt.mission.discodeit.entity.Role;
 import com.spirnt.mission.discodeit.entity.User;
+import com.spirnt.mission.discodeit.exception.DiscodeitException;
+import com.spirnt.mission.discodeit.exception.ErrorCode;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.exception.auth.InvalidJwtTokenException;
 import com.spirnt.mission.discodeit.exception.auth.JwtSessionNotFoundException;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.Jwts.SIG;
-import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
 import java.sql.Date;
-import java.time.Clock;
+import java.text.ParseException;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class JwtService {
 
-    private final Clock clock = Clock.systemUTC();
     private final JwtProperties jwtProperties;
     private final JwtSessionRepository jwtSessionRepository;
     private final UserRepository userRepository;
     private final JwtBlacklist jwtBlacklist;
+    private final ObjectMapper objectMapper;
 
     public enum TokenType {
         ACCESS,
@@ -48,10 +48,10 @@ public class JwtService {
 
     @Transactional
     public JwtSession createJwtSession(UserDto userDto) {
-        User user = userRepository.findById(userDto.getId())
-            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userDto.getId())));
-        JwtSession jwtSession = new JwtSession(user, generateAccessToken(userDto),
-            generateRefreshToken(userDto));
+        JwtObject accessToken = generateAccessToken(userDto);
+        JwtObject refreshToken = generateRefreshToken(userDto);
+        JwtSession jwtSession = new JwtSession(userDto.getId(), accessToken.token(),
+            refreshToken.token(), accessToken.expirationTime());
         jwtSessionRepository.save(jwtSession);
 
         return jwtSession;
@@ -60,18 +60,30 @@ public class JwtService {
 
     // 토큰 유효성 검증
     public boolean isValid(String token) {
+        boolean verified;
         try {
-            // 블랙리스트에 포함된 액세스 토큰은 유효하지 않음
-            if (jwtBlacklist.existsInBlacklist(token)) {
-                return false;
+            // 토큰이 시크릿을 이용해 올바르게 서명되었는가?
+            JWSVerifier verifier = new MACVerifier(jwtProperties.getSecret());
+            JWSObject jwsObject = JWSObject.parse(token);
+            verified = jwsObject.verify(verifier);
+
+            // 토큰 형태가 올바른가? 토큰이 만료되지 않았는가?
+            if (verified) {
+                JwtObject jwtObject = parse(token);
+                verified = !jwtObject.isExpired();
             }
-            getClaims(token);
-            return true;
-        } catch (JwtException | IllegalStateException e) {
-            return false;
+            // 블랙 리스트에 있는 액세스 토큰인가?
+            if (verified) {
+                verified = !jwtBlacklist.existsInBlacklist(token);
+            }
+        } catch (JOSEException | ParseException e) {
+            verified = false;
         }
+        return verified;
     }
 
+    // 리프레시 토큰을 이용해 새로운 토큰 발급
+    // 액세스, 리프레시 모두 새로 발급하는 rotatation 전
     @Transactional
     public JwtSession rotateToken(String refreshToken) {
         // 토큰 유효성 검증
@@ -83,105 +95,113 @@ public class JwtService {
             .orElseThrow(() -> new JwtSessionNotFoundException(Map.of()));
 
         // 기존 액세스 토큰을 블랙리스트에 추가
-        Instant expirationTime = jwtSession.getCreatedAt()
-            .plusSeconds(jwtProperties.getAccessToken().getValiditySeconds());
-        jwtBlacklist.addBlacklist(jwtSession.getAccessToken(), expirationTime);
+        jwtBlacklist.addBlacklist(jwtSession.getAccessToken(), jwtSession.getExpirationTime());
 
         // 토큰 재발급
-        User user = jwtSession.getUser();
+        UUID userId = jwtSession.getUserId();
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
         UserDto userDto = UserDto.from(user, true);
-        String newAccessToken = generateAccessToken(userDto);
-        String newRefreshToken = generateRefreshToken(userDto);
+        JwtObject newAccessToken = generateAccessToken(userDto);
+        JwtObject newRefreshToken = generateRefreshToken(userDto);
         // Rotation 전략
-        jwtSession.updateToken(newAccessToken, newRefreshToken);
+        jwtSession.update(newAccessToken.token(), newRefreshToken.token(),
+            newAccessToken.expirationTime());
 
         return jwtSession;
     }
 
-    // 리프레시 토큰 무효화
+    // 토큰 무효화
     @Transactional
     public void invalidateToken(String refreshToken) {
         JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
             .orElseThrow(() -> new JwtSessionNotFoundException(Map.of()));
 
         // 액세스 토큰을 블랙리스트에 추가
-        Instant expirationTime = jwtSession.getCreatedAt()
-            .plusSeconds(jwtProperties.getAccessToken().getValiditySeconds());
-        jwtBlacklist.addBlacklist(jwtSession.getAccessToken(), expirationTime);
+        jwtBlacklist.addBlacklist(jwtSession.getAccessToken(), jwtSession.getExpirationTime());
 
         jwtSessionRepository.delete(jwtSession);
     }
 
     @Transactional
     public void deleteJwtSession(UUID userId) {
-        jwtSessionRepository.deleteAllByUserId(userId);
+        jwtSessionRepository.findByUserId(userId)
+            .ifPresent(this::invalidate);
     }
 
-    public Authentication getAuthentication(String token) {
-        // 클레임에 포함된 role에서 SimpleGrantedAuthority 리스트 생성
-        Claims claims = getClaims(token);
-        Role role = Role.valueOf(claims.get("role", String.class));
-        Collection<SimpleGrantedAuthority> authorities = Collections.emptyList();
-        if (role != null) {
-            authorities = List.of(new SimpleGrantedAuthority(role.name()));
+    private void invalidate(JwtSession jwtSession) {
+        jwtSessionRepository.delete(jwtSession);
+        if (!jwtSession.isExpired()) {
+            jwtBlacklist.addBlacklist(jwtSession.getAccessToken(), jwtSession.getExpirationTime());
         }
-        User principal = new User(claims.getSubject(), "", "");
-        principal.updateRole(role);
+    }
 
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    // 토큰에서 주요 정보(JwtObject) 추출
+    // 추출 실패 = 지정한 토큰과 형태가 다름 -> 유효하지 않은 토큰
+    public JwtObject parse(String token) {
+        try {
+            JWSObject jwsObject = JWSObject.parse(token);
+            Payload payload = jwsObject.getPayload();
+            Map<String, Object> jsonObject = payload.toJSONObject();
+            return new JwtObject(
+                objectMapper.convertValue(jsonObject.get("iat"), Instant.class),
+                objectMapper.convertValue(jsonObject.get("exp"), Instant.class),
+                objectMapper.convertValue(jsonObject.get("userDto"), UserDto.class),
+                token
+            );
+        } catch (ParseException e) {
+            log.error(e.getMessage());
+            throw new DiscodeitException(ErrorCode.INVALID_JWT_TOKEN, Map.of("token", token));
+        }
+    }
+
+    // 현재 로그인 중인 유저 확인용
+    public List<JwtSession> getActiveJwtSessions() {
+        return jwtSessionRepository.findAllByExpirationTimeAfter(Instant.now());
     }
 
     // ----------------------------------
 
     // 액세스 토큰 발급
-    private String generateAccessToken(UserDto userDto) {
+    private JwtObject generateAccessToken(UserDto userDto) {
         return generateToken(userDto,
             jwtProperties.getAccessToken().getValiditySeconds(),
             TokenType.ACCESS);
     }
 
     // 리프레시 토큰 발급
-    private String generateRefreshToken(UserDto userDto) {
+    private JwtObject generateRefreshToken(UserDto userDto) {
         return generateToken(userDto,
             jwtProperties.getRefreshToken().getValiditySeconds(),
             TokenType.REFRESH);
     }
 
     // 토큰 생성
-    private String generateToken(UserDto userDto, long validitySeconds,
+    // Nimbus JOSE + JWT 라이브러리 이용하여 생성
+    private JwtObject generateToken(UserDto userDto, long validitySeconds,
         TokenType tokenType) {
-        Instant now = clock.instant();
-        Instant expiration = now.plusSeconds(validitySeconds);
+        Instant issueTime = Instant.now();
+        Instant expirationTime = issueTime.plusSeconds(validitySeconds);
 
-        return Jwts.builder()
-            .header()
-            .add("typ", "JWT")
-            .and()
-            .issuer(jwtProperties.getIssuer())
-            .issuedAt(Date.from(now))
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
             .subject(userDto.getUsername())
-            .expiration(Date.from(expiration))
+            .claim("userDto", userDto)
+            .issueTime(new Date(issueTime.toEpochMilli()))
+            .expirationTime(new Date(expirationTime.toEpochMilli()))
             .claim("type", tokenType.name())
-            .claim("userId", userDto.getId())
-            .claim("role", userDto.getRole().name())
-            .signWith(getSignKey(), SIG.HS256)
-            .compact();
-    }
+            .build();
 
-    //설정된 비밀 키를 서명 키로 변환
-    private SecretKey getSignKey() {
-        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
+        SignedJWT signedJWT = new SignedJWT(header, claimsSet);
 
-    // 토큰에서 클레임 추출
-    private Claims getClaims(String token) {
-        return Jwts.parser()
-            .verifyWith(getSignKey())
-            .clockSkewSeconds(60)   // 시간 오차 60초 허용
-            .build()
-            .parseSignedClaims(token) // 이때 서명, 만료시간 검증 + claim 추출
-            .getPayload();
+        try {
+            signedJWT.sign(new MACSigner(jwtProperties.getSecret()));
+        } catch (JOSEException e) {
+            log.error(e.getMessage());
+            throw new DiscodeitException(ErrorCode.INVALID_TOKEN_SECRET, Map.of());
+        }
+        String token = signedJWT.serialize();
+        return new JwtObject(issueTime, expirationTime, userDto, token);
     }
 
 

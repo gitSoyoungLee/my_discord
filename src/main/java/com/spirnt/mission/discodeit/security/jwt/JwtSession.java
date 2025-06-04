@@ -1,34 +1,44 @@
 package com.spirnt.mission.discodeit.security.jwt;
 
-import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "jwt_session")
+@Table(name = "jwt_sessions")
 @NoArgsConstructor
 @Getter
 public class JwtSession extends BaseEntity {
 
-    // 사용자 정보
-    @OneToOne
-    private User user;
-    private String accessToken; // 액세스 토큰
-    private String refreshToken;    // 리프레시 토큰
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    private UUID userId;
+    @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
+    private String accessToken;
+    @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
+    private String refreshToken;
+    @Column(columnDefinition = "timestamp with time zone", nullable = false)
+    private Instant expirationTime;
 
-    public JwtSession(User user, String accessToken, String refreshToken) {
-        super();
-        this.user = user;
+    public JwtSession(UUID userId, String accessToken, String refreshToken,
+        Instant expirationTime) {
+        this.userId = userId;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.expirationTime = expirationTime;
     }
 
-    public void updateToken(String accessToken, String refreshToken) {
+    public boolean isExpired() {
+        return this.expirationTime.isBefore(Instant.now());
+    }
+
+    public void update(String accessToken, String refreshToken, Instant expirationTime) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.expirationTime = expirationTime;
     }
 }

@@ -28,7 +28,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -65,10 +67,15 @@ public class SecurityConfig {
                 .ignoringRequestMatchers("/api/users", "/api/auth/login",
                     "/api/auth/logout")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // 요청으로부터 CSRF 토큰 가져오는 법: form data 또는 요청 헤더로부터 가져오는 CsrfTokenRequestAttributeHandler
+                // -> 쿠키 기반 인증 환경에 적합
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                // 기본값인 CsrfAuthenticationStrategy는 HttpSessionCsrfTokenRepository용
+                .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
             )
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtAuthenticationFilter, CustomAuthenticationFilter.class)
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )

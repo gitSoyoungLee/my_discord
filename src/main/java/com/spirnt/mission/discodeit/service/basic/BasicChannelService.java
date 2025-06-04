@@ -9,7 +9,6 @@ import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.ChannelType;
 import com.spirnt.mission.discodeit.entity.Message;
-import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.PrivateChannelUpdateException;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
@@ -19,7 +18,6 @@ import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
@@ -49,8 +47,6 @@ public class BasicChannelService implements ChannelService {
 
     private final ReadStatusService readStatusService;
     private final ReadStatusRepository readStatusRepository;
-
-    private final JwtSessionRepository jwtSessionRepository;
 
     @Transactional
     @Override
@@ -156,7 +152,7 @@ public class BasicChannelService implements ChannelService {
     public List<UserDto> getParticipants(Channel channel) {
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             return readStatusRepository.findAllByChannelId(channel.getId()).stream()
-                .map(readStatus -> toUserDto(readStatus.getUser()))
+                .map(readStatus -> userMapper.toDto(readStatus.getUser()))
                 .collect(Collectors.toList());
         }
         return new ArrayList<>();
@@ -169,10 +165,6 @@ public class BasicChannelService implements ChannelService {
             .collect(Collectors.toList());
     }
 
-    private UserDto toUserDto(User user) {
-        boolean isUserOnline = jwtSessionRepository.existsByUserId(user.getId());
-        return userMapper.toDto(user, isUserOnline);
-    }
 }
 
 

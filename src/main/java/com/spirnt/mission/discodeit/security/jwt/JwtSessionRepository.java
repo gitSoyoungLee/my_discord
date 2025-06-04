@@ -1,21 +1,21 @@
 package com.spirnt.mission.discodeit.security.jwt;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
 
-    @Query("SELECT j FROM JwtSession j WHERE j.refreshToken = :refreshToken")
     Optional<JwtSession> findByRefreshToken(String refreshToken);
 
-    @Modifying
-    @Query("DELETE FROM JwtSession j WHERE j.user.id = :userId")
-    void deleteAllByUserId(UUID userId);
+    boolean existsByUserIdAndExpirationTimeAfter(UUID userId, Instant after);
 
-    boolean existsByUserId(UUID userId);
+    Optional<JwtSession> findByUserId(UUID userId);
+
+    // 현재 로그인 중인 유저 확인용
+    List<JwtSession> findAllByExpirationTimeAfter(Instant after);
 }

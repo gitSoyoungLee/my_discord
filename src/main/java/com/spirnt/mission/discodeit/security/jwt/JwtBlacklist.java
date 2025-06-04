@@ -15,7 +15,7 @@ public class JwtBlacklist {
     private Map<String, Instant> blacklist = new ConcurrentHashMap();
 
     public void addBlacklist(String accessToken, Instant expirationTime) {
-        blacklist.put(accessToken, expirationTime);
+        blacklist.putIfAbsent(accessToken, expirationTime);
     }
 
     public boolean existsInBlacklist(String accessToken) {

@@ -46,6 +46,7 @@ public class AuthController implements AuthApiDocs {
     public ResponseEntity<UserDto> updateRole(
         @RequestBody UserRoleUpdateRequest userRoleUpdateRequest) {
         UserDto userDto = authService.updateRole(userRoleUpdateRequest);
+        jwtService.deleteJwtSession(userRoleUpdateRequest.userId());
         return ResponseEntity.ok(userDto);
     }
 

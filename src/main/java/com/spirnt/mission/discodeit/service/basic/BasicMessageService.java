@@ -50,12 +50,6 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final JwtSessionRepository jwtSessionRepository;
 
-
-    private MessageDto toMessageDto(Message message) {
-        boolean isUserOnline = jwtSessionRepository.existsByUserId(message.getAuthor().getId());
-        return MessageDto.from(message, isUserOnline);
-    }
-
     @Transactional
     @Override
     public MessageDto create(MessageCreateRequest messageCreateRequest,
@@ -91,7 +85,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.save(new Message(messageCreateRequest.content(),
             user, channel, attachedFiles));
 
-        return toMessageDto(message);
+        return messageMapper.toDto(message);
     }
 
     @Override
@@ -99,7 +93,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(
                 () -> new MessageNotFoundException(Map.of("messageId", messageId)));
-        return toMessageDto(message);
+        return messageMapper.toDto(message);
     }
 
     @Transactional(readOnly = true)
@@ -120,7 +114,7 @@ public class BasicMessageService implements MessageService {
         }
         List<Message> messages = messageSlice.getContent();
         List<MessageDto> messageDtos = messages.stream()
-            .map(message -> toMessageDto(message))
+            .map(message -> messageMapper.toDto(message))
             .toList();
         boolean hasNext = messageSlice.hasNext();
         int size = messages.size();
@@ -143,7 +137,7 @@ public class BasicMessageService implements MessageService {
                 return new MessageNotFoundException(Map.of("messageId", messageId));
             });
         message.update(dto.newContent());
-        return toMessageDto(message);
+        return messageMapper.toDto(message);
     }
 
     @Override
