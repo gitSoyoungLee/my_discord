@@ -1,9 +1,12 @@
+CREATE TYPE binary_content_upload_status AS ENUM ('WAITING', 'SUCCESS', 'FAILED');
+
 CREATE TABLE binary_contents(
   id UUID PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   file_name VARCHAR(255) NOT NULL,
   size BIGINT NOT NULL,
-  content_type VARCHAR(100) NOT NULL
+  content_type VARCHAR(100) NOT NULL,
+  upload_status binary_content_upload_status DEFAULT 'WAITING'
 );
 
 CREATE TYPE role AS ENUM (
