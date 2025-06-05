@@ -23,6 +23,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +61,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     // 파일을 로컬에 저장
     @Async("propagatingExecutor")
+    @Retryable(
+        value = {FileException.class},  // FileException 발생 시 재시도
+        maxAttempts = 3,    // 최대 시도 횟수
+        backoff = @Backoff(delay = 2000) // 2초 대기
+    )
     @Override
     public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
         Path path = resolvePath(binaryContentId);
