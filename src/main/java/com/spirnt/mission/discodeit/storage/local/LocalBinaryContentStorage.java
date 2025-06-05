@@ -1,5 +1,6 @@
 package com.spirnt.mission.discodeit.storage.local;
 
+import com.spirnt.mission.discodeit.async.AsyncTaskFailure;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.exception.BinaryContent.FileException;
 import com.spirnt.mission.discodeit.storage.BinaryContentStorage;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
@@ -24,6 +26,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -74,10 +77,26 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             fos.write(bytes);
         } catch (IOException e) {
             log.warn("[스토리지에 파일 저장 중 오류가 발생했습니다.]");
-            throw new FileException(Map.of("binaryContentId", binaryContentId));
+            throw new FileException(
+                Map.of("binaryContentId", binaryContentId, "message", e.getMessage()));
         }
         return CompletableFuture.completedFuture(binaryContentId);
     }
+
+    @Recover
+    public CompletableFuture<UUID> recover(FileException e, UUID binaryContentId, byte[] bytes) {
+        String requestId = MDC.get("requestId");  // MDC에서 requestId 추출
+        AsyncTaskFailure failure = new AsyncTaskFailure(
+            "binaryContentStorage-put",
+            requestId != null ? requestId : "UNKNOWN",
+            e.getMessage()
+        );
+
+        log.error("[비동기 파일 저장 실패] {}", failure);
+
+        return CompletableFuture.completedFuture(binaryContentId);
+    }
+
 
     // 파일을 InputStream 데이터 타입으로 반환
     @Override
