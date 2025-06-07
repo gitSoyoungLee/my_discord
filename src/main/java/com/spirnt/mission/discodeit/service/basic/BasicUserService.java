@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,6 +86,9 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
+    @Cacheable(
+        cacheNames = "users"
+    )
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {

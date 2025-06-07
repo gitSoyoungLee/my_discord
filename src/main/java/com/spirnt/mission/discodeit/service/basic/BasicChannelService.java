@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,6 +84,12 @@ public class BasicChannelService implements ChannelService {
             getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
     }
 
+
+    @Cacheable(
+        cacheNames = "channels",
+        key = "#userId",
+        unless = "result.isEmpty()" // 빈 리스트는 캐싱 x
+    )
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
         // User가 존재하지 않으면 예외 발생
