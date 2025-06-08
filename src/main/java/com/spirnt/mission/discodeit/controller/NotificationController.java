@@ -26,11 +26,13 @@ public class NotificationController {
     @GetMapping("")
     public ResponseEntity<List<NotificationDto>> findAll(
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(notificationService.findAll(userDetails.getUser().getId()));
+        List<NotificationDto> result = notificationService.findAll(userDetails.getUser().getId());
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<Void> delete(@PathVariable UUID notificationId) {
-        return null;
+        notificationService.delete(notificationId);
+        return ResponseEntity.noContent().build();
     }
 }
