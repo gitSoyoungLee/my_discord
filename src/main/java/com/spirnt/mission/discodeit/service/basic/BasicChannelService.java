@@ -115,11 +115,28 @@ public class BasicChannelService implements ChannelService {
         // PUBLIC + PRIVATE 채널을 하나의 리스트로 병합
         channels.addAll(privateChannels);
 
+        Map<UUID, List<UserDto>> participantsByChannelId =
+            readStatusRepository.findAllByUserId(userId).stream()
+                .collect(Collectors.groupingBy(
+                    rs -> rs.getChannel().getId(),
+                    Collectors.mapping(rs -> userMapper.toDto(rs.getUser()), Collectors.toList())
+                ));
+        List<UUID> allChannelIds = channels.stream()
+            .map(Channel::getId)
+            .toList();
+        Map<UUID, Instant> lastMessageAtByChannelId =
+            messageRepository.findLatestMessageTimestamps(allChannelIds).stream()
+                .collect(Collectors.toMap(
+                    row -> (UUID) row[0],
+                    row -> (Instant) row[1]
+                ));
         return channels.stream()
-            .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
-            .map(channel -> channelMapper.toDto(channel,
-                getParticipants(channel),
-                getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt())))
+            .sorted(Comparator.comparing(Channel::getCreatedAt))
+            .map(channel -> channelMapper.toDto(
+                channel,
+                participantsByChannelId.getOrDefault(channel.getId(), List.of()),
+                lastMessageAtByChannelId.getOrDefault(channel.getId(), channel.getCreatedAt())
+            ))
             .toList();
     }
 
@@ -140,7 +157,6 @@ public class BasicChannelService implements ChannelService {
         channel.update(publicChannelUpdateRequest.newName(),
             publicChannelUpdateRequest.newDescription());
         // 새롭게 업데이트 된 채널로 dto 반환
-        // todo: N+1 문제 발생
         return channelMapper.toDto(channel,
             getParticipants(channel),
             getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
