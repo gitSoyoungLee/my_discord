@@ -1,6 +1,7 @@
 package com.spirnt.mission.discodeit.entity;
 
 import com.spirnt.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,6 +24,7 @@ public class BinaryContent extends BaseEntity {
     private String contentType;
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "upload_status")
     private BinaryContentUploadStatus uploadStatus;
 
     public BinaryContent(String fileName, Long size, String contentType) {

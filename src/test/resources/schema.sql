@@ -34,7 +34,7 @@ CREATE TABLE users (
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(60) NOT NULL,
   profile_id UUID,
-  role role DEFAULT 'ROLE_USER',
+  role role NOT NULL,
   FOREIGN KEY (profile_id) REFERENCES binary_contents(id)
 	  ON DELETE SET NULL
 );
@@ -90,4 +90,21 @@ CREATE TABLE jwt_sessions (
  user_id UUID NOT NULL,
  access_token VARCHAR(512) NOT NULL,
  refresh_token VARCHAR(512)
+);
+
+CREATE TYPE notification_type AS ENUM (
+  'NEW_MESSAGE',
+  'ROLE_CHANGED',
+  'ASYNC_FAILED'
+);
+
+CREATE TABLE notifications (
+  id UUID PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  receiver_id UUID NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  content VARCHAR(255),
+  type notification_type,
+  target_id UUID,
+  FOREIGN KEY(receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
