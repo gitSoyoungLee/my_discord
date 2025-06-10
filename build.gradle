@@ -65,14 +65,19 @@ dependencies {
     implementation("org.springframework.retry:spring-retry:1.3.3")
     implementation("org.springframework:spring-aspects:5.3.22")
 
-
-    // CaffeineCache
+    // Cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    // Caffeine
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
 
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // json 직렬화용
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {
