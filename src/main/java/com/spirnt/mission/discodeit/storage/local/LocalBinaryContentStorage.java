@@ -85,11 +85,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     )
     @Override
     public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
-        try {
-            Thread.sleep(2000); // 의도적 지연
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         Path path = resolvePath(binaryContentId);
         File file = new File(String.valueOf(path));
         try (FileOutputStream fos = new FileOutputStream(file)) {
