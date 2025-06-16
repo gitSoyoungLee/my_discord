@@ -1,6 +1,5 @@
 package com.spirnt.mission.discodeit.dto.channel;
 
-
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.ChannelType;
