@@ -11,6 +11,7 @@ import com.spirnt.mission.discodeit.mapper.NotificationMapper;
 import com.spirnt.mission.discodeit.repository.NotificationRepository;
 import com.spirnt.mission.discodeit.service.NotificationService;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -53,6 +54,12 @@ public class BasicNotificationService implements NotificationService {
                 .map(User::getId)
                 .collect(Collectors.toList()))
         );
+
+        // sse로 실시간 알림 전송
+        for (Notification notification : notifications) {
+            sendNotification(notification.getReceiver().getId(),
+                notificationMapper.toDto(notification));
+        }
 
         return notificationMapper.toDto(notifications);
     }
@@ -111,15 +118,45 @@ public class BasicNotificationService implements NotificationService {
         try {
             newEmitter.send(SseEmitter.event()
                 .name("Connected")
-                .id(UUID.randomUUID().toString())   // 고유 ID 할당
+                .id(UUID.randomUUID().toString())
                 .data("Notification Service Connection Success"));
         } catch (IOException e) {
             newEmitter.completeWithError(e);
         }
 
-        // TODO: 이벤트 유실 복원
+        // 이벤트 유실 복원
         // 클라이언트가 마지막으로 받은 이벤트의 ID를 기억하고,
         // 서버와 다시 연결하면 서버는 그 이후 이벤트들을 다시 보내줌
+        if (lastEventId != null) {
+            try {
+                UUID lastEventUUID = UUID.fromString(lastEventId);
+
+                Notification lastNotification = notificationRepository
+                    .findById(lastEventUUID)
+                    .orElse(null);
+                if (lastNotification != null) {
+                    // lastEvent 이후로 클라이언트가 놓친 이벤트들
+                    List<Notification> missedNotifications = notificationRepository.findAllByReceiverIdAndCreatedAtAfterOrderByCreatedAt(
+                        userId, lastNotification.getCreatedAt());
+
+                    // 이벤트(알림)별로 클라이언트에게 sse 통해 보내기
+                    for (Notification missed : missedNotifications) {
+                        newEmitter.send(SseEmitter.event()
+                            .id(missed.getId().toString())
+                            .name("notifications")
+                            .data(notificationMapper.toDto(missed))
+                        );
+                    }
+                }
+
+            } catch (IOException e) {
+                log.error("알림 복원 전송 실패", e);
+                newEmitter.completeWithError(e);
+            } catch (IllegalArgumentException e) {
+                // lastEventId가 UUID로 변환되지 않을 때
+                log.info("Invalid Last-Event-ID Type: {}", lastEventId);
+            }
+        }
 
         return newEmitter;
     }
@@ -159,5 +196,25 @@ public class BasicNotificationService implements NotificationService {
                     }
                 }
             });
+    }
+
+    // 클라이언트에게 알림 전송
+    public void sendNotification(UUID userId, NotificationDto notificationDto) {
+        List<SseEmitter> emitters = userConnections.get(userId);
+        if (emitters == null || emitters.isEmpty()) {
+            return;
+        }
+
+        for (SseEmitter emitter : new ArrayList<>(emitters)) {
+            try {
+                emitter.send(SseEmitter.event()
+                    .id(notificationDto.id().toString())
+                    .name("notifications")
+                    .data(notificationDto));
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+                removeEmitter(userId, emitter);
+            }
+        }
     }
 }

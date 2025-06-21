@@ -106,6 +106,7 @@ public class BasicMessageService implements MessageService {
             notificationReceivers,
             "새로운 메시지",
             (channel.getType().equals(ChannelType.PUBLIC)) ? channel.getName()
+                + "에 새로운 메시지가 도착했습니다."
                 : "프라이빗 채널" + "에 새로운 메시지가 도착했습니다.",
             NotificationType.NEW_MESSAGE,
             channelId
