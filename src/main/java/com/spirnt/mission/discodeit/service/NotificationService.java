@@ -4,7 +4,6 @@ import com.spirnt.mission.discodeit.async.notification.NotificationCreateEvent;
 import com.spirnt.mission.discodeit.dto.notification.NotificationDto;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface NotificationService {
 
@@ -13,9 +12,5 @@ public interface NotificationService {
     List<NotificationDto> findAll(UUID userId);
 
     void delete(UUID notificationId);
-
-    SseEmitter subscribe(UUID userId, String lastEventId);
-
-    void sendPingToAllConnections();
 
 }

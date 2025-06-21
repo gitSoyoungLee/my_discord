@@ -82,7 +82,7 @@ public class BasicMessageService implements MessageService {
             .orElse(Collections.emptyList())) {
             BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
                 file);
-            BinaryContentDto binaryContent = binaryContentService.create(
+            BinaryContentDto binaryContent = binaryContentService.create(authorId,
                 binaryContentCreateRequest);
             attachedFilesId.add(binaryContent.getId());
         }

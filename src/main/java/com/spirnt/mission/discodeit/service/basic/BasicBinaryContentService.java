@@ -51,15 +51,10 @@ public class BasicBinaryContentService implements BinaryContentService {
             .thenAccept(binaryContentId -> {
                 log.info("!!!!success로 변경");
                 // 성공 시 upload status SUCCESS로 변경
-//                binaryContentRepository.updateUploadStatus(binaryContentId,
-//                    BinaryContentUploadStatus.SUCCESS);
                 statusUpater.uploadStatus(binaryContentId, BinaryContentUploadStatus.SUCCESS);
                 emitterManager.sendFileUploadStatus(userId, dto);
             })
             .exceptionally(e -> {
-                // 실패 시 FAILED로 변경
-//                binaryContentRepository.updateUploadStatus(binaryContent.getId(),
-//                    BinaryContentUploadStatus.FAILED);
                 statusUpater.uploadStatus(binaryContent.getId(), BinaryContentUploadStatus.FAILED);
                 emitterManager.sendFileUploadStatus(userId, dto);
                 return null;

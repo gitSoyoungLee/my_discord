@@ -68,7 +68,7 @@ public class BasicUserService implements UserService {
         // 프로필 이미지 저장
         BinaryContent binaryContent = null;
         if (binaryContentCreateRequest != null) {
-            BinaryContentDto binaryContentDto = binaryContentService.create(
+            BinaryContentDto binaryContentDto = binaryContentService.create(user.getId(),
                 binaryContentCreateRequest);
             binaryContent = binaryContentRepository.findById(binaryContentDto.getId())
                 .orElseThrow(
@@ -136,7 +136,7 @@ public class BasicUserService implements UserService {
         // 프로필 이미지 저장
         // 기존 프로필은 cascade로 자동 삭제
         BinaryContentDto binaryContentDto =
-            (binaryContentCreateRequest != null) ? binaryContentService.create(
+            (binaryContentCreateRequest != null) ? binaryContentService.create(userId,
                 binaryContentCreateRequest) : null;
         BinaryContent binaryContent =
             (binaryContentDto == null) ? null
