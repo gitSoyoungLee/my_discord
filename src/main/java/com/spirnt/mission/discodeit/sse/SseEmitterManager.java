@@ -130,47 +130,40 @@ public class SseEmitterManager {
             });
     }
 
-    // 새로운 Notification 생긴 경우 클라이언트에게 알림 전송
-    public void sendNotification(UUID userId, NotificationDto notificationDto) {
+    public void send(UUID userId, String name, Object data) {
         List<SseEmitter> emitters = userConnections.get(userId);
         if (emitters == null || emitters.isEmpty()) {
             return;
         }
-
         for (SseEmitter emitter : new ArrayList<>(emitters)) {
             try {
                 emitter.send(SseEmitter.event()
-                    .id(notificationDto.id().toString())
-                    .name("notifications")
-                    .data(notificationDto));
-                log.info("Sending Sse Success: Notification");
+                    .id(UUID.randomUUID().toString())
+                    .name(name)
+                    .data(data));
+                log.info("Sending Sse Success: {}", name);
             } catch (IOException e) {
-                log.warn("Sending Sse Failed: Notification / id: {}", notificationDto.id());
+                log.warn("Sending Sse Failed: {}", name);
                 emitter.completeWithError(e);
                 removeEmitter(userId, emitter);
             }
         }
     }
 
+    // 새로운 Notification 생긴 경우 클라이언트에게 알림 전송
+    public void sendNotification(UUID userId, NotificationDto notificationDto) {
+        send(userId, "notifications", notificationDto);
+    }
+
     // 파일 업로드 상태 변경 시 전송
     public void sendFileUploadStatus(UUID userId, BinaryContentDto binaryContentDto) {
-        List<SseEmitter> emitters = userConnections.get(userId);
-        if (emitters == null || emitters.isEmpty()) {
-            return;
-        }
+        send(userId, "binaryContents.status", binaryContentDto);
+    }
 
-        for (SseEmitter emitter : new ArrayList<>(emitters)) {
-            try {
-                emitter.send(SseEmitter.event()
-                    .id(binaryContentDto.getId().toString())
-                    .name("binaryContents.status")
-                    .data(binaryContentDto));
-                log.info("Sending Sse Success: BinaryContent");
-            } catch (IOException e) {
-                log.warn("Sending Sse Failed: BinaryContent / id: {}", binaryContentDto.getId());
-                emitter.completeWithError(e);
-                removeEmitter(userId, emitter);
-            }
+    // 채널 목록 갱신 이벤트 전송
+    public void sendChannelRefreshEvent(List<UUID> userIds, UUID channelId) {
+        for (UUID userId : userIds) {
+            send(userId, "channels.refresh", channelId);
         }
     }
 }
