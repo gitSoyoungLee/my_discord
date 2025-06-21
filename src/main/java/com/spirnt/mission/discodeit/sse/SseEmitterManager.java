@@ -161,9 +161,18 @@ public class SseEmitterManager {
     }
 
     // 채널 목록 갱신 이벤트 전송
+    // 채널 내 참가자에게만 전송
     public void sendChannelRefreshEvent(List<UUID> userIds, UUID channelId) {
         for (UUID userId : userIds) {
             send(userId, "channels.refresh", channelId);
+        }
+    }
+
+    // 사용자 목록 갱신 이벤트 전송
+    // 모든 유저에게 전송
+    public void sendUsersRefreshEvent(UUID changedUserId) {
+        for (UUID userId : userConnections.keySet()) {
+            send(userId, "users.refresh", changedUserId);
         }
     }
 }

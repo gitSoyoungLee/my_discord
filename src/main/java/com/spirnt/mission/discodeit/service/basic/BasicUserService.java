@@ -17,6 +17,7 @@ import com.spirnt.mission.discodeit.security.jwt.JwtService;
 import com.spirnt.mission.discodeit.security.jwt.JwtSession;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.UserService;
+import com.spirnt.mission.discodeit.sse.SseEmitterManager;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class BasicUserService implements UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final SseEmitterManager emitterManager;
 
     @CacheEvict(cacheNames = "users", key = "'all'")    // 캐시 무효화
     @Transactional
@@ -76,6 +78,9 @@ public class BasicUserService implements UserService {
                         Map.of("binaryContentId", binaryContentDto.getId())));
         }
         user.setProfile(binaryContent);
+
+        // sse 알림 전송
+        emitterManager.sendUsersRefreshEvent(user.getId());
 
         return userMapper.toDto(user);
     }
@@ -143,6 +148,10 @@ public class BasicUserService implements UserService {
                 : binaryContentRepository.findById(binaryContentDto.getId())
                     .orElse(null);
         user.update(username, email, password, binaryContent);
+
+        // sse 알림 전송
+        emitterManager.sendUsersRefreshEvent(user.getId());
+
         return userMapper.toDto(user);
     }
 
@@ -153,6 +162,10 @@ public class BasicUserService implements UserService {
             log.warn("[Updating User Failed: User with id {} not found]", userId);
             return new UserNotFoundException(Map.of("userId", userId));
         });
+
+        // sse 알림 전송
+        emitterManager.sendUsersRefreshEvent(user.getId());
+        
         userRepository.delete(user);
     }
 
