@@ -3,12 +3,15 @@ package com.spirnt.mission.discodeit.sse;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.dto.notification.NotificationDto;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,6 +25,19 @@ public class SseEmitterManager {
     // ConcurrentHashMap으로 스레드 세이프한 메모리 구조에서 관리
     // N개의 연결 허용하기 위해 SseEmitter를 List로 관리
     private final Map<UUID, List<SseEmitter>> userConnections = new ConcurrentHashMap<>();
+
+    // 사용자별로 보낸 이벤트를 저장
+    private final Map<UUID, List<SseEvent>> eventCache = new ConcurrentHashMap<>();
+
+    @AllArgsConstructor
+    public static class SseEvent {
+
+        String id;
+        String name;
+        Object data;
+        Instant createdAt;
+
+    }
 
     /**
      * SSE 연결 = 알림 구독 사용자의 ID를 기준으로 그 사용자를 위한 SSE 연결 통로(SseEmitter) 생성
@@ -57,39 +73,33 @@ public class SseEmitterManager {
             newEmitter.completeWithError(e);
         }
 
-        // TODO:이벤트 유실 복원
-//        // 클라이언트가 마지막으로 받은 이벤트의 ID를 기억하고,
-//        // 서버와 다시 연결하면 서버는 그 이후 이벤트들을 다시 보내줌
-//        if (lastEventId != null) {
-//            try {
-//                UUID lastEventUUID = UUID.fromString(lastEventId);
-//
-//                Notification lastNotification = notificationRepository
-//                    .findById(lastEventUUID)
-//                    .orElse(null);
-//                if (lastNotification != null) {
-//                    // lastEvent 이후로 클라이언트가 놓친 이벤트들
-//                    List<Notification> missedNotifications = notificationRepository.findAllByReceiverIdAndCreatedAtAfterOrderByCreatedAt(
-//                        userId, lastNotification.getCreatedAt());
-//
-//                    // 이벤트(알림)별로 클라이언트에게 sse 통해 보내기
-//                    for (Notification missed : missedNotifications) {
-//                        newEmitter.send(SseEmitter.event()
-//                            .id(missed.getId().toString())
-//                            .name("notifications")
-//                            .data(notificationMapper.toDto(missed))
-//                        );
-//                    }
-//                }
-//
-//            } catch (IOException e) {
-//                log.error("알림 복원 전송 실패", e);
-//                newEmitter.completeWithError(e);
-//            } catch (IllegalArgumentException e) {
-//                // lastEventId가 UUID로 변환되지 않을 때
-//                log.info("Invalid Last-Event-ID Type: {}", lastEventId);
-//            }
-//        }
+        // 이벤트 유실 복원
+        if (lastEventId != null) {
+            List<SseEvent> events = eventCache.getOrDefault(userId, List.of());
+
+            // 해당 ID에 해당하는 이벤트의 createdAt 찾기
+            Optional<Instant> lastTime = events.stream()
+                .filter(e -> e.id.equals(lastEventId))
+                .map(e -> e.createdAt)
+                .findFirst();
+
+            // 그 이후의 이벤트를 다시 전송
+            if (lastTime.isPresent()) {
+                for (SseEvent event : events) {
+                    if (event.createdAt.isAfter(lastTime.get())) {
+                        try {
+                            newEmitter.send(SseEmitter.event()
+                                .id(event.id)
+                                .name(event.name)
+                                .data(event.data));
+                        } catch (IOException e) {
+                            newEmitter.completeWithError(e);
+                        }
+
+                    }
+                }
+            }
+        }
 
         return newEmitter;
     }
@@ -135,6 +145,13 @@ public class SseEmitterManager {
         if (emitters == null || emitters.isEmpty()) {
             return;
         }
+
+        String eventId = UUID.randomUUID().toString();
+        Instant createdAt = Instant.now();
+        // 전송 이벤트를 캐시에 기록
+        eventCache.computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>())
+            .add(new SseEvent(eventId, name, data, createdAt));
+
         for (SseEmitter emitter : new ArrayList<>(emitters)) {
             try {
                 emitter.send(SseEmitter.event()
