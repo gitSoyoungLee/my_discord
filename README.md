@@ -11,146 +11,292 @@
 3. [나의 설계⭐](#나의-설계)
 
 ## 목표
-- 데이터베이스 환경 설정 및 모델링
-- Spring Data JPA 환경 적용
-- Entity 연관 관계 매핑
-- 레포지토리와 서비스 계층에 JPA 적용
-- Transaction 처리
-- 페이지네이션과 정렬
-- DTO의 적극적인 도입과 MapStruct의 활용
-- BinaryContent 저장 로직 고도화
-  - 메타정보와 바이너리 정보 분리
-- N+1 문제 해결
+- 애플리케이션 컨테이너화
+- BinaryContentStorage 고도화 (AWS S3)
+- AWS를 활용한 배포 (AWS ECS, RDS)
+- CI/CD 파이프라인 구축 (GitHub Actions)
 
 
 ## 요구사항💟
 ### 기본
 
-**데이터베이스**
+**01. 애플리케이션 컨테이너화**
 
-- [x] 아래와 같이 데이터베이스 환경을 설정하세요.
-데이터베이스: discodeit
-유저: discodeit_user
-패스워드: discodeit1234
-- [x] ERD를 참고하여 DDL을 작성하고, 테이블을 생성하세요.
-작성한 DDL 파일은 /src/main/resources/schema.sql 경로에 포함하세요.
+**Dockerfile 작성**
+- [x] [Amazon Corretto 17 이미지](https://hub.docker.com/layers/library/amazoncorretto/17/images/sha256-8929bdc3e2be20250ae46b3bc1dc361fcd637cd189ec02174251b0e499a22fad)를 베이스 이미지로 사용하세요.
+- [x] 작업 디렉토리를 설정하세요. (/app)
+- [x] 프로젝트 파일을 컨테이너로 복사하세요. 단, 불필요한 파일은 .dockerignore를 활용해 제외하세요.
+- [x] Gradle Wrapper를 사용하여 애플리케이션을 빌드하세요.
+- [x] 80 포트를 노출하도록 설정하세요.
+- [x] 프로젝트 정보를 환경 변수로 설정하세요.
+  - 실행할 jar 파일의 이름을 추론하는데 활용됩니다.
+  - PROJECT_NAME: discodeit
+  - PROJECT_VERSION: 1.2-M8
+- [x] JVM 옵션을 환경 변수로 설정하세요.
+  - JVM_OPTS: 기본값은 빈 문자열로 정의
+- [x] 애플리케이션 실행 명령어를 설정하세요. 이때 환경변수로 정의한 프로젝트 정보를 활용하세요.
 
----
+**이미지 빌드 및 실행 테스트**
+- [x] Docker 이미지를 빌드하고 태그(local)를 지정하세요.
+- [x] 빌드된 이미지를 활용해서 컨테이너를 실행하고 애플리케이션을 테스트하세요.
+  - [x] prod 프로필로 실행하세요.
+  - [x] 데이터베이스는 로컬 환경에서 구동 중인 PostgreSQL 서버를 활용하세요.
+  - [x] http://localhost:8081로 접속 가능하도록 포트를 매핑하세요.
 
-**Spring Data JPA 적용하기**
+**Docker Compose 구성**
+- 개발 환경용 docker-compose.yml 파일을 작성합니다.
+- [x] 애플리케이션과 PostgreSQL 서비스를 포함하세요.
+- [x] 각 서비스에 필요한 모든 환경 변수를 설정하세요.
+  - .env 파일을 활용하되, .env는 형상관리에서 제외하여 보안을 유지하세요.
+- [x] 애플리케이션 서비스를 로컬 Dockerfile에서 빌드하도록 구성하세요.
+- [x] 애플리케이션 볼륨을 구성하여 컨테이너가 재시작되어도 BinaryContentStorage 데이터가 유지되도록 하세요.
+- [x] PostgreSQL 볼륨을 구성하여 컨테이너가 재시작되어도 데이터가 유지되도록 하세요.
+- [x] PostgreSQL 서비스 실행 후 schema.sql이 자동으로 실행되도록 구성하세요.
+- [x] 서비스 간 의존성을 설정하세요(depends_on).
+- [x] 필요한 포트 매핑을 구성하세요.
+- [x] Docker Compose를 사용하여 서비스를 시작하고 테스트하세요.
+  - --build 플래그를 사용하여 서비스 시작 전에 이미지를 빌드하도록 합니다.
 
-- [x] Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
-- [x] 앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
-- [x] 디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
+**02. BinaryContentStorage 고도화(AWS S3)**
 
----
+**AWS S3 버킷 구성**
+- [x] AWS S3 버킷을 생성하세요.
+  - [x] 버킷 이름을 discodeit-binary-content-storage-(사용자 이니셜) 형식으로 지정하세요.
+  - [x] 퍼블릭 액세스 차단 설정을 활성화하세요(모든 퍼블릭 액세스 차단).
+  - [x] 버전 관리는 비활성화 상태로 두세요.
 
-**엔티티 정의하기**
+**AWS S3 접근을 위한 IAM 구성**
+- [x]  S3 버킷에 접근하기 위한 IAM 사용자(discodeit)를 생성하세요.
+- [x]  AmazonS3FullAccess 권한을 할당하고, 사용자 생성을 완료하세요.
+- [x]  생성된 사용자에 엑세스 키를 생성하세요.
+- [x]  발급받은 키를 포함해서 AWS 관련 정보는 .env 파일에 추가합니다.
+  - 작성한 .env 파일은 리뷰를 위해 PR에 별도로 첨부해주세요. 단, 엑세스 키와 시크릿 키는 제외하세요.
 
-- [x]  클래스 다이어그램을 참고해 도메인 모델의 공통 속성을 추상 클래스로 정의하고 상속 관계를 구현하세요.
-  - 이때 Serializable 인터페이스는 제외합니다.
-  - 패키지명: com.sprint.mission.discodeit.entity.base
-- [x]  JPA의 어노테이션을 활용해 createdAt, updatedAt 속성이 자동으로 설정되도록 구현하세요.
-  - @CreatedDate, @LastModifiedDate
--  클래스 다이어그램을 참고해 클래스 참조 관계를 수정하세요. 
-- [x]  ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보를 표로 정리해보세요.
+**AWS S3 테스트**
+- [x]  AWS S3 SDK 의존성을 추가하세요.
+  -  implementation 'software.amazon.awssdk:s3:2.31.7'
+- [x]  S3 API를 간단하게 테스트하세요.
+  - 패키지명: com.sprint.mission.discodeit.stoarge.s3
+  - 클래스명: AWSS3Test
+  - [ ] Properties 클래스를 활용해서 .env에 정의한 AWS 정보를 로드하세요.
+  - [x] 작업 별 테스트 메소드를 작성하세요.
+    - 업로드
+    - 다운로드
+    - PresignedUrl 생성
 
-![image](https://github.com/user-attachments/assets/e021bba9-a1cb-4c25-9b5b-8a2233c76362)
+**AWS S3를 활용한 BinaryContentStroage 고도화**
+- [x]  앞서 작성한 테스트 메소드를 참고해 S3BinaryContentStorage를 구현하세요.
+- [x]  discodeit.storage.type 값이 s3인 경우에만 Bean으로 등록되어야 합니다.
+- [x] S3BinaryContentStorageTest를 함께 작성하면서 구현하세요.
+- [x] BinaryContentStorage 설정을 유연하게 제어할 수 있도록 application.yaml을 수정하세요.
+  - [x] AWS 관련 정보는 형상관리하면 안되므로 .env 파일에 작성된 값을 임포트하는 방식으로 설정하세요.
+  - [x] Docker Compose에서도 위 설정을 주입할 수 있도록 수정하세요.
+- [x] download 메소드는 PresignedUrl을 활용해 리다이렉트하는 방식으로 구현하세요.
 
-- [x] JPA 주요 어노테이션을 활용해 ERD, 연관관계 매핑 정보를 도메인 모델에 반영해보세요.
-  - @Entity, @Table
-  - @Column, @Enumerated
-  - @OneToMany, @OneToOne, @ManyToOne
-  - @JoinColumn, @JoinTable  
-- [x] ERD의 외래키 제약 조건과 연관관계 매핑 정보의 부모-자식 관계를 고려해 영속성 전이와 고아 객체를 정의하세요.
-  - cascade, orphanRemoval
+**03. AWS를 활용한 배포(AWS RDS, ECR, ECS)**
 
----
+**AWS RDS 구성**
+- [x]  AWS RDS PostgreSQL 인스턴스를 생성하세요.
+  - 이외 설정은 기본값을 유지하세요.  
 
-**레포지토리와 서비스에 JPA 도입하기**
+| 항목 | 값 | 비고 |
+|------|----|------|
+| 데이터베이스 생성 방식 | 표준 생성 | |
+| 엔진 옵션 > 엔진 유형 | PostgreSQL | |
+| 엔진 옵션 > 엔진 버전 | 17.2-R2 | 기본값 |
+| 템플릿 | 프리 티어 | 과금 주의 |
+| 설정 > DB 인스턴스 식별자 | discodeit-db | |
+| 설정 > 자격증명설정 > 마스터 사용자 이름 | postgres | 기본값 |
+| 설정 > 자격증명설정 > 자격 증명 관리 | 자체 관리 | 기본값 |
+| 설정 > 자격증명설정 > 마스터 암호 | 임의의 값 | 따로 메모해두세요 |
+| 인스턴스 구성 > DB 인스턴스 클래스 | db.t4g.micro | 기본값 |
+| 연결 > 퍼블릭 액세스 | 아니오 | 과금 주의 |
+| 연결 > 추가구성 > 데이터베이스 포트 | 5432 | 기본값 |
+| 모니터링 > 보존기간 | 7일 (프리티어) | 과금 주의 |
+| 모니터링 > 추가 모니터링 설정 | 모두 체크 해제 | 기본값, 과금 주의 |
+| 추가 구성 > 백업 | 체크 해제 | 과금 주의 |
 
-- [x] 기존의 Repository 인터페이스를 JPARepository로 정의하고 쿼리메소드로 대체하세요.
-FileRepository와 JCFRepository 구현체는 삭제합니다.
-- [x] 영속성 컨텍스트의 특징에 맞추어 서비스 레이어를 수정해보세요.
-힌트: 트랜잭션, 영속성 전이, 변경 감지, 지연로딩
+- [x]  과금이 발생할 수 있으니 다음 항목은 한번 더 확인해주세요.
+  - [x] 템플릿: 프리티어
+  - [x] 퍼블릭 액세스: 아니오
+  - [x] 모니터링 > 보존기간: 7일
+  - [x] 모니터링 > 추가 모니터링 설정: 모두 체크 해제
+  - [x] 추가 구성 > 백업: 비활성화
+- [x] SSH 터널링을 통해 개발 환경에서 접근할 수 있도록 EC2를 구성하세요.
+  - [x] EC2 인스턴스를 생성하세요.
+    - 이외 설정은 기본값을 유지하세요.
+    
+| 항목 | 값 | 비고 |
+|------|----|------|
+| 이름 및 태그 | rds-ssh | |
+| 인스턴스 유형 | t2.micro | 기본값, 과금 주의 |
+| 키 페어 | 새 키 페어 생성 | `.pem` 파일 저장 위치를 기억하세요 |
+| 네트워크 설정 > 방화벽(보안그룹) | 기존 보안 그룹 선택 | |
+| 기타 설정 | 기본값 유지 | |
 
----
+  - [x]  보안 그룹에서 인바운드 규칙을 편집하세요.
+    - 유형: SSH
+    - 소스: 내 IP
+      - 작업 환경의 네트워크(와이파이 등)가 달라지면 계속 수정해주어야 할 수 있습니다.
 
-**DTO 적극 도입하기**
-
-- [x] Entity를 Controller 까지 그대로 노출했을 때 발생할 수 있는 문제점에 대해 정리해보세요. DTO를 적극 도입했을 때 보일러플레이트 코드가 많아지지만, 그럼에도 불구하고 어떤 이점이 있는지 알 수 있을거에요.
- 
+- [x]  DataGrip을 통해 연결 후 데이터베이스와 사용자, 테이블을 초기화하세요.
+  - [x] 데이터 소스 추가 시 SSH/SSL > Use SSH tunnel 설정을 활성화하세요. 이때 이전에 다운로드한 .pem 파일을 활용하세요.
+  - [x] 연결이 성공하면 데이터베이스와 사용자, 테이블을 초기화하세요.
 ```
-📌 엔티티를 컨트롤러까지 그대로 노출했을 때 발생할 수 있는 문제점
+-- 1. 새 유저 'discodeit_user' 생성 (비밀번호는 원하는 값으로 설정)
+CREATE USER discodeit_user WITH PASSWORD 'discodeit1234';
 
-엔티티가 그대로 노출된다는 것은 엔티티의 모든 속성이 공개될 수 있다는 뜻입니다.
-1. 테이블 설계가 노출될 수 있어 보안 면에서 위험합니다.
-2. 화면에서 필요한 데이터는 일부인데, 모든 속성을 다 보낼 필요는 없습니다. 엔티티 크기가 커질수록 클라이언트와의 통신 속도가 느려질 겁니다.
-3. 새롭게 알게 된 문제점인데, JPA 양방향 관계를 갖고 있는 엔티티를 컨트롤러에서 조회하면 순환 참조 문제가 생길 수 있습니다. 
-엔티티 A와 B가 있을 때(저희 미션에서는 User와 UserStatus가 예시가 될 것 같습니다.) 서비스에서 repository.findById()로 조회하면 엔티티 A가 조회되지만 지연 로딩으로 엔티티 B까지는 조회가 되지 않습니다. 하지만 컨트롤러에서 ResponseEntity로 엔티티 A를 내보내려고 할 때는 json화가 필요하니 엔티티 B까지 조회해야 되죠. 엔티티 B를 다시 json화하려고 하면 엔티티 A를 조회하게 되고, 무한 순환참조가 일어나게 된다고 이해를 했습니다.
+-- 2. postgres 계정은 AWS RDS 환경 특성상 완전한 super user가 아니므로, discodeit_user에 대한 권한을 추가로 부여해야함.  
+GRANT discodeit_user TO postgres;
 
-참고: https://m.blog.naver.com/writer0713/221587351970
+-- 3. 'discodeit' 데이터베이스 생성 (소유자는 'discodeit_user')
+CREATE DATABASE discodeit OWNER discodeit_user;
 
+-- 4. schema.sql 실행하여 테이블 생성
 ```
+  - [x]  구성이 완료되면 rds-ssh 인스턴스는 완전히 삭제하여 과금에 유의하세요.
 
-- [x]  Entity를 DTO로 매핑하는 로직을 책임지는 Mapper 컴포넌트를 정의해 반복되는 코드를 줄여보세요.
+**AWS ECR 구성**
+- [x]  이미지를 배포할 퍼블릭 레포지토리(discodeit)를 생성하세요.
+  - 프라이빗 레포지토리는 용량 제한이 있으므로 퍼블릭 레포지토리로 생성합니다.
+- [x]  [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)를 설치하세요.
+- [x]  aws configure 실행 후 앞서 생성한 discodeit IAM 사용자 정보를 입력하세요.
+  - 엑세스 키
+  - 시크릿 키
+  - region: ap-northeast-2
+  - output format: json
+- [x]  discodeit IAM 사용자가 ECR에 접근할 수 있도록 다음 권한을 부여하세요.
+  - AmazonElasticContainerRegistryPublicFullAccess
+- [x]  Docker 클라이언트를 배포할 레지스트리에 대해 인증합니다.
+  - AWS 콘솔을 통해 생성한 레포지토리 페이지로 이동 후 우측 상단 푸시 명령 보기를 클릭하면 관련 명령어를 확인할 수 있습니다.
+```
+# 예시
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/...
+```
+- [x]  멀티플랫폼을 지원하도록 애플리케이션 이미지를 빌드하고, discodeit 레포지토리에 push 하세요.
+  - 태그명: latest, 1.2-M8
+  - 멀티플랫폼: linux/amd64,linux/arm64
+- [x]  AWS 콘솔에서 푸시된 이미지를 확인하세요.
 
----
 
-**BinaryContent 저장 로직 고도화**
+**AWS ECS 구성**
+- [x]  배포 환경에서 컨테이너 실행 간 사용할 환경 변수를 정의하고, S3에 업로드하세요.
+  - [x] discodeit.env 파일을 만들어 다음의 내용을 작성하세요.
+```
+# Spring Configuration
+SPRING_PROFILES_ACTIVE=prod
 
-데이터베이스에 이미지와 같은 파일을 저장하면 성능 상 불리한 점이 많습니다. 따라서 실제 바이너리 데이터는 별도의 공간에 저장하고, 데이터베이스에는 바이너리 데이터에 대한 메타 정보(파일명, 크기, 유형 등)만 저장하는 것이 좋습니다.
+# Application Configuration
+STORAGE_TYPE=s3
+AWS_S3_ACCESS_KEY=엑세스_키
+AWS_S3_SECRET_KEY=시크릿_키
+AWS_S3_REGION=ap-northeast-2
+AWS_S3_BUCKET=버킷_이름
+AWS_S3_PRESIGNED_URL_EXPIRATION=600
 
-- [x]  BinaryContent 엔티티는 파일의 메타 정보(fileName, size, contentType)만 표현하도록 bytes 속성을 제거하세요.
-- [x]  BinaryContent의 byte[] 데이터 저장을 담당하는 인터페이스를 설계하세요.
-- [x]  서비스 레이어에서 기존에 BinaryContent를 저장하던 로직을 BinaryContentStorage를 활용하도록 리팩토링하세요.
-- [x]  BinaryContentController에 파일을 다운로드하는 API를 추가하고, BinaryContentStorage에 로직을 위임하세요.
-- [x]  로컬 디스크 저장 방식으로 BinaryContentStorage 구현체를 구현하세요.
+# DataSource Configuration
+RDS_ENDPOINT=RDS_엔드포인트(포트 포함)
+SPRING_DATASOURCE_URL=jdbc:postgresql://${RDS_ENDPOINT}/discodeit
+SPRING_DATASOURCE_USERNAME=RDS_유저네임(DataGrip을 통해 생성했던 유저)
+SPRING_DATASOURCE_PASSWORD=RDS_비밀번호
 
----
+# JVM Configuration (프리티어 고려)
+JVM_OPTS="-Xmx384m -Xms256m -XX:MaxMetaspaceSize=64m -XX:+UseSerialGC"
+```
+  - [x]  이 파일을 S3에 업로드하세요.
+  - [x] 이 파일은 형상관리되지 않도록 주의하세요.
+- [x] AWS ECS 콘솔에서 클러스터를 생성하세요.
 
-**페이징과 정렬**
+| 항목 | 값 | 비고 |
+|------|----|------|
+| 클러스터 구성 > 클러스터 이름 | discodeit-cluster | |
+| 인프라 > AWS Fargate(서버리스) | 체크해제 | 과금 주의 |
+| 인프라 > Amazon EC2 인스턴스 | 체크 |  |
+| 인프라 > EC2 인스턴스 유형 | t2.micro | 과금 주의 |
+| 인프라 > 원하는 용량 | 최소 0, 최대 1 | 과금 주의 |
+| 인프라 > SSH 키 페어 | 새 키 페어 생성 후 지정 | |
 
-- [x] 메시지 목록을 조회할 때 다음의 조건에 따라 페이지네이션 처리를 해보세요.
-50개씩 최근 메시지 순으로 조회합니다.
-총 메시지가 몇개인지 알 필요는 없습니다.
-- [x] 일관된 페이지네이션 응답을 위해 제네릭을 활용해 DTO로 구현하세요.
-- [x] Slice 또는 Page 객체로부터 DTO를 생성하는 Mapper를 구현하세요.
+  - 이외 설정은 기본값을 유지하세요.
+- [x]  태스크를 정의하세요.
+
+| 항목 | 값 | 비고 |
+|------|----|------|
+| 태스크 정의 구성 > 태스크 정의 패밀리 | discodeit-task | |
+| 인프라 요구 사항 > 시작 유형 | AWS Fargate: 체크 해제, Amazon EC2 인스턴스: 체크 | |
+| 인프라 요구 사항 > 네트워크 모드 | bridge | |
+| 인프라 요구 사항 > 태스크 크기 | CPU: 0.25 vCPU, 메모리: 0.5 GB | |
+| 컨테이너-1 > 컨테이너 세부 정보 | 이름: discodeit-app, 이미지 URI: 이전에 배포한 이미지 | |
+| 컨테이너-1 > 포트 매핑 | 호스트 포트: 80, 컨테이너 포트: 80 | |
+| 컨테이너-1 > 리소스 할당 제한 - 조건부 | CPU: 0.25 vCPU, 메모리 하드 제한: 0.5 GB, 메모리 소프트 제한: 0.25 GB | |
+| 컨테이너-1 > 환경 변수 - 선택 사항 > 파일에서 추가 | 이전에 S3에 업로드한 discodeit.env 파일 지정 | |
+
+  - 이외 설정은 기본값을 유지하세요.
+  -  [x] 태스크 생성 후 태스크 실행 역할에 S3 관련 권한을 추가하세요.
+    - 환경 변수 파일을 읽기위해 필요합니다.
+- [x] discodeit 클러스터 상세 화면에서 서비스를 생성하세요.
+
+| 항목 | 값 | 비고 |
+|------|----|------|
+| 배포 구성 > 태스크 정의 패밀리 | discodeit-task | |
+| 배포 구성 > 서비스 이름 | discodeit-service | |
+| 배포 구성 > 원하는 태스크 | 1 | 기본값 |
+| 배포 구성 > 상태 검사 유예 기간 | 30초 | |
+
+  - 이외 설정은 기본값을 유지하세요.
+- [x]  태스크의 EC2 보안 그룹의 인바운드 규칙을 설정하여 어디서든 접근할 수 있도록 하세요.
+  - [x] EC2 보안 그룹에서 인바운드 규칙을 편집하세요.
+  - [x] 규칙 유형으로 HTTP를 선택하세요.
+  - [x] 소스로 Anywhere-IPv4를 선택하여 모든 IP를 허용하세요.
+- [x]  태스크 실행이 완료되면 해당 EC2의 퍼블릭 IP에 접속해보세요.
 
 ### 심화
 
-**N+1 문제**
+**이미지 최적화하기**
+- [ ] 멀티 스테이지(빌드, 런타임) 빌드를 활용해 이미지의 크기를 줄여보세요.
+  -  태그명: local-slim
+  - 이전에 빌드한 이미지(1.2-M8 또는 local)와 크기를 비교해보세요.
+- [ ] 이미지 레이어 캐시를 고려해 Dockerfile을 수정해보세요.
 
-- [x] N+1 문제가 발생하는 쿼리를 찾고 해결해보세요.
----
+**GitHub Actions를 활용한 CI/CD 파이프라인 구축**
+- [x]  CI(지속적 통합)를 위한 워크플로우를 설정하세요.
+  - [x]  .github/workflows/test.yml 파일을 생성하세요.
+  - [x]  main 브랜치에 PR이 생성되면 실행되도록 설정하세요.
+  - [x]  테스트가 실행하는 Job을 정의하세요.
+  - [x]  [CodeCov](https://app.codecov.io/)를 통해 테스트 커버리지 뱃지를 README에 추가해보세요.
+- [x] CD(지속적 배포)를 위한 워크플로우를 설정하세요.
+  - [x] .github/workflows/deploy.yml 파일을 생성하세요.
+  - [x] release 브랜치에 코드가 푸시되면 실행되도록 설정하세요.
+  - [x] AWS 정보 설정
+    - [x] GitHub 레포지토리 설정을 통해 시크릿을 추가하세요.
+      - AWS_ACCESS_KEY: IAM 사용자의 액세스 키
+      - AWS_SECRET_KEY: IAM 사용자의 시크릿 키
+    - [x] GitHub 레포지토리 설정을 통해 변수를 추가하세요.  
+      - AWS_REGION: AWS 리전(ap-northeast-2)
+      - ECR_REPOSITORY_URI: ECR 레포지토리 URI
+      - ECS_CLUSTER: ECS 클러스터 이름(discodeit-cluster)
+      - ECS_SERVICE: ECS 서비스 이름(discodeit-service)
+      - ECS_TASK_DEFINITION: ECS 태스크 정의 이름(discodeit-task)
+  - [x] Docker 이미지 빌드 및 푸시
+    - [x] Docker 이미지를 빌드하고 푸시하는 Job을 정의하세요.
+    - [x] AWS CLI를 설정하는 Step을 추가하세요.
+      - Pubilc ECR에 배포해야하므로 리전은 us-east-1으로 설정해야합니다.
+    - [x] ECR 로그인 Step을 추가하세요.
+      - Public ECR에 로그인해야합니다.
+    - [x] Docker 이미지 빌드 및 푸시하는 과정을 Step으로 추가하세요.
+      - 단, 빌드 시간 단축을 위해 멀티 플랫폼 옵션은 제외합니다.
+      - GitHub Actions의 런타임 OS와 우리가 배포할 ECS는 모두 x86_64입니다.
+    - [x] 이미지 태그는 latest와 GitHub 커밋 해시를 사용하도록 설정하세요.
+  - [x] ECS 서비스 업데이트
+    - [x] ECS 서비스를 업데이트하는 Job을 정의하세요.
+    - [x] AWS CLI를 설정하는 Step을 추가하세요.
+      - 우리의 ECS 클러스터에 접근해야하므로 리전은 AWS_REGION으로 설정해야합니다.
+    - [x] 태스크 정의를 업데이트하는 Step을 추가하세요.
+      - 기존의 태스크 정의를 기반으로 새 이미지를 사용하도록 업데이트하세요.
+    - [x] 프리티어 리소스를 고려해 AWS CLI를 사용해 기존에 구동 중인 서비스를 중단하는 Step을 추가하세요.
+      - aws ecs update-service --desired-count 옵션을 활용하세요.
+    - [x] 새로 등록한 태스크 정의를 사용하도록 ECS 서비스를 업데이트하는 Step을 추가하세요.
+  - [x] AWS 콘솔을 통해 새로 등록된 태스크 정의로 배포되었는지 확인하세요.
 
-**읽기전용 트랜잭션 활용**
-
-- [x] 프로덕션 환경에서는 OSIV를 비활성화하는 경우가 많습니다. 이때 서비스 레이어의 조회 메소드에서 발생할 수 있는 문제를 식별하고, 읽기 전용 트랜잭션을 활용해 문제를 해결해보세요.
-
----
-
-**페이지네이션 최적화**
-- [x] 오프셋 페이지네이션과 커서 페이지네이션 방식의 차이에 대해 정리해보세요.
-
-
-📌 오프셋 페이지네이션
-- DB에 오프셋 쿼리로 페이지 단위로 요청하고 응답 받습니다.
-- 구현이 커서 페이지네이션보다는 쉬운 편입니다.
-- 각각의 페이지를 요청하는 사이에 데이터의 변화가 있는 경우 중복된 데이터가 노출될 수 있습니다.
-- 데이터row, offset이 크다면 성능에 부담이 됩니다. 
-
-📌 커서 페이지네이션
-- 클라이언트가 가져간 마지막 데이터를 커서로 받아 그 다음 데이터들을 응답합니다.
-- 오프셋 페이지네이션의 문제가 해결됩니다. 오프셋만큼의 데이터를 스킵해서 응답할 데이터를 찾는 게 아니라 어느 데이터부터 확인해야 될지 커서가 명확하기 때문입니다.
-
-- [x] 기존에 구현한 오프셋 페이지네이션을 커서 페이지네이션으로 리팩토링하세요.
-
----
-
-**MapStruct 적용**
-
-- [x] Entity와 DTO를 매핑하는 보일러플레이트 코드를 [MapStruct](https://mapstruct.org/) 라이브러리를 활용해 간소화해보세요.
 
 
 ## 나의 설계⭐
