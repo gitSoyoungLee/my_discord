@@ -3,7 +3,7 @@
 [![CI workflow](https://github.com/gitSoyoungLee/1-sprint-mission/actions/workflows/test.yml/badge.svg?branch=part3-%EC%9D%B4%EC%86%8C%EC%98%81-sprint8)](https://github.com/gitSoyoungLee/1-sprint-mission/actions/workflows/test.yml)
 
 # Spring 백엔드 트랙 1기 스프린트 미션 제출 리포지토리
-# 스프린트 미션 8
+# 스프린트 미션 11
 
 
 1. [목표](#목표)
@@ -11,148 +11,236 @@
 3. [나의 설계⭐](#나의-설계)
 
 ## 목표
-- 데이터베이스 환경 설정 및 모델링
-- Spring Data JPA 환경 적용
-- Entity 연관 관계 매핑
-- 레포지토리와 서비스 계층에 JPA 적용
-- Transaction 처리
-- 페이지네이션과 정렬
-- DTO의 적극적인 도입과 MapStruct의 활용
-- BinaryContent 저장 로직 고도화
-  - 메타정보와 바이너리 정보 분리
-- N+1 문제 해결
+- 비동기를 통해 응답 속도 향상하기
+- 캐시를 통해 DB I/O 줄이기
+- Kafka 도입하기
+- Redis 도입하기
 
 
 ## 요구사항💟
 ### 기본
 
-**데이터베이스**
-
-- [x] 아래와 같이 데이터베이스 환경을 설정하세요.
-데이터베이스: discodeit
-유저: discodeit_user
-패스워드: discodeit1234
-- [x] ERD를 참고하여 DDL을 작성하고, 테이블을 생성하세요.
-작성한 DDL 파일은 /src/main/resources/schema.sql 경로에 포함하세요.
-
----
-
-**Spring Data JPA 적용하기**
-
-- [x] Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
-- [x] 앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
-- [x] 디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
-
----
-
-**엔티티 정의하기**
-
-- [x]  클래스 다이어그램을 참고해 도메인 모델의 공통 속성을 추상 클래스로 정의하고 상속 관계를 구현하세요.
-  - 이때 Serializable 인터페이스는 제외합니다.
-  - 패키지명: com.sprint.mission.discodeit.entity.base
-- [x]  JPA의 어노테이션을 활용해 createdAt, updatedAt 속성이 자동으로 설정되도록 구현하세요.
-  - @CreatedDate, @LastModifiedDate
--  클래스 다이어그램을 참고해 클래스 참조 관계를 수정하세요. 
-- [x]  ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보를 표로 정리해보세요.
-
-![image](https://github.com/user-attachments/assets/e021bba9-a1cb-4c25-9b5b-8a2233c76362)
-
-- [x] JPA 주요 어노테이션을 활용해 ERD, 연관관계 매핑 정보를 도메인 모델에 반영해보세요.
-  - @Entity, @Table
-  - @Column, @Enumerated
-  - @OneToMany, @OneToOne, @ManyToOne
-  - @JoinColumn, @JoinTable  
-- [x] ERD의 외래키 제약 조건과 연관관계 매핑 정보의 부모-자식 관계를 고려해 영속성 전이와 고아 객체를 정의하세요.
-  - cascade, orphanRemoval
-
----
-
-**레포지토리와 서비스에 JPA 도입하기**
-
-- [x] 기존의 Repository 인터페이스를 JPARepository로 정의하고 쿼리메소드로 대체하세요.
-FileRepository와 JCFRepository 구현체는 삭제합니다.
-- [x] 영속성 컨텍스트의 특징에 맞추어 서비스 레이어를 수정해보세요.
-힌트: 트랜잭션, 영속성 전이, 변경 감지, 지연로딩
-
----
-
-**DTO 적극 도입하기**
-
-- [x] Entity를 Controller 까지 그대로 노출했을 때 발생할 수 있는 문제점에 대해 정리해보세요. DTO를 적극 도입했을 때 보일러플레이트 코드가 많아지지만, 그럼에도 불구하고 어떤 이점이 있는지 알 수 있을거에요.
+**비동기 적용하기**
+- [x] BinaryContentStorage의 파일 업로드 로직을 비동기적으로 처리하세요.
+  - 비동기 처리 시 MDC의 Request ID, SecurityContext의 인증 정보가 유지되도록 하세요.
+- [x] 업로드 중 예외가 발생한 경우, 자동 재시도 메커니즘을 구현하세요.
+  - Spring Retry의 ```@Retryable``` 어노테이션을 사용해 재시도 정책(횟수, 대기 시간 등)을 설정하세요.
+- [x] 재시도 횟수를 초과한 경우, 실패 정보(AsyncTaskFailure)를 기록하는 복구 로직을 실행하세요.
+  - ```@Recover``` 어노테이션을 사용해 재시도 실패 처리 메서드를 구현하세요.
+  - 실패 정보(AsyncTaskFailure)에는 MDC의 Request ID를 포함하여 추적이 가능하도록 하세요.
  
+![image](https://github.com/user-attachments/assets/60dd6d64-5c82-438c-963c-f23b31608a2d)
+
+- [x] 파일 업로드 메소드를 호출한 곳(BasicMessageService, BasicUserService 등)에서  비동기 처리 성공/실패에 따라 BinaryContent의 상태를 업데이트 하세요.
+  - BinaryContent 엔티티에 업로드 상태를 나타내는 속성(uploadStatus)을 추가하세요.
+![image](https://github.com/user-attachments/assets/484aab12-e71b-4a8e-91a6-c7515a43fde2)
+    - ```WAITING```: 업로드 대기 중 (파일 저장 요청만 완료된 상태)
+    - ```SUCCESS```: 업로드 완료
+    - ```FAILED```: 업로드 실패 (모든 재시도 실패)
+  - ```WAITING```으로 초기화하세요.
+  - 업로드 성공 시, ```SUCCESS```로 업데이트하세요.
+  - 업로드 실패 시, ```FAILED```로 업데이트하세요.
+    - 의도적인 예외를 발생시켜 테스트해보세요.
+
+> 경우에 따라 비동기 업로드 로직이 메인 스레드의 트랜잭션보다 일찍 종료되는 경우 업데이트할 BinaryContent 데이터가 DB에 반영되지 않아 업데이트가 정상적으로 이루어지지 않을 수 있습니다.
+따라서 메인 스레드의 트랜잭션이 끝난 시점까지 대기해야 합니다.
+```TransactionSynchronizationManager.registerSynchronization```를 활용해 트랜잭션이 성공적으로 커밋되었을 때 실행할 작업을 정의할 수 있습니다.
 ```
-📌 엔티티를 컨트롤러까지 그대로 노출했을 때 발생할 수 있는 문제점
-
-엔티티가 그대로 노출된다는 것은 엔티티의 모든 속성이 공개될 수 있다는 뜻입니다.
-1. 테이블 설계가 노출될 수 있어 보안 면에서 위험합니다.
-2. 화면에서 필요한 데이터는 일부인데, 모든 속성을 다 보낼 필요는 없습니다. 엔티티 크기가 커질수록 클라이언트와의 통신 속도가 느려질 겁니다.
-3. 새롭게 알게 된 문제점인데, JPA 양방향 관계를 갖고 있는 엔티티를 컨트롤러에서 조회하면 순환 참조 문제가 생길 수 있습니다. 
-엔티티 A와 B가 있을 때(저희 미션에서는 User와 UserStatus가 예시가 될 것 같습니다.) 서비스에서 repository.findById()로 조회하면 엔티티 A가 조회되지만 지연 로딩으로 엔티티 B까지는 조회가 되지 않습니다. 하지만 컨트롤러에서 ResponseEntity로 엔티티 A를 내보내려고 할 때는 json화가 필요하니 엔티티 B까지 조회해야 되죠. 엔티티 B를 다시 json화하려고 하면 엔티티 A를 조회하게 되고, 무한 순환참조가 일어나게 된다고 이해를 했습니다.
-
-참고: https://m.blog.naver.com/writer0713/221587351970
-
+@Transactional
+@Override
+public MessageDto create(MessageCreateRequest messageCreateRequest,
+    List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+                ... 
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+              @Override
+              public void afterCommit() {
+                // 비동기 로직...
+              }
+            }
+        );
+        ...
+}
 ```
+> ```@TransactionalEventListener```를 활용할 수도 있습니다.
 
-- [x]  Entity를 DTO로 매핑하는 로직을 책임지는 Mapper 컴포넌트를 정의해 반복되는 코드를 줄여보세요.
+- [x] 동기 처리와 비동기 처리 간의 성능 차이를 비교해보세요.
+- 파일 업로드 로직에 의도적인 지연(Thread.sleep(...))을 발생시키세요.
+- @Timed 어노테이션을 활용하여 API의 실행 시간을 측정하고, 동기/비동기 처리 방식 간 응답 속도 차이를 분석하고 PR에 해당 내용을 포함하세요.
 
----
+**알림 기능 추가하기**
+- [x]  ReadStatus 엔티티를 리팩토링하세요.
+  - 새로운 메시지에 대한 알림 활성화 여부를 관리하는 속성(notificationEnabled)을 추가하세요.
+  - ReadStatus 엔티티에 ```boolean notificationEnabled``` 추가
+  - 사용자가 해당 알림 설정을 변경할 수 있게 API를 수정하세요.
+    - ReadStatusUpdateRequest DTO에 ```boolean newNotificationEnabled``` 추가
+  - PRIVATE 채널은 알림을 활성화하는 것을 기본으로 합니다.
+  - PUBLIC 채널은 알림을 비활성화하는 것을 기본으로 합니다.
+- [x]  알림 관련 API를 구현하세요.
 
-**BinaryContent 저장 로직 고도화**
+| 기능                | 엔드포인트                              | 요청                                 | 응답                        |
+|---------------------|----------------------------------------|--------------------------------------|-----------------------------|
+| 알림 조회           | GET /api/notifications                 | Header Authorization: …              | 200 List<NotificationDto>   |
+| 알림 삭제 (알림 확인) | DELETE /api/notifications/{notificationId} | Header Authorization: …              | 204 Void                    |
 
-데이터베이스에 이미지와 같은 파일을 저장하면 성능 상 불리한 점이 많습니다. 따라서 실제 바이너리 데이터는 별도의 공간에 저장하고, 데이터베이스에는 바이너리 데이터에 대한 메타 정보(파일명, 크기, 유형 등)만 저장하는 것이 좋습니다.
+  - 알림 조회, 확인(삭제)은 요청자 본인의 알림에 대해서만 수행할 수 있습니다.
+  - 알림 조회 및 삭제 시 현재 요청의 인증 정보로 요청자를 식별합니다.
+  - 알림 확인은 삭제를 통해 수행합니다.
+![image](https://github.com/user-attachments/assets/5ae72a6f-831f-4109-901c-11df059d079f)
 
-- [x]  BinaryContent 엔티티는 파일의 메타 정보(fileName, size, contentType)만 표현하도록 bytes 속성을 제거하세요.
-- [x]  BinaryContent의 byte[] 데이터 저장을 담당하는 인터페이스를 설계하세요.
-- [x]  서비스 레이어에서 기존에 BinaryContent를 저장하던 로직을 BinaryContentStorage를 활용하도록 리팩토링하세요.
-- [x]  BinaryContentController에 파일을 다운로드하는 API를 추가하고, BinaryContentStorage에 로직을 위임하세요.
-- [x]  로컬 디스크 저장 방식으로 BinaryContentStorage 구현체를 구현하세요.
+  - ```receiverId```: 알림을 수신할 User의 id입니다.
+  - ```targetId```는 optional 입니다.
+- [x]  다음 상황 발생 시, 해당 사용자에게 알림을 발행하세요.
+  - 사용자가 알림을 활성화한 채팅방(```ReadStatus.notificationEnabled == true```)에 메시지가 등록된 경우
+    - ```type: NEW_MESSAGE, targetId: channelId```
+  - 사용자의 권한(Role)이 변경된 경우
+    - ```type: ROLE_CHANGED, targetId: userId```
+  - 해당 사용자의 요청에서 발생한 비동기 작업이 실패하여 실패 로그가 기록된 경우
+    - ```type: ASYNC_FAILED, targetId: null```
+- [x]  알림은 Spring Event 기반의 비동기 방식으로 발행되도록 구현하세요.
+  - ```@Async``` + ```@EventListener``` 구조로 비동기 처리하세요.
+  - 이벤트 처리 중 실패가 발생할 경우, 자동 재시도 메커니즘을 도입하세요.
+  - 이벤트 발행 및 리스닝은 트랜잭션 경계(transaction boundary)를 고려하여 수행하세요.
+    - ```@TransactionalEventListener```
 
----
+**캐시 적용하기**
 
-**페이징과 정렬**
+- [x] ```Caffeine``` 캐시를 적용하세요.
+- [x] 캐시가 필요하다고 판단되는 로직에 캐시를 적용하세요.
+  - 예시:
+    - 사용자별 채널 목록 조회
+    - 사용자별 알림 목록 조회
+    - 사용자 목록 조회
+- [x] 데이터 변경 시, 캐시를 갱신 또는 무효화하는 로직을 구현하세요.
+  - ```@CacheEvict```, ```@CachePut```, ```Spring Event``` 등을 활용하세요.
+  - 예시:
+    - 새로운 채널 추가 → 채널 목록 캐시 무효화
+    - 알림 추가 → 알림 목록 캐시 무효화
+    - 채널에 사용자 추가 → 사용자 목록 캐시 무효화
+- [x] 캐시 적용 전후의 차이를 비교해보세요.
+  - SQL 실행 횟수
+  - 응답 시간
 
-- [x] 메시지 목록을 조회할 때 다음의 조건에 따라 페이지네이션 처리를 해보세요.
-50개씩 최근 메시지 순으로 조회합니다.
-총 메시지가 몇개인지 알 필요는 없습니다.
-- [x] 일관된 페이지네이션 응답을 위해 제네릭을 활용해 DTO로 구현하세요.
-- [x] Slice 또는 Page 객체로부터 DTO를 생성하는 Mapper를 구현하세요.
 
 ### 심화
+**유의 사항**
+- 이번 실습은 분산 환경을 대비한 기술 도입을 목표로 합니다. 특히, 여러 서버나 인스턴스로 구성되는 시스템에서 발생할 수 있는 문제를 해결하는 데 필요한 기술을 학습합니다.
+  - Kafka를 통한 이벤트 발행/구독
+  - Redis를 활용한 전역 캐시 저장소 구성
+- 이번 미션에서는 Kafka, Redis의 세부 설정이나 고급 기능보다는, 기술을 간단하게 적용하고, 분산 환경의 필요성과 기존 시스템의 한계를 이해하는 데 집중해주세요.
 
-**N+1 문제**
+**Spring Kafka 도입하기**
 
-- [x] N+1 문제가 발생하는 쿼리를 찾고 해결해보세요.
----
+- 알림 기능이 별도의 애플리케이션으로 분리된다고 가정해봅시다.
+- Spring Event를 통해 발행/소비했던 이벤트는 더 이상 활용할 수 없습니다.
+- 대신, Kafka와 같은 메시지 브로커를 통해 이벤트를 애플케이션 간 발행/구독할 수 있습니다.
+- [x]  Kafka 환경을 구성하세요.
+  - Docker Compose를 활용해 Kafka를 구동하세요.
+```
+services:
+  broker:
+    image: apache/kafka:latest
+    hostname: broker
+    container_name: broker
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:29093
+      KAFKA_LISTENERS: PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+```
+- Spring Kafka 의존성을 추가하고, application.yml에 Kafka 설정을 추가하세요.
+```
+implementation 'org.springframework.kafka:spring-kafka'
+```
+```
+spring:
+    ...
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+```
+- [x]  Spring Event → Kafka 중계 핸들러(KafkaHandler)를 구현하세요.
+  - 앞서 구현한 Spring Event 발행 코드는 유지하세요.
+  - ```@EventListener``` / ```@TransactionalEventListener```와 KafkaTemplate을 활용해 발행된 Spring Event를 Kafka 메시지로 변환해 전송하는 중계 구조를 구성하세요.
+  - 기존에 사용하던 Spring Event 발행 코드를 유지하면서, 내부적으로 Kafka로 메시지를 전송하는 중계 구조를 구성하세요.
+```
+sequenceDiagram
 
-**읽기전용 트랜잭션 활용**
+    ApplicationEventPublisher->>+KafkaHandler: handle(MyEvent)
+    KafkaHandler->>+Kafka Server: KafkaTemplate.send(topic, payload)
+```
+- [x]  Kafka Console을 통해 Kafka 이벤트가 잘 발행되는지 확인해보세요.
+```
+broker 컨테이너에 접속
+➜ docker exec -it -w /opt/kafka/bin broker sh
 
-- [x] 프로덕션 환경에서는 OSIV를 비활성화하는 경우가 많습니다. 이때 서비스 레이어의 조회 메소드에서 발생할 수 있는 문제를 식별하고, 읽기 전용 트랜잭션을 활용해 문제를 해결해보세요.
+토픽 리스트 확인 
+/opt/kafka/bin $ ./kafka-topics.sh --list --bootstrap-server broker:29092
 
----
+__consumer_offsets
+discodeit.async-task-failed
+discodeit.new-message
+discodeit.role-changed
 
-**페이지네이션 최적화**
-- [x] 오프셋 페이지네이션과 커서 페이지네이션 방식의 차이에 대해 정리해보세요.
+특정 토픽(discodeit.role-changed) 이벤트 수신 대기
+/opt/kafka/bin $ ./kafka-console-consumer.sh --topic discodeit.role-changed --from-beginning --bootstrap-server broker:29092
 
+{"userId":"31d44730-baba-40c0-95b4-b224f1e2cb10","oldRole":"USER","newRole":"CHANNEL_MANAGER","topic":"discodeit.role-changed"}
+```
+- [x]  NotificationHandler를 Kafka Consumer 기반으로 리팩토링하세요.
+  - 기존 ```@EventListener``` 기반 로직을 제거하고 ```@KafkaListener```로 대체하세요.
 
-📌 오프셋 페이지네이션
-- DB에 오프셋 쿼리로 페이지 단위로 요청하고 응답 받습니다.
-- 구현이 커서 페이지네이션보다는 쉬운 편입니다.
-- 각각의 페이지를 요청하는 사이에 데이터의 변화가 있는 경우 중복된 데이터가 노출될 수 있습니다.
-- 데이터row, offset이 크다면 성능에 부담이 됩니다. 
+**Redis 도입하기**
+- 대용량 트래픽을 감당하기 위해 서버의 인스턴스를 여러 개로 늘렸다고 가정해봅시다.
+- Caffeine과 같은 로컬 캐시는 서로 다른 서버에서 더 이상 활용할 수 없습니다.  따라서 Redis를 통해 전역 캐시 저장소를 구성합니다.
+- [x]  Redis 환경을 구성하세요.
+  - Docker Compose를 활용해 Redis를 구동하세요.
+```
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+```
+  - Caffeine 의존성은 삭제 / Redis 의존성을 추가하고, application.yml에 Kafka 설정을 추가하세요.
 
-📌 커서 페이지네이션
-- 클라이언트가 가져간 마지막 데이터를 커서로 받아 그 다음 데이터들을 응답합니다.
-- 오프셋 페이지네이션의 문제가 해결됩니다. 오프셋만큼의 데이터를 스킵해서 응답할 데이터를 찾는 게 아니라 어느 데이터부터 확인해야 될지 커서가 명확하기 때문입니다.
+```
+implementation 'com.github.ben-manes.caffeine:caffeine'
+implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+```
+```
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
-- [x] 기존에 구현한 오프셋 페이지네이션을 커서 페이지네이션으로 리팩토링하세요.
-
----
-
-**MapStruct 적용**
-
-- [x] Entity와 DTO를 매핑하는 보일러플레이트 코드를 [MapStruct](https://mapstruct.org/) 라이브러리를 활용해 간소화해보세요.
-
-
+```
+- [x]  DataGrip을 통해 Redis에 저장된 캐시 정보를 조회해보세요.
 ## 나의 설계⭐
 
 
