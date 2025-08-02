@@ -3,7 +3,7 @@
 [![CI workflow](https://github.com/gitSoyoungLee/1-sprint-mission/actions/workflows/test.yml/badge.svg?branch=part3-%EC%9D%B4%EC%86%8C%EC%98%81-sprint8)](https://github.com/gitSoyoungLee/1-sprint-mission/actions/workflows/test.yml)
 
 # Spring 백엔드 트랙 1기 스프린트 미션 제출 리포지토리
-# 스프린트 미션 8
+# 스프린트 미션 12
 
 
 1. [목표](#목표)
@@ -11,16 +11,8 @@
 3. [나의 설계⭐](#나의-설계)
 
 ## 목표
-- 데이터베이스 환경 설정 및 모델링
-- Spring Data JPA 환경 적용
-- Entity 연관 관계 매핑
-- 레포지토리와 서비스 계층에 JPA 적용
-- Transaction 처리
-- 페이지네이션과 정렬
-- DTO의 적극적인 도입과 MapStruct의 활용
-- BinaryContent 저장 로직 고도화
-  - 메타정보와 바이너리 정보 분리
-- N+1 문제 해결
+- 웹소켓과 SSE를 활용한 실시간 통신
+- Nginx를 활용한 배포 아키텍처 구성
 
 
 ## 요구사항💟
@@ -29,129 +21,196 @@
 **데이터베이스**
 
 - [x] 아래와 같이 데이터베이스 환경을 설정하세요.
-데이터베이스: discodeit
-유저: discodeit_user
-패스워드: discodeit1234
-- [x] ERD를 참고하여 DDL을 작성하고, 테이블을 생성하세요.
-작성한 DDL 파일은 /src/main/resources/schema.sql 경로에 포함하세요.
+**웹소켓 구현하기**
+- [x] 웹소켓 환경 구성
+  - spring-boot-starter-websocket 의존성을 추가하세요.
+  - ```implementation 'org.springframework.boot:spring-boot-starter-websocket'```
+  - 웹소켓 메시지 브로커 설정
+    - 메모리 기반 SimpleBroker를 사용하세요.
+    - STOMP 엔드포인트는 /ws로 설정하고, SockJS 연결을 지원해야 합니다.
+- [x] 메시지 수신
+  - 구독(Subscribe) 엔드포인트: /sub/channels.{channelId}.messages
+  - 수신되는 메시지 타입은 MessageDto를 사용하세요.
+- [x] 메시지 송신
+  - 클라이언트가 메시지를 전송할 수 있도록 다음과 같이 엔드포인트를 구성하세요.
+  - 첨부파일이 없는 텍스트 메시지
+    - 송신 방식: 웹소켓
+    - 전송 엔드포인트: ```/pub/messages```
+    - 요청 페이로드 타입: ```MessageCreateRequest```
+  - 첨부파일이 포함된 메시지
+    - 기존 HTTP API를 유지하세요.
 
----
+**SSE 구현하기**
+- [x] SSE 환경을 구성하세요.
+  - SSE 연결을 위한 엔드포인트를 구현하세요.
+    - GET ```/api/sse```
+  - 다음 요구사항을 만족해야 합니다.
+    - 사용자당 N개의 연결을 허용할 수 있어야 합니다 (예: 다중 탭/기기).
+    - SseEmitter 객체를 스레드 세이프한 메모리 구조에서 안전하게 관리해야 합니다.
+    - 메모리 누수 방지를 위해 다음과 같은 처리를 해야 합니다:
+      - ```onCompletion```, ```onTimeout```, ```onError``` 이벤트 핸들러에서 emitter를 제거합니다.
+      - 주기적 스케줄링 작업을 통해 ping을 보내고, 응답이 없는 연결을 정리합니다.
+    - 각 이벤트에는 고유한 ID를 부여하고, 클라이언트에서 Last-Event-ID를 전송해 이벤트 유실 복원이 가능하도록 해야 합니다.
+- 기존에 클라이언트에서 폴링 방식으로 주기적으로 요청하던 데이터를 SSE를 이용해 서버에서 실시간으로 전달하는 방식으로 리팩토링하세요.
+- [x] 새로운 알림 이벤트 전송
+  - 새 알림이 생성되었을 때 클라이언트에 이벤트를 전송하세요.
+  - 클라이언트는 이 이벤트를 수신하면 알림 목록에 알림을 추가합니다.
+  - 이벤트 명세
 
-**Spring Data JPA 적용하기**
+| id | 이벤트 고유 ID |
+| --- | --- |
+| name | `notifications` |
+| data | `NotificationDto` |
 
-- [x] Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
-- [x] 앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
-- [x] 디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
+- [x] 파일 업로드 상태 변경 이벤트 전송
+  - 파일 업로드 상태가 변경될 때 이벤트를 발송하세요.
+  - 클라이언트는 해당 상태를 수신하여 UI를 다시 렌더링합니다.
+  - 이벤트 명세
 
----
+| id | 이벤트 고유 ID |
+| --- | --- |**웹소켓 구현하기**
+- [x] 웹소켓 환경 구성
+  - spring-boot-starter-websocket 의존성을 추가하세요.
+  - ```implementation 'org.springframework.boot:spring-boot-starter-websocket'```
+  - 웹소켓 메시지 브로커 설정
+    - 메모리 기반 SimpleBroker를 사용하세요.
+    - STOMP 엔드포인트는 /ws로 설정하고, SockJS 연결을 지원해야 합니다.
+- [x] 메시지 수신
+  - 구독(Subscribe) 엔드포인트: /sub/channels.{channelId}.messages
+  - 수신되는 메시지 타입은 MessageDto를 사용하세요.
+- [x] 메시지 송신
+  - 클라이언트가 메시지를 전송할 수 있도록 다음과 같이 엔드포인트를 구성하세요.
+  - 첨부파일이 없는 텍스트 메시지
+    - 송신 방식: 웹소켓
+    - 전송 엔드포인트: ```/pub/messages```
+    - 요청 페이로드 타입: ```MessageCreateRequest```
+  - 첨부파일이 포함된 메시지
+    - 기존 HTTP API를 유지하세요.
 
-**엔티티 정의하기**
+**SSE 구현하기**
+- [x] SSE 환경을 구성하세요.
+  - SSE 연결을 위한 엔드포인트를 구현하세요.
+    - GET ```/api/sse```
+  - 다음 요구사항을 만족해야 합니다.
+    - 사용자당 N개의 연결을 허용할 수 있어야 합니다 (예: 다중 탭/기기).
+    - SseEmitter 객체를 스레드 세이프한 메모리 구조에서 안전하게 관리해야 합니다.
+    - 메모리 누수 방지를 위해 다음과 같은 처리를 해야 합니다:
+      - ```onCompletion```, ```onTimeout```, ```onError``` 이벤트 핸들러에서 emitter를 제거합니다.
+      - 주기적 스케줄링 작업을 통해 ping을 보내고, 응답이 없는 연결을 정리합니다.
+    - 각 이벤트에는 고유한 ID를 부여하고, 클라이언트에서 Last-Event-ID를 전송해 이벤트 유실 복원이 가능하도록 해야 합니다.
+- 기존에 클라이언트에서 폴링 방식으로 주기적으로 요청하던 데이터를 SSE를 이용해 서버에서 실시간으로 전달하는 방식으로 리팩토링하세요.
+- [x] 새로운 알림 이벤트 전송
+  - 새 알림이 생성되었을 때 클라이언트에 이벤트를 전송하세요.
+  - 클라이언트는 이 이벤트를 수신하면 알림 목록에 알림을 추가합니다.
+  - 이벤트 명세
 
-- [x]  클래스 다이어그램을 참고해 도메인 모델의 공통 속성을 추상 클래스로 정의하고 상속 관계를 구현하세요.
-  - 이때 Serializable 인터페이스는 제외합니다.
-  - 패키지명: com.sprint.mission.discodeit.entity.base
-- [x]  JPA의 어노테이션을 활용해 createdAt, updatedAt 속성이 자동으로 설정되도록 구현하세요.
-  - @CreatedDate, @LastModifiedDate
--  클래스 다이어그램을 참고해 클래스 참조 관계를 수정하세요. 
-- [x]  ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보를 표로 정리해보세요.
+| id | 이벤트 고유 ID |
+| --- | --- |
+| name | `notifications` |
+| data | `NotificationDto` |
 
-![image](https://github.com/user-attachments/assets/e021bba9-a1cb-4c25-9b5b-8a2233c76362)
+- [x] 파일 업로드 상태 변경 이벤트 전송
+  - 파일 업로드 상태가 변경될 때 이벤트를 발송하세요.
+  - 클라이언트는 해당 상태를 수신하여 UI를 다시 렌더링합니다.
+  - 이벤트 명세
 
-- [x] JPA 주요 어노테이션을 활용해 ERD, 연관관계 매핑 정보를 도메인 모델에 반영해보세요.
-  - @Entity, @Table
-  - @Column, @Enumerated
-  - @OneToMany, @OneToOne, @ManyToOne
-  - @JoinColumn, @JoinTable  
-- [x] ERD의 외래키 제약 조건과 연관관계 매핑 정보의 부모-자식 관계를 고려해 영속성 전이와 고아 객체를 정의하세요.
-  - cascade, orphanRemoval
+| id | 이벤트 고유 ID |
+| --- | --- |
+| name | `binaryContents.status` |
+| data | `BinaryContentDto` |
 
----
+- [x] 채널 목록 갱신 이벤트 전송
+  - 채널 목록을 업데이트해야 할 경우, 이벤트를 발송하세요.
+  - 클라이언트는 해당 이벤트를 수신하면 채널 목록을 재조회합니다.
+  - 이벤트 명세
 
-**레포지토리와 서비스에 JPA 도입하기**
+    | id | 이벤트 고유 ID |
+    | --- | --- |
+| name | `binaryContents.status` |
+| data | `BinaryContentDto` |
 
-- [x] 기존의 Repository 인터페이스를 JPARepository로 정의하고 쿼리메소드로 대체하세요.
-FileRepository와 JCFRepository 구현체는 삭제합니다.
-- [x] 영속성 컨텍스트의 특징에 맞추어 서비스 레이어를 수정해보세요.
-힌트: 트랜잭션, 영속성 전이, 변경 감지, 지연로딩
+- [x] 채널 목록 갱신 이벤트 전송
+  - 채널 목록을 업데이트해야 할 경우, 이벤트를 발송하세요.
+  - 클라이언트는 해당 이벤트를 수신하면 채널 목록을 재조회합니다.
+  - 이벤트 명세
 
----
+    | id | 이벤트 고유 ID |
+    | --- | --- |
+    | name | `channels.refresh` |
+    | data | `{channelId: $channelId}` |
 
-**DTO 적극 도입하기**
+- [x] 사용자 목록 갱신 이벤트 전송
+  - 사용자 목록을 업데이트해야 할 경우, 이벤트를 발송하세요.
+  - 클라이언트는 해당 이벤트를 수신하면 사용자 목록을 재조회합니다.
+  - 이벤트 명세
 
-- [x] Entity를 Controller 까지 그대로 노출했을 때 발생할 수 있는 문제점에 대해 정리해보세요. DTO를 적극 도입했을 때 보일러플레이트 코드가 많아지지만, 그럼에도 불구하고 어떤 이점이 있는지 알 수 있을거에요.
- 
-```
-📌 엔티티를 컨트롤러까지 그대로 노출했을 때 발생할 수 있는 문제점
+    | id | 이벤트 고유 ID |
+    | --- | --- |
+    | name | `users.refresh` |
+    | data | `{userId: $userId}` |
 
-엔티티가 그대로 노출된다는 것은 엔티티의 모든 속성이 공개될 수 있다는 뜻입니다.
-1. 테이블 설계가 노출될 수 있어 보안 면에서 위험합니다.
-2. 화면에서 필요한 데이터는 일부인데, 모든 속성을 다 보낼 필요는 없습니다. 엔티티 크기가 커질수록 클라이언트와의 통신 속도가 느려질 겁니다.
-3. 새롭게 알게 된 문제점인데, JPA 양방향 관계를 갖고 있는 엔티티를 컨트롤러에서 조회하면 순환 참조 문제가 생길 수 있습니다. 
-엔티티 A와 B가 있을 때(저희 미션에서는 User와 UserStatus가 예시가 될 것 같습니다.) 서비스에서 repository.findById()로 조회하면 엔티티 A가 조회되지만 지연 로딩으로 엔티티 B까지는 조회가 되지 않습니다. 하지만 컨트롤러에서 ResponseEntity로 엔티티 A를 내보내려고 할 때는 json화가 필요하니 엔티티 B까지 조회해야 되죠. 엔티티 B를 다시 json화하려고 하면 엔티티 A를 조회하게 되고, 무한 순환참조가 일어나게 된다고 이해를 했습니다.
 
-참고: https://m.blog.naver.com/writer0713/221587351970
+**배포 아키텍처 구성하기**
+- [ ]  다음의 다이어그램에 부합하는 배포 아키텍처를 Docker Compose를 통해 구현하세요.
 
-```
+<img width="1347" height="612" alt="image" src="https://github.com/user-attachments/assets/18fa4441-901c-493d-92b4-9d6c4c3ddb33" />
 
-- [x]  Entity를 DTO로 매핑하는 로직을 책임지는 Mapper 컴포넌트를 정의해 반복되는 코드를 줄여보세요.
-
----
-
-**BinaryContent 저장 로직 고도화**
-
-데이터베이스에 이미지와 같은 파일을 저장하면 성능 상 불리한 점이 많습니다. 따라서 실제 바이너리 데이터는 별도의 공간에 저장하고, 데이터베이스에는 바이너리 데이터에 대한 메타 정보(파일명, 크기, 유형 등)만 저장하는 것이 좋습니다.
-
-- [x]  BinaryContent 엔티티는 파일의 메타 정보(fileName, size, contentType)만 표현하도록 bytes 속성을 제거하세요.
-- [x]  BinaryContent의 byte[] 데이터 저장을 담당하는 인터페이스를 설계하세요.
-- [x]  서비스 레이어에서 기존에 BinaryContent를 저장하던 로직을 BinaryContentStorage를 활용하도록 리팩토링하세요.
-- [x]  BinaryContentController에 파일을 다운로드하는 API를 추가하고, BinaryContentStorage에 로직을 위임하세요.
-- [x]  로컬 디스크 저장 방식으로 BinaryContentStorage 구현체를 구현하세요.
-
----
-
-**페이징과 정렬**
-
-- [x] 메시지 목록을 조회할 때 다음의 조건에 따라 페이지네이션 처리를 해보세요.
-50개씩 최근 메시지 순으로 조회합니다.
-총 메시지가 몇개인지 알 필요는 없습니다.
-- [x] 일관된 페이지네이션 응답을 위해 제네릭을 활용해 DTO로 구현하세요.
-- [x] Slice 또는 Page 객체로부터 DTO를 생성하는 Mapper를 구현하세요.
-
+- `Reverse Proxy`
+  - Nginx 기반의 리버스 프록시 컨테이너를 구성하세요.
+  - 역할 및 설정은 다음과 같습니다:
+    - `/api/*`, `/ws/*` 요청은 Backend 컨테이너로 프록시 처리합니다.
+    - 이 외의 모든 요청은 정적 리소스(프론트엔드 빌드 결과)를 서빙합니다. 
+      - 프론트엔드 정적 리소스는 Nginx 컨테이너 내부의 적절한 경로(/usr/share/nginx/html 등)에 복사하세요.
+  - 외부에서 접근 가능한 유일한 컨테이너이며, 3000번 포트를 통해 접근할 수 있어야 합니다.
+- `Backend`
+  - Spring Boot 기반의 백엔드 서버를 Docker 컨테이너로 구성하세요.
+  - Reverse Proxy를 통해 /api/*, /ws/* 요청이 이 서버로 전달됩니다.
+- `DB`, `Memory DB`, `Message Broker`
+  - `Backend` 컨테이너가 접근 가능한 다음의 인프라 컨테이너들을 구성하세요
+    - DB: PostgreSQL
+    - Memory DB: Redis
+    - Message Broker: Kafka
+  - 각 컨테이너는 Docker Compose 네트워크를 통해 백엔드에서 통신할 수 있어야 합니다.
+  - 별도로 외부에 노출하지 않아도 됩니다.
+  
 ### 심화
 
-**N+1 문제**
+**웹소켓 인증/인가 처리하기**
+- [ ] 인증 처리
+  - 클라이언트는 CONNECT 프레임의 헤더에 다음과 같이 Authorization 토큰을 포함합니다.
+```
+CONNECT
+Authorization:Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ3b29keSIsImV4cCI6MTc0OTM5MzA0OCwiaWF0IjoxNzQ5MzkyNDQ4LCJ1c2VyRHRvIjp7ImlkIjoiMDQwZTk2ZWMtMjdmNC00Y2MxLWI4MWQtNTMyM2ExZWQ5NTZhIiwidXNlcm5hbWUiOiJ3b29keSIsImVtYWlsIjoid29vZHlAZGlzY29kZWl0LmNvbSIsInByb2ZpbGUiOm51bGwsIm9ubGluZSI6bnVsbCwicm9sZSI6IlVTRVIifX0.JOkvCpnR0e0KMQYLh_hUWglgTvUIlfQOT58eD4Cym5o
+accept-version:1.2,1.1,1.0
+heart-beat:4000,4000
+```
+  - 서버 측에서는 ChannelInterceptor를 구현하여 연결 시 토큰을 검증하고, 인증된 사용자 정보를 SecurityContext에 설정해야 합니다.
+  - 참고문서: [Spring 공식 문서](https://docs.spring.io/spring-framework/reference/web/websocket/stomp/authentication-token-based.html)
+  - `SecurityContextChannelInterceptor`를 등록하여 이후 메시지 처리 흐름에서도 인증 정보를 활용할 수 있도록 구성하세요.
+  - `ChannelInterceptor`와 `SecurityContextChannelInterceptor`를 활용하세요.
+  - 디스코드잇 프론트엔드에서는 초기 핸드셰이크 단계에서 헤더(Authorization)에 토큰을 포함하도록 설계되었습니다.
 
-- [x] N+1 문제가 발생하는 쿼리를 찾고 해결해보세요.
----
+- [ ] 인가 처리
+  - 메시지 발행(PUB) 또는 구독(SUB) 요청에 대해 인가 정책을 적용하세요.
+  - AuthorizationChannelInterceptor를 사용해 메시지 권한 검사를 수행합니다.
+  - 아래의 의존성을 추가하고, AuthorizationManager는 MessageMatcherDelegatingAuthorizationManager를 활용하세요.
+  - ```implementation 'org.springframework.security:spring-security-messaging'```
+     
+**분산 환경 배포 아키텍처 구성하기**
+- [ ]  다음의 다이어그램에 부합하는 배포 아키텍처를 Docker Compose를 통해 구현하세요.
 
-**읽기전용 트랜잭션 활용**
+<img width="1411" height="612" alt="image" src="https://github.com/user-attachments/assets/3c548291-c77a-4106-8882-e2f3b7d1db47" />
 
-- [x] 프로덕션 환경에서는 OSIV를 비활성화하는 경우가 많습니다. 이때 서비스 레이어의 조회 메소드에서 발생할 수 있는 문제를 식별하고, 읽기 전용 트랜잭션을 활용해 문제를 해결해보세요.
-
----
-
-**페이지네이션 최적화**
-- [x] 오프셋 페이지네이션과 커서 페이지네이션 방식의 차이에 대해 정리해보세요.
-
-
-📌 오프셋 페이지네이션
-- DB에 오프셋 쿼리로 페이지 단위로 요청하고 응답 받습니다.
-- 구현이 커서 페이지네이션보다는 쉬운 편입니다.
-- 각각의 페이지를 요청하는 사이에 데이터의 변화가 있는 경우 중복된 데이터가 노출될 수 있습니다.
-- 데이터row, offset이 크다면 성능에 부담이 됩니다. 
-
-📌 커서 페이지네이션
-- 클라이언트가 가져간 마지막 데이터를 커서로 받아 그 다음 데이터들을 응답합니다.
-- 오프셋 페이지네이션의 문제가 해결됩니다. 오프셋만큼의 데이터를 스킵해서 응답할 데이터를 찾는 게 아니라 어느 데이터부터 확인해야 될지 커서가 명확하기 때문입니다.
-
-- [x] 기존에 구현한 오프셋 페이지네이션을 커서 페이지네이션으로 리팩토링하세요.
-
----
-
-**MapStruct 적용**
-
-- [x] Entity와 DTO를 매핑하는 보일러플레이트 코드를 [MapStruct](https://mapstruct.org/) 라이브러리를 활용해 간소화해보세요.
-
+- `Reverse Proxy`
+  - 기존 Nginx Reverse Proxy 컨테이너에 로드밸런서 역할을 추가하세요.
+  - 다음과 같은 로드밸런싱 전략 중 하나를 선택하여 Backend 서버들로 트래픽을 분산시키세요.
+    - Round Robin
+    - Least Connections
+    - IP Hash
+    - Weight
+  - upstream 블록을 통해 여러 Backend 서버 인스턴스를 설정하고, 라우팅 전략을 적용하세요.
+- [ ]  분산환경에 따른 웹소켓의 한계점을 식별하고 Kafka를 활용해 리팩토링하세요.
+- [ ]  분산환경에 따른 SSE의 한계점을 식별하고 Kafka를 활용해 리팩토링하세요.
 
 ## 나의 설계⭐
 
